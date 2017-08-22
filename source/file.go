@@ -19,22 +19,22 @@ func NewFileSource(filePath string) *FileSource {
 	}
 }
 
-func (s *FileSource) GetState(info model.NodeInfo) (model.DesiredState, error) {
+func (s *FileSource) GetState(info model.NodeInfo) (pod model.Pod, err error) {
 	data, err := ioutil.ReadFile(s.filePath)
 	if err != nil {
-		return model.DesiredState{}, err
+		return pod, err
 	}
 
 	switch extension := filepath.Ext(s.filePath); extension {
 	case ".yaml", ".yml":
 		return unmarshalYaml(data)
 	default:
-		return model.DesiredState{}, fmt.Errorf("Invalid source file format: %s", extension)
+		return pod, fmt.Errorf("Invalid source file format: %s", extension)
 	}
 }
 
-func unmarshalYaml(data []byte) (model.DesiredState, error) {
-	state := &model.DesiredState{}
-	err := yaml.Unmarshal(data, state)
-	return *state, err
+func unmarshalYaml(data []byte) (model.Pod, error) {
+	pod := &model.Pod{}
+	err := yaml.Unmarshal(data, pod)
+	return *pod, err
 }

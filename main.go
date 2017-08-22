@@ -38,7 +38,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "namespace, n",
 			Usage:  "namespace to use with commands",
-			Value:  "layeryd",
+			Value:  "layery",
 			EnvVar: "LAYERYD_NAMESPACE",
 		},
 	}

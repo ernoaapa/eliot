@@ -1,3 +1,5 @@
-containers:
-  - "foo"
-  - "bar"
+name: "foo"
+spec:
+  containers:
+    - name: "foo"
+      image: "docker.io/library/hello-world:latest"

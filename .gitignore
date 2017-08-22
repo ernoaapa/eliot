@@ -1,0 +1,7 @@
+# The binary build
+main
+
+*-cmdline
+*-initrd.img
+*-kernel
+*-state/
