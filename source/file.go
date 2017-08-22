@@ -3,6 +3,7 @@ package source
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/ernoaapa/layeryd/model"
@@ -22,6 +23,9 @@ func NewFileSource(filePath string) *FileSource {
 func (s *FileSource) GetState(info model.NodeInfo) (pod model.Pod, err error) {
 	data, err := ioutil.ReadFile(s.filePath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return pod, fmt.Errorf("Unable to open state, file [%s] does not exist!", s.filePath)
+		}
 		return pod, err
 	}
 

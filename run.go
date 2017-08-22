@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/containerd/containerd"
 	"github.com/ernoaapa/layeryd/controller"
-	"github.com/ernoaapa/layeryd/source"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -13,7 +13,12 @@ import (
 var runCommand = cli.Command{
 	Name:  "run",
 	Usage: "Run the daemon",
-
+	Flags: []cli.Flag{
+		cli.StringFlag{
+			Name:  "file",
+			Usage: "Read pod info from file",
+		},
+	},
 	Action: func(clicontext *cli.Context) error {
 		address := clicontext.GlobalString("address")
 		namespace := clicontext.GlobalString("namespace")
@@ -27,7 +32,10 @@ var runCommand = cli.Command{
 			return err
 		}
 
-		source := source.NewFileSource("./test.yml")
+		source := getSource(clicontext)
+		if source == nil {
+			return fmt.Errorf("You must define source, e.g. '--file path/to/file.yml'")
+		}
 
 		for {
 			if err := controller.Sync(ctx, client, source); err != nil {

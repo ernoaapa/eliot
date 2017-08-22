@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/containerd/containerd/namespaces"
+	"github.com/ernoaapa/layeryd/source"
 	"github.com/urfave/cli"
 )
 
@@ -29,4 +30,12 @@ func appContext(clicontext *cli.Context) (context.Context, context.CancelFunc) {
 	}
 
 	return ctx, cancel
+}
+
+func getSource(clicontext *cli.Context) source.Source {
+	file := clicontext.String("file")
+	if file != "" {
+		return source.NewFileSource(file)
+	}
+	return nil
 }
