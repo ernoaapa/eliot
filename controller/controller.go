@@ -18,10 +18,14 @@ func Sync(ctx context.Context, client *containerd.Client, pods []model.Pod) erro
 		log.Warnf("Error getting list of containers: %v", err)
 		return err
 	}
-	log.Debugf("Found %d containers running", len(containers))
-
 	for _, pod := range pods {
-		create, valid, update, remove := groupContainers(ctx, pod, containers)
+		create, remove := groupContainers(ctx, pod, containers)
+
+		log.WithFields(log.Fields{
+			"running": len(containers),
+			"create":  len(create),
+			"remove":  len(remove),
+		}).Debugln("Resolved current container status")
 
 		if err := createContainers(ctx, client, pod, create); err != nil {
 			return err
@@ -29,19 +33,14 @@ func Sync(ctx context.Context, client *containerd.Client, pods []model.Pod) erro
 		if err := stopContainers(ctx, remove); err != nil {
 			return err
 		}
-		log.Debugf("Valid containers: %d", len(valid))
-		log.Debugf("Update containers: %d", len(update))
 	}
 	return nil
 }
 
-func groupContainers(ctx context.Context, pod model.Pod, active []containerd.Container) (create []model.Container, valid []containerd.Container, update []containerd.Container, remove []containerd.Container) {
-	existing := make(map[model.Container]containerd.Container)
+func groupContainers(ctx context.Context, pod model.Pod, active []containerd.Container) (create []model.Container, remove []containerd.Container) {
+
 	for _, targetContainer := range pod.Spec.Containers {
-		runningContainer := findActiveContainer(pod.GetName(), targetContainer, active)
-		if runningContainer != nil {
-			existing[targetContainer] = runningContainer
-		} else {
+		if !containsActiveContainer(pod.GetName(), targetContainer, active) {
 			create = append(create, targetContainer)
 		}
 	}
@@ -49,14 +48,6 @@ func groupContainers(ctx context.Context, pod model.Pod, active []containerd.Con
 	for _, activeContainer := range active {
 		if !containsTargetContainer(pod.GetName(), activeContainer, pod.Spec.Containers) {
 			remove = append(remove, activeContainer)
-		}
-	}
-
-	for targetContainer, existingContainer := range existing {
-		if isUpToDate(ctx, targetContainer, existingContainer) {
-			valid = append(valid, existingContainer)
-		} else {
-			update = append(update, existingContainer)
 		}
 	}
 
@@ -72,13 +63,13 @@ func containsTargetContainer(podName string, target containerd.Container, list [
 	return false
 }
 
-func findActiveContainer(podName string, target model.Container, list []containerd.Container) containerd.Container {
+func containsActiveContainer(podName string, target model.Container, list []containerd.Container) bool {
 	for _, item := range list {
 		if target.BuildID(podName) == item.ID() {
-			return item
+			return true
 		}
 	}
-	return nil
+	return false
 }
 
 func isUpToDate(ctx context.Context, target model.Container, active containerd.Container) bool {
