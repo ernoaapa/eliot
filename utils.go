@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/namespaces"
 	"github.com/ernoaapa/layeryd/source"
 	"github.com/urfave/cli"
@@ -32,6 +33,13 @@ func appContext(clicontext *cli.Context) (context.Context, context.CancelFunc) {
 	}
 
 	return ctx, cancel
+}
+
+func getContainerdClient(clicontext *cli.Context) (*containerd.Client, error) {
+	address := clicontext.GlobalString("address")
+	namespace := clicontext.GlobalString("namespace")
+
+	return containerd.New(address, containerd.WithDefaultNamespace(namespace))
 }
 
 func getSource(clicontext *cli.Context) (source.Source, error) {

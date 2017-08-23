@@ -23,17 +23,8 @@ var runCommand = cli.Command{
 		},
 	},
 	Action: func(clicontext *cli.Context) error {
-		address := clicontext.GlobalString("address")
-		namespace := clicontext.GlobalString("namespace")
-
 		ctx, cancel := appContext(clicontext)
 		defer cancel()
-
-		client, err := containerd.New(address, containerd.WithDefaultNamespace(namespace))
-		if err != nil {
-			log.Warnf("Error from new client: %s", err)
-			return err
-		}
 
 		source, err := getSource(clicontext)
 		if err != nil {
@@ -42,8 +33,19 @@ var runCommand = cli.Command{
 
 		updates := source.GetUpdates(model.DeviceInfo{})
 		for {
-			if err := controller.Sync(ctx, client, <-updates); err != nil {
-				return err
+			var client *containerd.Client
+			if client == nil {
+				client, err = getContainerdClient(clicontext)
+				if err != nil {
+					log.Warnf("Failed to create containerd client", err.Error())
+				}
+			}
+
+			if client != nil {
+				if err := controller.Sync(ctx, client, <-updates); err != nil {
+					log.Warnf("Failed to update state to containerd: %s", err)
+					client = nil
+				}
 			}
 		}
 	},
