@@ -7,6 +7,7 @@ import (
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/plugin"
 	"github.com/ernoaapa/layeryd/model"
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -23,7 +24,6 @@ func createContainers(ctx context.Context, client *containerd.Client, pod model.
 func createContainer(ctx context.Context, client *containerd.Client, pod model.Pod, target model.Container) error {
 	image, err := ensureImagePulled(ctx, client, target.Image)
 	if err != nil {
-		log.Warnf("Error pulling image: %v", err)
 		return err
 	}
 
@@ -45,8 +45,7 @@ func createContainer(ctx context.Context, client *containerd.Client, pod model.P
 	log.Debugf("Create task in container: %s", container.ID())
 	task, err := container.NewTask(ctx, containerd.NullIO)
 	if err != nil {
-		log.Infof("Error in newtask: %s", err)
-		return err
+		return errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())
 	}
 
 	log.Debugln("Starting task...")
@@ -82,8 +81,7 @@ func stopContainer(ctx context.Context, container containerd.Container) error {
 func ensureImagePulled(ctx context.Context, client *containerd.Client, ref string) (image containerd.Image, err error) {
 	image, err = client.Pull(ctx, ref)
 	if err != nil {
-		log.Warnf("Error pulling container image: %v", err)
-		return image, err
+		return image, errors.Wrapf(err, "Error pulling image [%s]", ref)
 	}
 
 	log.Debugf("Unpacking container image %s...", image.Target().Digest)
@@ -92,5 +90,5 @@ func ensureImagePulled(ctx context.Context, client *containerd.Client, ref strin
 		return image, err
 	}
 
-	return image, err
+	return image, nil
 }

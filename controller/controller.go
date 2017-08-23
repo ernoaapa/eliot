@@ -6,6 +6,7 @@ import (
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/ernoaapa/layeryd/model"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,8 +16,7 @@ func Sync(ctx context.Context, client *containerd.Client, pods []model.Pod) erro
 
 	containers, err := client.Containers(ctx)
 	if err != nil {
-		log.Warnf("Error getting list of containers: %v", err)
-		return err
+		return errors.Wrap(err, "Error while getting list of containers")
 	}
 	for _, pod := range pods {
 		create, remove := groupContainers(ctx, pod, containers)

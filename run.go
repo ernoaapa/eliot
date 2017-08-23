@@ -32,12 +32,14 @@ var runCommand = cli.Command{
 		}
 
 		updates := source.GetUpdates(model.DeviceInfo{})
+		log.Infoln("Started, start waiting for changes in source")
+
 		for {
 			var client *containerd.Client
 			if client == nil {
 				client, err = getContainerdClient(clicontext)
 				if err != nil {
-					log.Warnf("Failed to create containerd client", err.Error())
+					log.Warnf("Failed to create containerd client: %s", err)
 				}
 			}
 
