@@ -9,13 +9,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Sync start and stop containers to match with target pods
 func Sync(ctx context.Context, client *containerd.Client, target model.Pod) error {
+	log.Debugln("Received update, start updating containerd")
+
 	containers, err := client.Containers(ctx)
 	if err != nil {
 		log.Warnf("Error getting list of containers: %v", err)
 		return err
 	}
-	log.Printf("Found %d containers running", len(containers))
+	log.Debugf("Found %d containers running", len(containers))
 
 	create, valid, update, remove := groupContainers(ctx, target.Spec.Containers, containers)
 
@@ -25,8 +28,8 @@ func Sync(ctx context.Context, client *containerd.Client, target model.Pod) erro
 	if err := stopContainers(ctx, remove); err != nil {
 		return err
 	}
-	log.Printf("Valid containers: %d", len(valid))
-	log.Printf("Update containers: %d", len(update))
+	log.Debugf("Valid containers: %d", len(valid))
+	log.Debugf("Update containers: %d", len(update))
 
 	return nil
 }

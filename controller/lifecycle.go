@@ -23,7 +23,7 @@ func createContainers(ctx context.Context, client *containerd.Client, containers
 func createContainer(ctx context.Context, client *containerd.Client, target model.Container) error {
 	image, err := ensureImagePulled(ctx, client, target.Image)
 	if err != nil {
-		log.Warnf("Error getting image: %v", err)
+		log.Warnf("Error pulling image: %v", err)
 		return err
 	}
 
@@ -32,7 +32,7 @@ func createContainer(ctx context.Context, client *containerd.Client, target mode
 		return err
 	}
 
-	log.Infof("Create new container from image %s...", image.Name())
+	log.Debugf("Create new container from image %s...", image.Name())
 	container, err := client.NewContainer(ctx, target.Name,
 		containerd.WithSpec(spec),
 		containerd.WithNewSnapshotView(target.Name, image),
@@ -42,19 +42,19 @@ func createContainer(ctx context.Context, client *containerd.Client, target mode
 		return err
 	}
 
-	log.Printf("Create task in container: %s", container.ID())
+	log.Debugf("Create task in container: %s", container.ID())
 	task, err := container.NewTask(ctx, containerd.NullIO)
 	if err != nil {
 		log.Infof("Error in newtask: %s", err)
 		return err
 	}
 
-	log.Println("Starting task...")
+	log.Debugln("Starting task...")
 	err = task.Start(ctx)
 	if err != nil {
 		return err
 	}
-	log.Printf("Task started (%d)", task.Pid())
+	log.Debugf("Task started (pid %d)", task.Pid())
 	return nil
 }
 
@@ -82,11 +82,11 @@ func stopContainer(ctx context.Context, container containerd.Container) error {
 func ensureImagePulled(ctx context.Context, client *containerd.Client, ref string) (image containerd.Image, err error) {
 	image, err = client.Pull(ctx, ref)
 	if err != nil {
-		log.Warnf("Error from pull: %v", err)
+		log.Warnf("Error pulling container image: %v", err)
 		return image, err
 	}
 
-	log.Infof("unpacking %s...", image.Target().Digest)
+	log.Debugf("Unpacking container image %s...", image.Target().Digest)
 	err = image.Unpack(ctx, "")
 	if err != nil {
 		return image, err

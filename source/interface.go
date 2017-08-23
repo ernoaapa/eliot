@@ -2,7 +2,7 @@ package source
 
 import "github.com/ernoaapa/layeryd/model"
 
+// Source is interface for all state sources
 type Source interface {
-	// GetState(model.NodeInfo) (model.Pod, error)
-	GetUpdates(model.NodeInfo) chan model.Pod
+	GetUpdates(model.DeviceInfo) chan model.Pod
 }

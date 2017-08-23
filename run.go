@@ -40,7 +40,7 @@ var runCommand = cli.Command{
 			return err
 		}
 
-		updates := source.GetUpdates(model.NodeInfo{})
+		updates := source.GetUpdates(model.DeviceInfo{})
 		for {
 			if err := controller.Sync(ctx, client, <-updates); err != nil {
 				return err

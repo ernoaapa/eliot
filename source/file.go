@@ -3,32 +3,39 @@ package source
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/layeryd/model"
 	"gopkg.in/yaml.v2"
 )
 
+// FileSource is source what reads desired state from file
 type FileSource struct {
 	filePath string
 	interval time.Duration
 }
 
+// NewFileSource creates new file source what updates the state intervally
 func NewFileSource(filePath string, interval time.Duration) *FileSource {
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		log.Panicf("Unable to open state, file [%s] does not exist!", filePath)
+	}
 	return &FileSource{
 		filePath,
 		interval,
 	}
 }
 
-func (s *FileSource) GetUpdates(info model.NodeInfo) chan model.Pod {
+// GetUpdates return channel for state changes
+func (s *FileSource) GetUpdates(info model.DeviceInfo) chan model.Pod {
 	updates := make(chan model.Pod)
 	go func() {
 		for {
-			state, err := s.GetState(info)
+			state, err := s.getState(info)
 
 			if err != nil {
 				log.Printf("Error reading state: %s", err)
@@ -41,11 +48,11 @@ func (s *FileSource) GetUpdates(info model.NodeInfo) chan model.Pod {
 	return updates
 }
 
-func (s *FileSource) GetState(info model.NodeInfo) (pod model.Pod, err error) {
+func (s *FileSource) getState(info model.DeviceInfo) (pod model.Pod, err error) {
 	data, err := ioutil.ReadFile(s.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return pod, fmt.Errorf("Unable to open state, file [%s] does not exist!", s.filePath)
+			return pod, fmt.Errorf("Cannot update state, file [%s] does not exist", s.filePath)
 		}
 		return pod, err
 	}

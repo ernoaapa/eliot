@@ -24,7 +24,7 @@ spec:
 `), 0666)
 
 	source := NewFileSource(filePath, 100*time.Millisecond)
-	updates := source.GetUpdates(model.NodeInfo{})
+	updates := source.GetUpdates(model.DeviceInfo{})
 
 	select {
 	case pod := <-updates:
