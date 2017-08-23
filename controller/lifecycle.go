@@ -12,6 +12,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func getContainers(ctx context.Context, client *containerd.Client) ([]containerd.Container, error) {
+	containers, err := client.Containers(ctx)
+	if err != nil {
+		return containers, errors.Wrap(err, "Error while getting list of containers")
+	}
+	return containers, nil
+}
+
 func createContainers(ctx context.Context, client *containerd.Client, pod model.Pod, containers []model.Container) error {
 	for _, container := range containers {
 		if err := createContainer(ctx, client, pod, container); err != nil {
@@ -91,4 +99,24 @@ func ensureImagePulled(ctx context.Context, client *containerd.Client, ref strin
 	}
 
 	return image, nil
+}
+
+func getCurrentState(ctx context.Context, client *containerd.Client) (*model.DeviceState, error) {
+	containers, err := getContainers(ctx, client)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.DeviceState{
+		Pods: mapToPods(containers),
+	}, nil
+}
+
+func mapToPods(containers []containerd.Container) (states []model.PodState) {
+	for _, container := range containers {
+		states = append(states, model.PodState{
+			ID: container.ID(),
+		})
+	}
+	return states
 }

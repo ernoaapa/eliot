@@ -50,7 +50,3 @@ type Container struct {
 func (c *Container) BuildID(podName string) string {
 	return fmt.Sprintf("%s-%s", podName, c.Name)
 }
-
-// DeviceInfo contains information about current device
-type DeviceInfo struct {
-}

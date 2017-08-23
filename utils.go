@@ -7,9 +7,15 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/namespaces"
+	"github.com/ernoaapa/layeryd/model"
 	"github.com/ernoaapa/layeryd/source"
+	"github.com/ernoaapa/layeryd/status"
 	"github.com/urfave/cli"
 )
+
+func getDeviceInfo() model.DeviceInfo {
+	return model.DeviceInfo{}
+}
 
 // appContext returns the context for a command. Should only be called once per
 // command, near the start.
@@ -52,4 +58,8 @@ func getSource(clicontext *cli.Context) (source.Source, error) {
 		return source.NewFileSource(file, interval), nil
 	}
 	return nil, fmt.Errorf("You must define one source for updates. E.g. --file path/to/file.yml")
+}
+
+func getReporter(clicontext *cli.Context) (status.Reporter, error) {
+	return status.NewConsoleReporter(), nil
 }

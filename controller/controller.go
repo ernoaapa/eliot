@@ -6,18 +6,18 @@ import (
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/ernoaapa/layeryd/model"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 // Sync start and stop containers to match with target pods
-func Sync(ctx context.Context, client *containerd.Client, pods []model.Pod) error {
+func Sync(ctx context.Context, client *containerd.Client, pods []model.Pod) (state *model.DeviceState, err error) {
 	log.Debugln("Received update, start updating containerd")
 
-	containers, err := client.Containers(ctx)
+	containers, err := getContainers(ctx, client)
 	if err != nil {
-		return errors.Wrap(err, "Error while getting list of containers")
+		return nil, err
 	}
+
 	for _, pod := range pods {
 		create, remove := groupContainers(ctx, pod, containers)
 
@@ -28,13 +28,13 @@ func Sync(ctx context.Context, client *containerd.Client, pods []model.Pod) erro
 		}).Debugln("Resolved current container status")
 
 		if err := createContainers(ctx, client, pod, create); err != nil {
-			return err
+			return nil, err
 		}
 		if err := stopContainers(ctx, remove); err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+	return getCurrentState(ctx, client)
 }
 
 func groupContainers(ctx context.Context, pod model.Pod, active []containerd.Container) (create []model.Container, remove []containerd.Container) {

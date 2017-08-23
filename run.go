@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/containerd/containerd"
 	"github.com/ernoaapa/layeryd/controller"
-	"github.com/ernoaapa/layeryd/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -23,6 +22,7 @@ var runCommand = cli.Command{
 		},
 	},
 	Action: func(clicontext *cli.Context) error {
+		deviceInfo := getDeviceInfo()
 		ctx, cancel := appContext(clicontext)
 		defer cancel()
 
@@ -31,7 +31,12 @@ var runCommand = cli.Command{
 			return err
 		}
 
-		updates := source.GetUpdates(model.DeviceInfo{})
+		reporter, err := getReporter(clicontext)
+		if err != nil {
+			return err
+		}
+
+		updates := source.GetUpdates(deviceInfo)
 		log.Infoln("Started, start waiting for changes in source")
 
 		for {
@@ -44,9 +49,17 @@ var runCommand = cli.Command{
 			}
 
 			if client != nil {
-				if err := controller.Sync(ctx, client, <-updates); err != nil {
+				state, err := controller.Sync(ctx, client, <-updates)
+				if err != nil {
 					log.Warnf("Failed to update state to containerd: %s", err)
 					client = nil
+				}
+
+				if state != nil {
+					err := reporter.Report(deviceInfo, *state)
+					if err != nil {
+						log.Warnf("Error while reporting current device state: %s", err)
+					}
 				}
 			}
 		}
