@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/containerd/containerd"
 	"github.com/ernoaapa/layeryd/controller"
+	"github.com/ernoaapa/layeryd/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -17,6 +15,11 @@ var runCommand = cli.Command{
 		cli.StringFlag{
 			Name:  "file",
 			Usage: "Read pod info from file",
+		},
+		cli.StringFlag{
+			Name:  "interval",
+			Usage: "Interval to fetch updates",
+			Value: "10s",
 		},
 	},
 	Action: func(clicontext *cli.Context) error {
@@ -32,16 +35,16 @@ var runCommand = cli.Command{
 			return err
 		}
 
-		source := getSource(clicontext)
-		if source == nil {
-			return fmt.Errorf("You must define source, e.g. '--file path/to/file.yml'")
+		source, err := getSource(clicontext)
+		if err != nil {
+			return err
 		}
 
+		updates := source.GetUpdates(model.NodeInfo{})
 		for {
-			if err := controller.Sync(ctx, client, source); err != nil {
+			if err := controller.Sync(ctx, client, <-updates); err != nil {
 				return err
 			}
-			time.Sleep(2 * time.Second)
 		}
 	},
 }

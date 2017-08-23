@@ -6,17 +6,10 @@ import (
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/ernoaapa/layeryd/model"
-	"github.com/ernoaapa/layeryd/source"
 	log "github.com/sirupsen/logrus"
 )
 
-func Sync(ctx context.Context, client *containerd.Client, source source.Source) error {
-
-	target, err := source.GetState(model.NodeInfo{})
-	if err != nil {
-		return err
-	}
-
+func Sync(ctx context.Context, client *containerd.Client, target model.Pod) error {
 	containers, err := client.Containers(ctx)
 	if err != nil {
 		log.Warnf("Error getting list of containers: %v", err)
