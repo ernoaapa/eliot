@@ -31,16 +31,16 @@ func NewFileSource(filePath string, interval time.Duration) *FileSource {
 }
 
 // GetUpdates return channel for state changes
-func (s *FileSource) GetUpdates(info model.DeviceInfo) chan model.Pod {
-	updates := make(chan model.Pod)
+func (s *FileSource) GetUpdates(info model.DeviceInfo) chan []model.Pod {
+	updates := make(chan []model.Pod)
 	go func() {
 		for {
-			state, err := s.getState(info)
+			pods, err := s.getPods(info)
 
 			if err != nil {
 				log.Printf("Error reading state: %s", err)
 			} else {
-				updates <- state
+				updates <- pods
 			}
 			time.Sleep(s.interval)
 		}
@@ -48,25 +48,25 @@ func (s *FileSource) GetUpdates(info model.DeviceInfo) chan model.Pod {
 	return updates
 }
 
-func (s *FileSource) getState(info model.DeviceInfo) (pod model.Pod, err error) {
+func (s *FileSource) getPods(info model.DeviceInfo) (pods []model.Pod, err error) {
 	data, err := ioutil.ReadFile(s.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return pod, fmt.Errorf("Cannot update state, file [%s] does not exist", s.filePath)
+			return pods, fmt.Errorf("Cannot update state, file [%s] does not exist", s.filePath)
 		}
-		return pod, err
+		return pods, err
 	}
 
 	switch extension := filepath.Ext(s.filePath); extension {
 	case ".yaml", ".yml":
 		return unmarshalYaml(data)
 	default:
-		return pod, fmt.Errorf("Invalid source file format: %s", extension)
+		return pods, fmt.Errorf("Invalid source file format: %s", extension)
 	}
 }
 
-func unmarshalYaml(data []byte) (model.Pod, error) {
-	pod := &model.Pod{}
-	err := yaml.Unmarshal(data, pod)
-	return *pod, err
+func unmarshalYaml(data []byte) ([]model.Pod, error) {
+	pods := &[]model.Pod{}
+	err := yaml.Unmarshal(data, pods)
+	return *pods, err
 }

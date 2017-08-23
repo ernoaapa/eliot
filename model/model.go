@@ -1,9 +1,20 @@
 package model
 
+import "fmt"
+
+var (
+	nameFieldName = "name"
+)
+
 // Pod is set of containers
 type Pod struct {
-	Name string `yaml:"name"`
-	Spec Spec   `yaml:"spec"`
+	Metadata map[string]string `yaml:"metadata"`
+	Spec     Spec              `yaml:"spec"`
+}
+
+// GetName returns name from metadata
+func (p *Pod) GetName() string {
+	return p.Metadata[nameFieldName]
 }
 
 // Spec defines what containers should be running
@@ -15,6 +26,11 @@ type Spec struct {
 type Container struct {
 	Name  string `yaml:"name"`
 	Image string `yaml:"image"`
+}
+
+// BuildID creates unique id for the container from parent pod name
+func (c *Container) BuildID(podName string) string {
+	return fmt.Sprintf("%s-%s", podName, c.Name)
 }
 
 // DeviceInfo contains information about current device

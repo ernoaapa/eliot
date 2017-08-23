@@ -16,20 +16,30 @@ func TestFileSource(t *testing.T) {
 	filePath := fmt.Sprintf("%s/%s", dir, "test.yml")
 
 	ioutil.WriteFile(filePath, []byte(`
-name: "foo"
-spec:
-  containers:
-    - name: "foo"
-      image: "docker.io/library/hello-world:latest"
+- metadata:
+    name: "foo"
+  spec:
+    containers:
+      - name: "foo-1"
+        image: "docker.io/library/hello-world:latest"
+      - name: "foo-2"
+        image: "docker.io/library/hello-world:latest"
+- metadata:
+    name: "bar"
+  spec:
+    containers:
+      - name: "bar"
+        image: "docker.io/library/hello-world:latest"
 `), 0666)
 
 	source := NewFileSource(filePath, 100*time.Millisecond)
 	updates := source.GetUpdates(model.DeviceInfo{})
 
 	select {
-	case pod := <-updates:
-		assert.Equal(t, "foo", pod.Name, "Should unmarshal name")
-		assert.Equal(t, 1, len(pod.Spec.Containers), "Should have one container spec")
+	case pods := <-updates:
+		assert.Equal(t, 2, len(pods), "Should have one pod spec")
+		assert.Equal(t, "foo", pods[0].GetName(), "Should unmarshal name")
+		assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
 	case <-time.After(200 * time.Millisecond):
 		assert.FailNow(t, "Didn't receive update in two second")
 	}

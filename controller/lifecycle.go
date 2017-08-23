@@ -11,16 +11,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func createContainers(ctx context.Context, client *containerd.Client, containers []model.Container) error {
+func createContainers(ctx context.Context, client *containerd.Client, pod model.Pod, containers []model.Container) error {
 	for _, container := range containers {
-		if err := createContainer(ctx, client, container); err != nil {
+		if err := createContainer(ctx, client, pod, container); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func createContainer(ctx context.Context, client *containerd.Client, target model.Container) error {
+func createContainer(ctx context.Context, client *containerd.Client, pod model.Pod, target model.Container) error {
 	image, err := ensureImagePulled(ctx, client, target.Image)
 	if err != nil {
 		log.Warnf("Error pulling image: %v", err)
@@ -33,9 +33,9 @@ func createContainer(ctx context.Context, client *containerd.Client, target mode
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
-	container, err := client.NewContainer(ctx, target.Name,
+	container, err := client.NewContainer(ctx, target.BuildID(pod.GetName()),
 		containerd.WithSpec(spec),
-		containerd.WithNewSnapshotView(target.Name, image),
+		containerd.WithNewSnapshotView(target.BuildID(pod.GetName()), image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux")),
 	)
 	if err != nil {
