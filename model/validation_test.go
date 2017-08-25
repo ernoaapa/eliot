@@ -15,7 +15,7 @@ func TestValidationIsValid(t *testing.T) {
 			Spec: Spec{
 				Containers: []Container{
 					Container{
-						Name:  "foo",
+						Name:  "foo-1",
 						Image: "docker.io/library/foobar",
 					},
 				},

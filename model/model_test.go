@@ -16,10 +16,16 @@ func TestPodGetName(t *testing.T) {
 	assert.Equal(t, pod.GetName(), "foobar", "should return name from metadata")
 }
 
-func TestContainerBuildID(t *testing.T) {
-	container := Container{
-		Name: "foo",
+func TestPodGetNamespace(t *testing.T) {
+	pod := Pod{
+		Metadata: Metadata{
+			"namespace": "foobar",
+		},
 	}
 
-	assert.Equal(t, container.BuildID("podname"), "podname-foo", "should build valid id")
+	assert.Equal(t, pod.GetNamespace(), "foobar", "should return namespace from metadata")
+}
+
+func TestContainerBuildID(t *testing.T) {
+	assert.Equal(t, BuildContainerID("foo", "podname"), "foo-podname", "should build valid id")
 }

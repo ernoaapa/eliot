@@ -38,13 +38,13 @@ var runCommand = cli.Command{
 		log.Infoln("Started, start waiting for changes in source")
 
 		for {
-			state, err := controller.Sync(client, <-updates)
+			states, err := controller.Sync(client, <-updates)
 			if err != nil {
 				log.Warnf("Failed to update state to containerd: %s", err)
 			}
 
-			if state != nil {
-				err := reporter.Report(deviceInfo, *state)
+			if states != nil {
+				err := reporter.Report(deviceInfo, states)
 				if err != nil {
 					log.Warnf("Error while reporting current device state: %s", err)
 				}

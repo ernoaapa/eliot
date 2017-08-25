@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ernoaapa/layeryd/runtime"
 	"github.com/ernoaapa/layeryd/model"
+	"github.com/ernoaapa/layeryd/runtime"
 	"github.com/ernoaapa/layeryd/source"
 	"github.com/ernoaapa/layeryd/status"
 	"github.com/urfave/cli"
@@ -21,7 +21,6 @@ func getRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
 		context.Background(),
 		clicontext.GlobalDuration("timeout"),
 		clicontext.GlobalString("address"),
-		clicontext.GlobalString("namespace"),
 	)
 }
 

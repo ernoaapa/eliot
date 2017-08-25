@@ -5,34 +5,36 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/errdefs"
-	"github.com/ernoaapa/layeryd/runtime"
 	"github.com/ernoaapa/layeryd/model"
+	"github.com/ernoaapa/layeryd/runtime"
 	log "github.com/sirupsen/logrus"
 )
 
 // Sync start and stop containers to match with target pods
-func Sync(client *runtime.ContainerdClient, pods []model.Pod) (state *model.DeviceState, err error) {
+func Sync(client *runtime.ContainerdClient, pods []model.Pod) (state map[string]*model.DeviceState, err error) {
 	log.Debugln("Received update, start updating containerd")
 
-	containers, err := client.GetContainers()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, pod := range pods {
-		create, remove := groupContainers(pod, containers)
-
-		log.WithFields(log.Fields{
-			"running": len(containers),
-			"create":  len(create),
-			"remove":  len(remove),
-		}).Debugln("Resolved current container status")
-
-		if err := client.CreateContainers(pod, create); err != nil {
+	for namespace, pods := range groupByNamespaces(pods) {
+		containers, err := client.GetContainers(namespace)
+		if err != nil {
 			return nil, err
 		}
-		if err := client.StopContainers(remove); err != nil {
-			return nil, err
+
+		for _, pod := range pods {
+			create, remove := groupContainers(pod, containers)
+
+			log.WithFields(log.Fields{
+				"running": len(containers),
+				"create":  len(create),
+				"remove":  len(remove),
+			}).Debugf("Resolved current container status for namespace %s", namespace)
+
+			if err := client.CreateContainers(pod, create); err != nil {
+				return nil, err
+			}
+			if err := client.StopContainers(remove); err != nil {
+				return nil, err
+			}
 		}
 	}
 	return getCurrentState(client)
@@ -57,7 +59,7 @@ func groupContainers(pod model.Pod, active []containerd.Container) (create []mod
 
 func containsTargetContainer(podName string, target containerd.Container, list []model.Container) bool {
 	for _, item := range list {
-		if target.ID() == item.BuildID(podName) {
+		if target.ID() == item.ID {
 			return true
 		}
 	}
@@ -66,7 +68,7 @@ func containsTargetContainer(podName string, target containerd.Container, list [
 
 func containsActiveContainer(podName string, target model.Container, list []containerd.Container) bool {
 	for _, item := range list {
-		if target.BuildID(podName) == item.ID() {
+		if target.ID == item.ID() {
 			return true
 		}
 	}
@@ -103,15 +105,25 @@ func isContainerRunning(ctx context.Context, container containerd.Container) boo
 	return status.Status == containerd.Running
 }
 
-func getCurrentState(client *runtime.ContainerdClient) (*model.DeviceState, error) {
-	containers, err := client.GetContainers()
+func getCurrentState(client *runtime.ContainerdClient) (result map[string]*model.DeviceState, err error) {
+	result = map[string]*model.DeviceState{}
+
+	namespaces, err := client.GetNamespaces()
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 
-	return &model.DeviceState{
-		Pods: mapToPods(containers),
-	}, nil
+	for _, namespace := range namespaces {
+		containers, err := client.GetContainers(namespace)
+		if err != nil {
+			return result, err
+		}
+
+		result[namespace] = &model.DeviceState{
+			Pods: mapToPods(containers),
+		}
+	}
+	return result, nil
 }
 
 func mapToPods(containers []containerd.Container) (states []model.PodState) {
@@ -121,4 +133,15 @@ func mapToPods(containers []containerd.Container) (states []model.PodState) {
 		})
 	}
 	return states
+}
+
+func groupByNamespaces(pods []model.Pod) map[string][]model.Pod {
+	result := map[string][]model.Pod{}
+	for _, pod := range pods {
+		if _, ok := result[pod.GetNamespace()]; !ok {
+			result[pod.GetNamespace()] = []model.Pod{}
+		}
+		result[pod.GetNamespace()] = append(result[pod.GetNamespace()], pod)
+	}
+	return result
 }

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/containerd/containerd"
-	"github.com/containerd/containerd/namespaces"
+	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
 	"github.com/containerd/containerd/plugin"
 	"github.com/ernoaapa/layeryd/model"
 	"github.com/pkg/errors"
@@ -16,20 +16,18 @@ import (
 
 // ContainerdClient is containerd client wrapper
 type ContainerdClient struct {
-	client    *containerd.Client
-	context   context.Context
-	timeout   time.Duration
-	address   string
-	namespace string
+	client  *containerd.Client
+	context context.Context
+	timeout time.Duration
+	address string
 }
 
-// NewContainerdClient creates new containerd client with given timeout and namespace
-func NewContainerdClient(context context.Context, timeout time.Duration, address, namespace string) *ContainerdClient {
+// NewContainerdClient creates new containerd client with given timeout
+func NewContainerdClient(context context.Context, timeout time.Duration, address string) *ContainerdClient {
 	return &ContainerdClient{
-		context:   context,
-		timeout:   timeout,
-		address:   address,
-		namespace: namespace,
+		context: context,
+		timeout: timeout,
+		address: address,
 	}
 }
 
@@ -38,8 +36,6 @@ func (c *ContainerdClient) getContext() (context.Context, context.CancelFunc) {
 		ctx    = c.context
 		cancel context.CancelFunc
 	)
-
-	ctx = namespaces.WithNamespace(ctx, c.namespace)
 
 	if c.timeout > 0 {
 		ctx, cancel = context.WithTimeout(ctx, c.timeout)
@@ -50,16 +46,12 @@ func (c *ContainerdClient) getContext() (context.Context, context.CancelFunc) {
 	return ctx, cancel
 }
 
-func (c *ContainerdClient) getConnection() (*containerd.Client, error) {
-	if c.client == nil {
-		log.Debugf("Try to establish connection to containerd %s", c.address)
-		client, err := containerd.New(c.address, containerd.WithDefaultNamespace(c.namespace))
-		if err != nil {
-			return client, errors.Wrapf(err, "Unable to create connection to containerd")
-		}
-		c.client = client
+func (c *ContainerdClient) getConnection(namespace string) (*containerd.Client, error) {
+	client, err := containerd.New(c.address, containerd.WithDefaultNamespace(namespace))
+	if err != nil {
+		return client, errors.Wrapf(err, "Unable to create connection to containerd")
 	}
-	return c.client, nil
+	return client, nil
 }
 
 func (c *ContainerdClient) resetConnection() {
@@ -67,11 +59,11 @@ func (c *ContainerdClient) resetConnection() {
 }
 
 // GetContainers return all containerd containers
-func (c *ContainerdClient) GetContainers() (containers []containerd.Container, err error) {
+func (c *ContainerdClient) GetContainers(namespace string) (containers []containerd.Container, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, err := c.getConnection()
+	client, err := c.getConnection(namespace)
 	if err != nil {
 		return containers, err
 	}
@@ -94,16 +86,16 @@ func (c *ContainerdClient) CreateContainers(pod model.Pod, containers []model.Co
 }
 
 // CreateContainer creates given container
-func (c *ContainerdClient) CreateContainer(pod model.Pod, target model.Container) error {
+func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, err := c.getConnection()
+	client, err := c.getConnection(pod.GetNamespace())
 	if err != nil {
 		return err
 	}
 
-	image, err := c.EnsureImagePulled(target.Image)
+	image, err := c.EnsureImagePulled(pod.GetNamespace(), container.Image)
 	if err != nil {
 		return err
 	}
@@ -114,9 +106,9 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, target model.Container
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
-	container, err := client.NewContainer(ctx, target.BuildID(pod.GetName()),
+	created, err := client.NewContainer(ctx, container.ID,
 		containerd.WithSpec(spec),
-		containerd.WithNewSnapshotView(target.BuildID(pod.GetName()), image),
+		containerd.WithNewSnapshotView(container.ID, image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux")),
 	)
 	if err != nil {
@@ -124,18 +116,18 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, target model.Container
 		return errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
 
-	log.Debugf("Create task in container: %s", container.ID())
-	task, err := container.NewTask(ctx, containerd.NullIO)
+	log.Debugf("Create task in container: %s", created.ID())
+	task, err := created.NewTask(ctx, containerd.NullIO)
 	if err != nil {
 		c.resetConnection()
-		return errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())
+		return errors.Wrapf(err, "Error while creating task for container [%s]", created.ID())
 	}
 
 	log.Debugln("Starting task...")
 	err = task.Start(ctx)
 	if err != nil {
 		c.resetConnection()
-		return errors.Wrapf(err, "Failed to start task in container", container.ID())
+		return errors.Wrapf(err, "Failed to start task in container", created.ID())
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
 	return nil
@@ -169,11 +161,11 @@ func (c *ContainerdClient) StopContainer(container containerd.Container) error {
 }
 
 // EnsureImagePulled pulls the image reference to ensure image is fetched
-func (c *ContainerdClient) EnsureImagePulled(ref string) (image containerd.Image, err error) {
+func (c *ContainerdClient) EnsureImagePulled(namespace, ref string) (image containerd.Image, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, err := c.getConnection()
+	client, err := c.getConnection(namespace)
 	if err != nil {
 		return image, err
 	}
@@ -192,4 +184,31 @@ func (c *ContainerdClient) EnsureImagePulled(ref string) (image containerd.Image
 	}
 
 	return image, nil
+}
+
+// GetNamespaces return all namespaces what layeryd manages
+func (c *ContainerdClient) GetNamespaces() ([]string, error) {
+	ctx, cancel := c.getContext()
+	defer cancel()
+
+	client, err := c.getConnection(model.DefaultNamespace)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := client.NamespaceService().List(ctx, &namespaces.ListNamespacesRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	return getNamespaces(resp.Namespaces), nil
+}
+
+func getNamespaces(namespaces []namespaces.Namespace) (result []string) {
+	for _, namespace := range namespaces {
+		if namespace.Name != "default" {
+			result = append(result, namespace.Name)
+		}
+	}
+	return result
 }

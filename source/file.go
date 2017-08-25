@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/layeryd/model"
@@ -66,7 +67,19 @@ func (s *FileSource) getPods(info model.DeviceInfo) (pods []model.Pod, err error
 }
 
 func unmarshalYaml(data []byte) ([]model.Pod, error) {
-	pods := &[]model.Pod{}
-	err := yaml.Unmarshal(data, pods)
-	return *pods, err
+	target := &[]model.Pod{}
+
+	unmarshalErr := yaml.Unmarshal(data, target)
+	if unmarshalErr != nil {
+		return []model.Pod{}, errors.Wrapf(unmarshalErr, "Unable to read yaml file")
+	}
+
+	pods := model.Defaults(*target)
+
+	validationErr := model.Validate(pods)
+	if validationErr != nil {
+		return pods, errors.Wrapf(validationErr, "Invalid pod definitions")
+	}
+
+	return pods, nil
 }

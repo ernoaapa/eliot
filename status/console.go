@@ -17,9 +17,12 @@ func NewConsoleReporter() *ConsoleReporter {
 }
 
 // Report implements Reporter interface by printing out the state to console
-func (r *ConsoleReporter) Report(info model.DeviceInfo, state model.DeviceState) error {
-	log.WithFields(log.Fields{
-		"nr of pods": fmt.Sprintf("%d containers", len(state.Pods)),
-	}).Info("State update")
+func (r *ConsoleReporter) Report(info model.DeviceInfo, states map[string]*model.DeviceState) error {
+
+	for namespace, state := range states {
+		log.WithFields(log.Fields{
+			"nr of pods": fmt.Sprintf("%d containers", len(state.Pods)),
+		}).Infof("%s state update", namespace)
+	}
 	return nil
 }

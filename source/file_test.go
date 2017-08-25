@@ -10,14 +10,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFileSource(t *testing.T) {
+func createTempFile(t *testing.T, data []byte) string {
 	dir, createErr := ioutil.TempDir("", "example")
 	assert.NoError(t, createErr, "Unable to create temp file")
 	filePath := fmt.Sprintf("%s/%s", dir, "test.yml")
 
-	ioutil.WriteFile(filePath, []byte(`
+	writeErr := ioutil.WriteFile(filePath, data, 0666)
+	assert.NoError(t, writeErr, "Unable to write to temporary file")
+	return filePath
+}
+
+func TestFileSource(t *testing.T) {
+	filePath := createTempFile(t, []byte(`
 - metadata:
     name: "foo"
+    namespace: "my-namespace"
   spec:
     containers:
       - name: "foo-1"
@@ -30,7 +37,7 @@ func TestFileSource(t *testing.T) {
     containers:
       - name: "bar"
         image: "docker.io/library/hello-world:latest"
-`), 0666)
+`))
 
 	source := NewFileSource(filePath, 100*time.Millisecond)
 	updates := source.GetUpdates(model.DeviceInfo{})
@@ -40,6 +47,9 @@ func TestFileSource(t *testing.T) {
 		assert.Equal(t, 2, len(pods), "Should have one pod spec")
 		assert.Equal(t, "foo", pods[0].GetName(), "Should unmarshal name")
 		assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
+
+		assert.Equal(t, "my-namespace", pods[0].GetNamespace(), "Should set default namespace")
+		assert.Equal(t, "layeryd", pods[1].GetNamespace(), "Should set default namespace")
 	case <-time.After(200 * time.Millisecond):
 		assert.FailNow(t, "Didn't receive update in two second")
 	}
