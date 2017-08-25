@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/containerd/containerd"
-	"github.com/containerd/containerd/namespaces"
+	"github.com/ernoaapa/layeryd/runtime"
 	"github.com/ernoaapa/layeryd/model"
 	"github.com/ernoaapa/layeryd/source"
 	"github.com/ernoaapa/layeryd/status"
@@ -17,35 +16,13 @@ func getDeviceInfo() model.DeviceInfo {
 	return model.DeviceInfo{}
 }
 
-// appContext returns the context for a command. Should only be called once per
-// command, near the start.
-//
-// This will ensure the namespace is picked up and set the timeout, if one is
-// defined.
-func appContext(clicontext *cli.Context) (context.Context, context.CancelFunc) {
-	var (
-		ctx       = context.Background()
-		timeout   = clicontext.GlobalDuration("timeout")
-		namespace = clicontext.GlobalString("namespace")
-		cancel    context.CancelFunc
+func getRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
+	return runtime.NewContainerdClient(
+		context.Background(),
+		clicontext.GlobalDuration("timeout"),
+		clicontext.GlobalString("address"),
+		clicontext.GlobalString("namespace"),
 	)
-
-	ctx = namespaces.WithNamespace(ctx, namespace)
-
-	if timeout > 0 {
-		ctx, cancel = context.WithTimeout(ctx, timeout)
-	} else {
-		ctx, cancel = context.WithCancel(ctx)
-	}
-
-	return ctx, cancel
-}
-
-func getContainerdClient(clicontext *cli.Context) (*containerd.Client, error) {
-	address := clicontext.GlobalString("address")
-	namespace := clicontext.GlobalString("namespace")
-
-	return containerd.New(address, containerd.WithDefaultNamespace(namespace))
 }
 
 func getSource(clicontext *cli.Context) (source.Source, error) {

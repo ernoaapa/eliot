@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/containerd/containerd"
 	"github.com/ernoaapa/layeryd/controller"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -23,8 +22,7 @@ var runCommand = cli.Command{
 	},
 	Action: func(clicontext *cli.Context) error {
 		deviceInfo := getDeviceInfo()
-		ctx, cancel := appContext(clicontext)
-		defer cancel()
+		client := getRuntimeClient(clicontext)
 
 		source, err := getSource(clicontext)
 		if err != nil {
@@ -40,26 +38,15 @@ var runCommand = cli.Command{
 		log.Infoln("Started, start waiting for changes in source")
 
 		for {
-			var client *containerd.Client
-			if client == nil {
-				client, err = getContainerdClient(clicontext)
-				if err != nil {
-					log.Warnf("Failed to create containerd client: %s", err)
-				}
+			state, err := controller.Sync(client, <-updates)
+			if err != nil {
+				log.Warnf("Failed to update state to containerd: %s", err)
 			}
 
-			if client != nil {
-				state, err := controller.Sync(ctx, client, <-updates)
+			if state != nil {
+				err := reporter.Report(deviceInfo, *state)
 				if err != nil {
-					log.Warnf("Failed to update state to containerd: %s", err)
-					client = nil
-				}
-
-				if state != nil {
-					err := reporter.Report(deviceInfo, *state)
-					if err != nil {
-						log.Warnf("Error while reporting current device state: %s", err)
-					}
+					log.Warnf("Error while reporting current device state: %s", err)
 				}
 			}
 		}
