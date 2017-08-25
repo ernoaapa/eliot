@@ -29,25 +29,19 @@ var runCommand = cli.Command{
 			return err
 		}
 
-		reporter, err := getReporter(clicontext)
+		reporter, err := getReporter(clicontext, deviceInfo, client)
 		if err != nil {
 			return err
 		}
+		go reporter.Start()
 
-		updates := source.GetUpdates(deviceInfo)
+		changes := source.GetUpdates(deviceInfo)
 		log.Infoln("Started, start waiting for changes in source")
 
 		for {
-			states, err := controller.Sync(client, <-updates)
+			err := controller.Sync(client, <-changes)
 			if err != nil {
 				log.Warnf("Failed to update state to containerd: %s", err)
-			}
-
-			if states != nil {
-				err := reporter.Report(deviceInfo, states)
-				if err != nil {
-					log.Warnf("Error while reporting current device state: %s", err)
-				}
 			}
 		}
 	},

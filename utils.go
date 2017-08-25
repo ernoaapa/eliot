@@ -36,6 +36,10 @@ func getSource(clicontext *cli.Context) (source.Source, error) {
 	return nil, fmt.Errorf("You must define one source for updates. E.g. --file path/to/file.yml")
 }
 
-func getReporter(clicontext *cli.Context) (status.Reporter, error) {
-	return status.NewConsoleReporter(), nil
+func getReporter(clicontext *cli.Context, info model.DeviceInfo, client *runtime.ContainerdClient) (status.Reporter, error) {
+	return status.NewConsoleReporter(
+		info,
+		client,
+		clicontext.GlobalDuration("status-interval"),
+	), nil
 }

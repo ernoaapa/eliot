@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -32,8 +33,9 @@ func main() {
 			Usage: "total timeout for ctr commands",
 		},
 		cli.DurationFlag{
-			Name:  "connect-timeout",
-			Usage: "timeout for connecting to containerd",
+			Name:  "status-interval",
+			Usage: "interval for sending statuses",
+			Value: 5 * time.Second,
 		},
 		cli.StringFlag{
 			Name:   "namespace, n",

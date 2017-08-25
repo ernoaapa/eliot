@@ -11,13 +11,13 @@ import (
 )
 
 // Sync start and stop containers to match with target pods
-func Sync(client *runtime.ContainerdClient, pods []model.Pod) (state map[string]*model.DeviceState, err error) {
+func Sync(client *runtime.ContainerdClient, pods []model.Pod) (err error) {
 	log.Debugln("Received update, start updating containerd")
 
 	for namespace, pods := range groupByNamespaces(pods) {
 		containers, err := client.GetContainers(namespace)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		for _, pod := range pods {
@@ -30,14 +30,14 @@ func Sync(client *runtime.ContainerdClient, pods []model.Pod) (state map[string]
 			}).Debugf("Resolved current container status for namespace %s", namespace)
 
 			if err := client.CreateContainers(pod, create); err != nil {
-				return nil, err
+				return err
 			}
 			if err := client.StopContainers(remove); err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
-	return getCurrentState(client)
+	return nil
 }
 
 func groupContainers(pod model.Pod, active []containerd.Container) (create []model.Container, remove []containerd.Container) {
@@ -103,36 +103,6 @@ func isContainerRunning(ctx context.Context, container containerd.Container) boo
 		return true
 	}
 	return status.Status == containerd.Running
-}
-
-func getCurrentState(client *runtime.ContainerdClient) (result map[string]*model.DeviceState, err error) {
-	result = map[string]*model.DeviceState{}
-
-	namespaces, err := client.GetNamespaces()
-	if err != nil {
-		return result, err
-	}
-
-	for _, namespace := range namespaces {
-		containers, err := client.GetContainers(namespace)
-		if err != nil {
-			return result, err
-		}
-
-		result[namespace] = &model.DeviceState{
-			Pods: mapToPods(containers),
-		}
-	}
-	return result, nil
-}
-
-func mapToPods(containers []containerd.Container) (states []model.PodState) {
-	for _, container := range containers {
-		states = append(states, model.PodState{
-			ID: container.ID(),
-		})
-	}
-	return states
 }
 
 func groupByNamespaces(pods []model.Pod) map[string][]model.Pod {
