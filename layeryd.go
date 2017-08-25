@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ernoaapa/layeryd/controller"
+	"github.com/ernoaapa/layeryd/device"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -60,7 +61,7 @@ func main() {
 	}
 
 	app.Action = func(clicontext *cli.Context) error {
-		deviceInfo := getDeviceInfo()
+		deviceInfo := device.GetInfo()
 		client := getRuntimeClient(clicontext)
 
 		source, err := getManifestSource(clicontext)
@@ -74,7 +75,7 @@ func main() {
 		}
 		go reporter.Start()
 
-		changes := source.GetUpdates(deviceInfo)
+		changes := source.GetUpdates()
 		log.Infoln("Started, start waiting for changes in source")
 
 		for {

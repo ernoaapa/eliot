@@ -32,11 +32,11 @@ func NewFileManifestSource(filePath string, interval time.Duration) *FileManifes
 }
 
 // GetUpdates return channel for state changes
-func (s *FileManifestSource) GetUpdates(info model.DeviceInfo) chan []model.Pod {
+func (s *FileManifestSource) GetUpdates() chan []model.Pod {
 	updates := make(chan []model.Pod)
 	go func() {
 		for {
-			pods, err := s.getPods(info)
+			pods, err := s.getPods()
 
 			if err != nil {
 				log.Printf("Error reading state: %s", err)
@@ -49,7 +49,7 @@ func (s *FileManifestSource) GetUpdates(info model.DeviceInfo) chan []model.Pod 
 	return updates
 }
 
-func (s *FileManifestSource) getPods(info model.DeviceInfo) (pods []model.Pod, err error) {
+func (s *FileManifestSource) getPods() (pods []model.Pod, err error) {
 	data, err := ioutil.ReadFile(s.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {

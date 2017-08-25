@@ -1,5 +1,6 @@
 package model
 
+// DefaultNamespace is namespace what each pod get if there is no metadata.namespace
 var DefaultNamespace = "layeryd"
 
 // Defaults set default values to pod definitions

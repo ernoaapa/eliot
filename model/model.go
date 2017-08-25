@@ -14,8 +14,8 @@ var (
 
 // Pod is set of containers
 type Pod struct {
-	Metadata Metadata `validate:"hasName" yaml:"metadata"`
-	Spec     Spec     `validate:"required" yaml:"spec"`
+	Metadata Metadata `validate:"hasName"  json:"metadata" yaml:"metadata"`
+	Spec     Spec     `validate:"required" json:"spec"     yaml:"spec"`
 }
 
 // GetName returns pod name from metadata
@@ -51,15 +51,15 @@ func (m Metadata) GetNamespace() string {
 
 // Spec defines what containers should be running
 type Spec struct {
-	Containers []Container `validate:"required,gt=0,dive" yaml:"containers"`
+	Containers []Container `validate:"required,gt=0,dive"  json:"containers"  yaml:"containers"`
 }
 
 // Container defines what image should be running
 type Container struct {
-	ID        string `yaml:"id"`
-	Name      string `validate:"required,gt=0,alphanumOrDash" yaml:"name"`
-	Image     string `validate:"required,gt=0,imageRef" yaml:"image"`
-	Namespace string `validate:"omitempty,gt=0,alphanumOrDash" yaml:"namespace"`
+	ID        string `                                          json:"id"        yaml:"id"`
+	Name      string `validate:"required,gt=0,alphanumOrDash"   json:"name"      yaml:"name"`
+	Image     string `validate:"required,gt=0,imageRef"         json:"image"     yaml:"image"`
+	Namespace string `validate:"omitempty,gt=0,alphanumOrDash"  json:"namespace" yaml:"namespace"`
 }
 
 // BuildContainerID creates unique id for the container from parent pod name

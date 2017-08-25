@@ -12,10 +12,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-func getDeviceInfo() model.DeviceInfo {
-	return model.DeviceInfo{}
-}
-
 func getRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
 	return runtime.NewContainerdClient(
 		context.Background(),
@@ -36,7 +32,7 @@ func getManifestSource(clicontext *cli.Context) (manifest.Source, error) {
 	return nil, fmt.Errorf("You must define one manifest source for updates. E.g. --manifest-file path/to/file.yml")
 }
 
-func getStateReporter(clicontext *cli.Context, info model.DeviceInfo, client *runtime.ContainerdClient) (state.Reporter, error) {
+func getStateReporter(clicontext *cli.Context, info *model.DeviceInfo, client *runtime.ContainerdClient) (state.Reporter, error) {
 	return state.NewConsoleStateReporter(
 		info,
 		client,

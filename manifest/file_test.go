@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ernoaapa/layeryd/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -40,7 +39,7 @@ func TestFileSource(t *testing.T) {
 `))
 
 	source := NewFileManifestSource(filePath, 100*time.Millisecond)
-	updates := source.GetUpdates(model.DeviceInfo{})
+	updates := source.GetUpdates()
 
 	select {
 	case pods := <-updates:
