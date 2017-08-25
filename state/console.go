@@ -1,4 +1,4 @@
-package status
+package state
 
 import (
 	"fmt"
@@ -9,16 +9,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// ConsoleReporter is Reporter implementation what just prints status to stdout
-type ConsoleReporter struct {
+// ConsoleStateReporter is Reporter implementation what just prints status to stdout
+type ConsoleStateReporter struct {
 	info     model.DeviceInfo
 	client   *runtime.ContainerdClient
 	interval time.Duration
 }
 
-// NewConsoleReporter creates new ConsoleReporter
-func NewConsoleReporter(info model.DeviceInfo, client *runtime.ContainerdClient, interval time.Duration) *ConsoleReporter {
-	return &ConsoleReporter{
+// NewConsoleStateReporter creates new ConsoleStateReporter
+func NewConsoleStateReporter(info model.DeviceInfo, client *runtime.ContainerdClient, interval time.Duration) *ConsoleStateReporter {
+	return &ConsoleStateReporter{
 		info,
 		client,
 		interval,
@@ -26,7 +26,7 @@ func NewConsoleReporter(info model.DeviceInfo, client *runtime.ContainerdClient,
 }
 
 // Start starts printing status to console with given interval
-func (r *ConsoleReporter) Start() {
+func (r *ConsoleStateReporter) Start() {
 	for {
 		states, err := getCurrentState(r.client)
 		if err != nil {
@@ -39,7 +39,7 @@ func (r *ConsoleReporter) Start() {
 }
 
 // Report implements Reporter interface by printing out the state to console
-func (r *ConsoleReporter) report(info model.DeviceInfo, states map[string]*model.DeviceState) error {
+func (r *ConsoleStateReporter) report(info model.DeviceInfo, states map[string]*model.DeviceState) error {
 
 	for namespace, state := range states {
 		log.WithFields(log.Fields{

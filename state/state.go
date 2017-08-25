@@ -1,4 +1,4 @@
-package status
+package state
 
 import (
 	"github.com/containerd/containerd"

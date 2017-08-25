@@ -1,4 +1,4 @@
-package source
+package manifest
 
 import "github.com/ernoaapa/layeryd/model"
 

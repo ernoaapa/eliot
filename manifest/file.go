@@ -1,4 +1,4 @@
-package source
+package manifest
 
 import (
 	"fmt"
@@ -14,25 +14,25 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// FileSource is source what reads desired state from file
-type FileSource struct {
+// FileManifestSource is source what reads manifest from file
+type FileManifestSource struct {
 	filePath string
 	interval time.Duration
 }
 
-// NewFileSource creates new file source what updates the state intervally
-func NewFileSource(filePath string, interval time.Duration) *FileSource {
+// NewFileManifestSource creates new file source what updates the state intervally
+func NewFileManifestSource(filePath string, interval time.Duration) *FileManifestSource {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		log.Panicf("Unable to open state, file [%s] does not exist!", filePath)
 	}
-	return &FileSource{
+	return &FileManifestSource{
 		filePath,
 		interval,
 	}
 }
 
 // GetUpdates return channel for state changes
-func (s *FileSource) GetUpdates(info model.DeviceInfo) chan []model.Pod {
+func (s *FileManifestSource) GetUpdates(info model.DeviceInfo) chan []model.Pod {
 	updates := make(chan []model.Pod)
 	go func() {
 		for {
@@ -49,7 +49,7 @@ func (s *FileSource) GetUpdates(info model.DeviceInfo) chan []model.Pod {
 	return updates
 }
 
-func (s *FileSource) getPods(info model.DeviceInfo) (pods []model.Pod, err error) {
+func (s *FileManifestSource) getPods(info model.DeviceInfo) (pods []model.Pod, err error) {
 	data, err := ioutil.ReadFile(s.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {

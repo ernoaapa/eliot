@@ -1,4 +1,4 @@
-package source
+package manifest
 
 import (
 	"fmt"
@@ -39,7 +39,7 @@ func TestFileSource(t *testing.T) {
         image: "docker.io/library/hello-world:latest"
 `))
 
-	source := NewFileSource(filePath, 100*time.Millisecond)
+	source := NewFileManifestSource(filePath, 100*time.Millisecond)
 	updates := source.GetUpdates(model.DeviceInfo{})
 
 	select {

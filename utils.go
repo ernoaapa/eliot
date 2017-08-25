@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ernoaapa/layeryd/manifest"
 	"github.com/ernoaapa/layeryd/model"
 	"github.com/ernoaapa/layeryd/runtime"
-	"github.com/ernoaapa/layeryd/source"
-	"github.com/ernoaapa/layeryd/status"
+	"github.com/ernoaapa/layeryd/state"
 	"github.com/urfave/cli"
 )
 
@@ -24,22 +24,22 @@ func getRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
 	)
 }
 
-func getSource(clicontext *cli.Context) (source.Source, error) {
-	file := clicontext.String("file")
+func getManifestSource(clicontext *cli.Context) (manifest.Source, error) {
+	file := clicontext.String("manifest-file")
 	if file != "" {
-		interval, err := time.ParseDuration(clicontext.String("interval"))
+		interval, err := time.ParseDuration(clicontext.String("manifest-update-interval"))
 		if err != nil {
-			return nil, fmt.Errorf("Unable to parse update interval [%s]. Example --interval 1s", clicontext.String("interval"))
+			return nil, fmt.Errorf("Unable to parse update interval [%s]. Example --manifest-update-interval 1s", clicontext.String("interval"))
 		}
-		return source.NewFileSource(file, interval), nil
+		return manifest.NewFileManifestSource(file, interval), nil
 	}
-	return nil, fmt.Errorf("You must define one source for updates. E.g. --file path/to/file.yml")
+	return nil, fmt.Errorf("You must define one manifest source for updates. E.g. --manifest-file path/to/file.yml")
 }
 
-func getReporter(clicontext *cli.Context, info model.DeviceInfo, client *runtime.ContainerdClient) (status.Reporter, error) {
-	return status.NewConsoleReporter(
+func getStateReporter(clicontext *cli.Context, info model.DeviceInfo, client *runtime.ContainerdClient) (state.Reporter, error) {
+	return state.NewConsoleStateReporter(
 		info,
 		client,
-		clicontext.GlobalDuration("status-interval"),
+		clicontext.GlobalDuration("state-update-interval"),
 	), nil
 }
