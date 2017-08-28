@@ -3,5 +3,5 @@
 
 ## Development
 ```
-go run ./*.go --debug --manifest-file ./examples/hello-world.yml
+go run ./*.go --debug --manifest ./examples/hello-world.yml
 ```

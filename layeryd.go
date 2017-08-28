@@ -36,8 +36,8 @@ func main() {
 		},
 
 		cli.StringFlag{
-			Name:  "manifest-file",
-			Usage: "Read desired state from file",
+			Name:  "manifest",
+			Usage: "url path to manifest file. E.g. file:///some/path/to/file.yaml",
 		},
 
 		cli.StringFlag{
