@@ -2,6 +2,8 @@ package model
 
 // DeviceInfo contains information about current device
 type DeviceInfo struct {
+	// Labels for the device, provided through cli
+	Labels map[string]string `json:"labels"`
 
 	// The machine id is an ID identifying a specific Linux/Unix installation.
 	// It does not change if hardware is replaced.

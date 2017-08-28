@@ -1,10 +1,12 @@
-package main
+package cmd
 
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ernoaapa/layeryd/manifest"
@@ -15,7 +17,27 @@ import (
 	"github.com/urfave/cli"
 )
 
-func getRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
+func GetLabels(clicontext *cli.Context) map[string]string {
+	if !clicontext.IsSet("labels") {
+		return map[string]string{}
+	}
+
+	param := clicontext.String("labels")
+	values := strings.Split(param, ",")
+
+	labels := map[string]string{}
+	for _, value := range values {
+		pair := strings.Split(value, "=")
+		if len(pair) == 2 {
+			labels[pair[0]] = pair[1]
+		} else {
+			log.Fatalf("Invalid --labels parameter [%s]. It must be comma separated key=value list. E.g. '--labels foo=bar,one=two'", param)
+		}
+	}
+	return labels
+}
+
+func GetRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
 	return runtime.NewContainerdClient(
 		context.Background(),
 		clicontext.GlobalDuration("timeout"),
@@ -23,7 +45,7 @@ func getRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
 	)
 }
 
-func getManifestSource(clicontext *cli.Context) (manifest.Source, error) {
+func GetManifestSource(clicontext *cli.Context) (manifest.Source, error) {
 	if !clicontext.IsSet("manifest") {
 		return nil, fmt.Errorf("You must define --manifest parameter")
 	}
@@ -52,7 +74,7 @@ func getManifestSource(clicontext *cli.Context) (manifest.Source, error) {
 	return nil, fmt.Errorf("You must define manifest source. E.g. --manifest path/to/file.yml")
 }
 
-func getStateReporter(clicontext *cli.Context, info *model.DeviceInfo, client *runtime.ContainerdClient) (state.Reporter, error) {
+func GetStateReporter(clicontext *cli.Context, info *model.DeviceInfo, client *runtime.ContainerdClient) (state.Reporter, error) {
 	return state.NewConsoleStateReporter(
 		info,
 		client,

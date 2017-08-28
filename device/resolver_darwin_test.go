@@ -7,9 +7,13 @@ import (
 )
 
 func TestGetInfo(t *testing.T) {
-	info := GetInfo()
+	labels := map[string]string{
+		"foo": "bar",
+	}
+	info := GetInfo(labels)
 
 	assert.NotEmpty(t, info.BootID, "should resolve BootID")
 	assert.NotEmpty(t, info.MachineID, "should resolve MachineID")
 	assert.NotEmpty(t, info.SystemUUID, "should resolve SystemUUID")
+	assert.Equal(t, labels, info.Labels, "should have given device labels")
 }

@@ -14,11 +14,12 @@ import (
 // GetInfo resolves information about the device
 // Note: Darwin (OSX) implementation is just for development purpose
 // For example, BootID get generated every time when process restarts
-func GetInfo() *model.DeviceInfo {
+func GetInfo(labels map[string]string) *model.DeviceInfo {
 	osInfo := goInfo.GetInfo()
 	ioregOutput := runCommandOrFail("ioreg", "-rd1", "-c", "IOPlatformExpertDevice")
 
 	return &model.DeviceInfo{
+		Labels:   labels,
 		Platform: osInfo.Platform,
 		OS:       osInfo.GoOS,
 		Kernel:   osInfo.Kernel,

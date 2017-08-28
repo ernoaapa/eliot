@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	cmd "github.com/ernoaapa/layeryd/cmd"
 	"github.com/ernoaapa/layeryd/controller"
 	"github.com/ernoaapa/layeryd/device"
 	log "github.com/sirupsen/logrus"
@@ -36,6 +37,11 @@ func main() {
 		},
 
 		cli.StringFlag{
+			Name:  "labels",
+			Usage: "Labels to add to the device info.  Labels must be key=value pairs separated by ','.",
+		},
+
+		cli.StringFlag{
 			Name:  "manifest",
 			Usage: "url path to manifest file. E.g. file:///some/path/to/file.yaml",
 		},
@@ -61,15 +67,15 @@ func main() {
 	}
 
 	app.Action = func(clicontext *cli.Context) error {
-		deviceInfo := device.GetInfo()
-		client := getRuntimeClient(clicontext)
+		deviceInfo := device.GetInfo(cmd.GetLabels(clicontext))
+		client := cmd.GetRuntimeClient(clicontext)
 
-		source, err := getManifestSource(clicontext)
+		source, err := cmd.GetManifestSource(clicontext)
 		if err != nil {
 			return err
 		}
 
-		reporter, err := getStateReporter(clicontext, deviceInfo, client)
+		reporter, err := cmd.GetStateReporter(clicontext, deviceInfo, client)
 		if err != nil {
 			return err
 		}
