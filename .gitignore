@@ -1,5 +1,6 @@
 # The binary build
-main
+layeryd
+layeryd_*
 
 *-cmdline
 *-initrd.img
