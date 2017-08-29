@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ernoaapa/layeryd/model"
+	"github.com/ernoaapa/layery/pkg/model"
 	"github.com/matishsiao/goInfo"
 )
 

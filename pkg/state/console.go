@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ernoaapa/layeryd/model"
-	"github.com/ernoaapa/layeryd/runtime"
+	"github.com/ernoaapa/layery/pkg/model"
+	"github.com/ernoaapa/layery/pkg/runtime"
 	"github.com/fatih/structs"
 	log "github.com/sirupsen/logrus"
 )

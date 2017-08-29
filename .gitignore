@@ -1,7 +1,11 @@
-# The binary build
-layeryd
-layeryd_*
 
+/bin
+/.go
+/.push-*
+/.container-*
+/.dockerfile-*
+
+# Linuxkit
 *-cmdline
 *-initrd.img
 *-kernel

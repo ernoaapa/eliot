@@ -4,9 +4,10 @@ import (
 	"os"
 	"time"
 
-	cmd "github.com/ernoaapa/layeryd/cmd"
-	"github.com/ernoaapa/layeryd/controller"
-	"github.com/ernoaapa/layeryd/device"
+	"github.com/coreos/etcd/version"
+	"github.com/ernoaapa/layery/pkg/controller"
+	"github.com/ernoaapa/layery/pkg/device"
+	utils "github.com/ernoaapa/layery/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -21,6 +22,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "layeryd"
 	app.Usage = "Layery daemon"
+	app.Version = version.Version
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "debug",
@@ -67,15 +69,15 @@ func main() {
 	}
 
 	app.Action = func(clicontext *cli.Context) error {
-		deviceInfo := device.GetInfo(cmd.GetLabels(clicontext))
-		client := cmd.GetRuntimeClient(clicontext)
+		deviceInfo := device.GetInfo(utils.GetLabels(clicontext))
+		client := utils.GetRuntimeClient(clicontext)
 
-		source, err := cmd.GetManifestSource(clicontext)
+		source, err := utils.GetManifestSource(clicontext)
 		if err != nil {
 			return err
 		}
 
-		reporter, err := cmd.GetStateReporter(clicontext, deviceInfo, client)
+		reporter, err := utils.GetStateReporter(clicontext, deviceInfo, client)
 		if err != nil {
 			return err
 		}

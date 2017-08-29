@@ -1,7 +1,7 @@
 package manifest
 
 import (
-	"github.com/ernoaapa/layeryd/model"
+	"github.com/ernoaapa/layery/pkg/model"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )

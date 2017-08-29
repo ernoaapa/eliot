@@ -1,4 +1,4 @@
-package cmd
+package utils
 
 import (
 	"context"
@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ernoaapa/layeryd/manifest"
-	"github.com/ernoaapa/layeryd/model"
-	"github.com/ernoaapa/layeryd/runtime"
-	"github.com/ernoaapa/layeryd/state"
+	"github.com/ernoaapa/layery/pkg/manifest"
+	"github.com/ernoaapa/layery/pkg/model"
+	"github.com/ernoaapa/layery/pkg/runtime"
+	"github.com/ernoaapa/layery/pkg/state"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )

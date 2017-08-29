@@ -8,7 +8,7 @@ import (
 	"github.com/containerd/containerd"
 	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
 	"github.com/containerd/containerd/plugin"
-	"github.com/ernoaapa/layeryd/model"
+	"github.com/ernoaapa/layery/pkg/model"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
