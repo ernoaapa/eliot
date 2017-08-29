@@ -3,6 +3,7 @@ package manifest
 import (
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,15 +14,16 @@ import (
 
 // URLManifestSource is source what reads manifest from file
 type URLManifestSource struct {
-	manifestURL string
-	interval    time.Duration
+	manifestURL      string
+	interval         time.Duration
+	previousManifest []model.Pod
 }
 
 // NewURLManifestSource creates new url source what updates the state intervally
 func NewURLManifestSource(manifestURL string, interval time.Duration) *URLManifestSource {
 	return &URLManifestSource{
-		manifestURL,
-		interval,
+		manifestURL: manifestURL,
+		interval:    interval,
 	}
 }
 
@@ -30,15 +32,21 @@ func (s *URLManifestSource) GetUpdates() chan []model.Pod {
 	updates := make(chan []model.Pod)
 	go func() {
 		for {
+			time.Sleep(s.interval)
+
 			log.Debugf("Load manifest from %s", s.manifestURL)
 			pods, err := s.getPods()
-
 			if err != nil {
 				log.Printf("Error reading state: %s", err)
-			} else {
-				updates <- pods
+				continue
 			}
-			time.Sleep(s.interval)
+			if reflect.DeepEqual(s.previousManifest, pods) {
+				log.Debugln("Manifest is up-to-date")
+				continue
+			}
+
+			s.previousManifest = pods
+			updates <- pods
 		}
 	}()
 	return updates

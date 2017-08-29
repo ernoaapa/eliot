@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -14,8 +15,9 @@ import (
 
 // FileManifestSource is source what reads manifest from file
 type FileManifestSource struct {
-	filePath string
-	interval time.Duration
+	filePath         string
+	interval         time.Duration
+	previousManifest []model.Pod
 }
 
 // NewFileManifestSource creates new file source what updates intervally
@@ -24,8 +26,8 @@ func NewFileManifestSource(filePath string, interval time.Duration) *FileManifes
 		log.Panicf("Unable to open state, file [%s] does not exist!", filePath)
 	}
 	return &FileManifestSource{
-		filePath,
-		interval,
+		filePath: filePath,
+		interval: interval,
 	}
 }
 
@@ -34,14 +36,19 @@ func (s *FileManifestSource) GetUpdates() chan []model.Pod {
 	updates := make(chan []model.Pod)
 	go func() {
 		for {
-			pods, err := s.getPods()
+			time.Sleep(s.interval)
 
+			pods, err := s.getPods()
 			if err != nil {
 				log.Printf("Error reading state: %s", err)
-			} else {
-				updates <- pods
+				continue
 			}
-			time.Sleep(s.interval)
+
+			if reflect.DeepEqual(s.previousManifest, pods) {
+				continue
+			}
+
+			updates <- pods
 		}
 	}()
 	return updates
