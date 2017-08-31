@@ -7,49 +7,58 @@ import (
 	"github.com/containerd/containerd/errdefs"
 	"github.com/ernoaapa/layery/pkg/model"
 	"github.com/ernoaapa/layery/pkg/runtime"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 // Sync start and stop containers to match with target pods
-func Sync(client *runtime.ContainerdClient, pods []model.Pod) (err error) {
+func Sync(client *runtime.ContainerdClient, allPods []model.Pod) (err error) {
 	log.Debugln("Received update, start updating containerd")
+	namespaces, err := client.GetNamespaces()
+	if err != nil {
+		return errors.Wrapf(err, "Failed to list namespaces when syncing containers")
+	}
 
-	for namespace, pods := range groupByNamespaces(pods) {
+	log.Debugf("Found namespaces: %s", namespaces)
+	for _, namespace := range namespaces {
+		pods := filterByNamespace(namespace, allPods)
 		containers, err := client.GetContainers(namespace)
+		log.Debugf("Found running containers in namespace %s: %d", namespace, len(containers))
 		if err != nil {
 			return err
 		}
 
 		for _, pod := range pods {
-			create, remove := groupContainers(pod, containers)
+			create := getMissingContainers(pod, containers)
 
 			log.WithFields(log.Fields{
-				"running": len(containers),
-				"create":  len(create),
-				"remove":  len(remove),
-			}).Debugf("Resolved current container status for namespace %s", namespace)
+				"namespace": namespace,
+				"create":    len(create),
+				"running":   len(containers),
+			}).Debugf("Missing containers in namespace %s", namespace)
 
 			if err := client.CreateContainers(pod, create); err != nil {
 				return err
 			}
-			if err := client.StopContainers(remove); err != nil {
-				return err
-			}
+		}
+
+		remove := getRemovedContainers(containers, pods)
+
+		log.WithFields(log.Fields{
+			"namespace": namespace,
+			"remove":    len(remove),
+		}).Debugf("Remove containers from namespace %s", namespace)
+
+		if err := client.StopContainers(remove); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-func groupContainers(pod model.Pod, active []containerd.Container) (create []model.Container, remove []containerd.Container) {
-
-	for _, targetContainer := range pod.Spec.Containers {
-		if !containsActiveContainer(pod.GetName(), targetContainer, active) {
-			create = append(create, targetContainer)
-		}
-	}
-
+func getRemovedContainers(active []containerd.Container, pods []model.Pod) (remove []containerd.Container) {
 	for _, activeContainer := range active {
-		if !containsTargetContainer(pod.GetName(), activeContainer, pod.Spec.Containers) {
+		if !containsTargetContainer(activeContainer, pods) {
 			remove = append(remove, activeContainer)
 		}
 	}
@@ -57,16 +66,27 @@ func groupContainers(pod model.Pod, active []containerd.Container) (create []mod
 	return
 }
 
-func containsTargetContainer(podName string, target containerd.Container, list []model.Container) bool {
-	for _, item := range list {
-		if target.ID() == item.ID {
-			return true
+func containsTargetContainer(target containerd.Container, pods []model.Pod) bool {
+	for _, pod := range pods {
+		for _, container := range pod.Spec.Containers {
+			if target.ID() == container.ID {
+				return true
+			}
 		}
 	}
 	return false
 }
 
-func containsActiveContainer(podName string, target model.Container, list []containerd.Container) bool {
+func getMissingContainers(pod model.Pod, active []containerd.Container) (create []model.Container) {
+	for _, targetContainer := range pod.Spec.Containers {
+		if !containsActiveContainer(targetContainer, active) {
+			create = append(create, targetContainer)
+		}
+	}
+	return
+}
+
+func containsActiveContainer(target model.Container, list []containerd.Container) bool {
 	for _, item := range list {
 		if target.ID == item.ID() {
 			return true
@@ -105,13 +125,12 @@ func isContainerRunning(ctx context.Context, container containerd.Container) boo
 	return status.Status == containerd.Running
 }
 
-func groupByNamespaces(pods []model.Pod) map[string][]model.Pod {
-	result := map[string][]model.Pod{}
+func filterByNamespace(namespace string, pods []model.Pod) []model.Pod {
+	result := []model.Pod{}
 	for _, pod := range pods {
-		if _, ok := result[pod.GetNamespace()]; !ok {
-			result[pod.GetNamespace()] = []model.Pod{}
+		if namespace == pod.GetNamespace() {
+			result = append(result, pod)
 		}
-		result[pod.GetNamespace()] = append(result[pod.GetNamespace()], pod)
 	}
 	return result
 }
