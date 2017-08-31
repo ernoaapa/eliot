@@ -18,20 +18,30 @@ func GetInfo(labels map[string]string) *model.DeviceInfo {
 		Hostname: osInfo.Hostname,
 		CPUs:     osInfo.CPUs,
 
-		MachineID: getInfoFromFiles([]string{
-			"/etc/machine-id",
-			"/var/lib/dbus/machine-id",
-		}, failIfCannotResolve("MachineID")),
+		MachineID: resolveFirst(
+			"MachineID",
+			fromEnv("MACHINE_ID"),
+			fromFiles([]string{
+				"/etc/machine-id",
+				"/var/lib/dbus/machine-id",
+			}),
+		),
 
-		SystemUUID: getInfoFromFiles([]string{
-			"/sys/class/dmi/id/product_uuid",
-			"/proc/device-tree/system-id",
-			"/proc/device-tree/vm,uuid",
-			"/etc/machine-id",
-		}, failIfCannotResolve("SystemUUID")),
+		SystemUUID: resolveFirst(
+			"SystemUUID",
+			fromFiles([]string{
+				"/sys/class/dmi/id/product_uuid",
+				"/proc/device-tree/system-id",
+				"/proc/device-tree/vm,uuid",
+				"/etc/machine-id",
+			}),
+		),
 
-		BootID: getInfoFromFiles([]string{
-			"/proc/sys/kernel/random/boot_id",
-		}, failIfCannotResolve("BootID")),
+		BootID: resolveFirst(
+			"BootID",
+			fromFiles([]string{
+				"/proc/sys/kernel/random/boot_id",
+			}),
+		),
 	}
 }
