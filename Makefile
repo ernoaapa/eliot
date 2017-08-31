@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # The binary to build (just the basename).
-BIN := layery
+BIN := layeryd
 
 # This repo's root import path (under GOPATH).
 PKG := github.com/ernoaapa/layery
@@ -54,7 +54,7 @@ endif
 
 IMAGE := $(REGISTRY)/$(BIN)-$(ARCH)
 
-BUILD_IMAGE ?= golang:1.8-alpine
+BUILD_IMAGE ?= golang:1.9-alpine
 
 # If you want to build all binaries, see the 'all-build' rule.
 # If you want to build all containers, see the 'all-container' rule.
@@ -157,7 +157,6 @@ test: build-dirs
 	    $(BUILD_IMAGE)                                                      \
 	    /bin/sh -c "                                                        \
 	        ./build/test.sh $(SRC_DIRS)                                     \
-
 	    "
 
 build-dirs:

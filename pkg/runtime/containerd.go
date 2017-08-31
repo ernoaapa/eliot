@@ -100,7 +100,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		return err
 	}
 
-	spec, err := containerd.GenerateSpec(containerd.WithImageConfig(ctx, image))
+	spec, err := containerd.GenerateSpec(ctx, client, nil, containerd.WithImageConfig(image))
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	created, err := client.NewContainer(ctx, container.ID,
 		containerd.WithSpec(spec),
 		containerd.WithNewSnapshotView(container.ID, image),
-		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux")),
+		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 	)
 	if err != nil {
 		c.resetConnection()
