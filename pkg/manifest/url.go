@@ -1,9 +1,11 @@
 package manifest
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -64,5 +66,11 @@ func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {
 		return pods, errors.Wrapf(err, "Failed to read response")
 	}
 
-	return unmarshalYaml(data)
+	if strings.HasSuffix(strings.ToLower(s.manifestURL), "yaml") {
+		return unmarshalYaml(data)
+	} else if strings.HasSuffix(strings.ToLower(s.manifestURL), "json") {
+		return unmarshalJSON(data)
+	} else {
+		return pods, fmt.Errorf("Cannot resolve from url data type! Must end with 'json' or 'yaml'")
+	}
 }
