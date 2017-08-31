@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"strings"
 	"time"
 
@@ -16,9 +15,8 @@ import (
 
 // URLManifestSource is source what reads manifest from file
 type URLManifestSource struct {
-	manifestURL      string
-	interval         time.Duration
-	previousManifest []model.Pod
+	manifestURL string
+	interval    time.Duration
 }
 
 // NewURLManifestSource creates new url source what updates the state intervally
@@ -34,21 +32,14 @@ func (s *URLManifestSource) GetUpdates() chan []model.Pod {
 	updates := make(chan []model.Pod)
 	go func() {
 		for {
-			time.Sleep(s.interval)
-
 			log.Debugf("Load manifest from %s", s.manifestURL)
 			pods, err := s.getPods()
 			if err != nil {
 				log.Printf("Error reading state: %s", err)
-				continue
+			} else {
+				updates <- pods
 			}
-			if reflect.DeepEqual(s.previousManifest, pods) {
-				log.Debugln("Manifest is up-to-date")
-				continue
-			}
-
-			s.previousManifest = pods
-			updates <- pods
+			time.Sleep(s.interval)
 		}
 	}()
 	return updates
