@@ -14,6 +14,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	snapshotter = "overlayfs"
+)
+
 // ContainerdClient is containerd client wrapper
 type ContainerdClient struct {
 	client  *containerd.Client
@@ -108,6 +112,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	log.Debugf("Create new container from image %s...", image.Name())
 	created, err := client.NewContainer(ctx, container.ID,
 		containerd.WithSpec(spec),
+		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshotView(container.ID, image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 	)
@@ -177,7 +182,7 @@ func (c *ContainerdClient) EnsureImagePulled(namespace, ref string) (image conta
 	}
 
 	log.Debugf("Unpacking container image [%s]...", image.Target().Digest)
-	err = image.Unpack(ctx, "")
+	err = image.Unpack(ctx, snapshotter)
 	if err != nil {
 		c.resetConnection()
 		return image, errors.Wrapf(err, "Error while unpacking image [%s]", image.Target().Digest)
