@@ -36,7 +36,7 @@ func (s *FileManifestSource) GetUpdates() chan []model.Pod {
 		for {
 			pods, err := s.getPods()
 			if err != nil {
-				log.Printf("Error reading state: %s", err)
+				log.Printf("Error while fetching manifest: %s", err)
 			} else {
 				updates <- pods
 			}
