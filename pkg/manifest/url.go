@@ -1,7 +1,6 @@
 package manifest
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -35,7 +34,7 @@ func (s *URLManifestSource) GetUpdates() chan []model.Pod {
 			log.Debugf("Load manifest from %s", s.manifestURL)
 			pods, err := s.getPods()
 			if err != nil {
-				log.Printf("Error reading state: %s", err)
+				log.Warnf("Error while fetching manifest: %s", err)
 			} else {
 				updates <- pods
 			}
@@ -57,11 +56,9 @@ func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {
 		return pods, errors.Wrapf(err, "Failed to read response")
 	}
 
-	if strings.HasSuffix(strings.ToLower(s.manifestURL), "yaml") {
-		return unmarshalYaml(data)
-	} else if strings.HasSuffix(strings.ToLower(s.manifestURL), "json") {
+	if strings.HasSuffix(strings.ToLower(s.manifestURL), "json") {
 		return unmarshalJSON(data)
 	} else {
-		return pods, fmt.Errorf("Cannot resolve from url data type! Must end with 'json' or 'yaml'")
+		return unmarshalYaml(data)
 	}
 }
