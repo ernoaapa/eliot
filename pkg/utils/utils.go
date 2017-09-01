@@ -9,14 +9,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/manifest"
-	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/ernoaapa/can/pkg/state"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
 
+// GetLabels return --labels CLI parameter value as string map
 func GetLabels(clicontext *cli.Context) map[string]string {
 	if !clicontext.IsSet("labels") {
 		return map[string]string{}
@@ -37,6 +38,7 @@ func GetLabels(clicontext *cli.Context) map[string]string {
 	return labels
 }
 
+// GetRuntimeClient initialises new runtime client from CLI parameters
 func GetRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
 	return runtime.NewContainerdClient(
 		context.Background(),
@@ -45,7 +47,8 @@ func GetRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
 	)
 }
 
-func GetManifestSource(clicontext *cli.Context) (manifest.Source, error) {
+// GetManifestSource initialises new manifest source based on CLI parameters
+func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver) (manifest.Source, error) {
 	if !clicontext.IsSet("manifest") {
 		return nil, fmt.Errorf("You must define --manifest parameter")
 	}
@@ -57,7 +60,7 @@ func GetManifestSource(clicontext *cli.Context) (manifest.Source, error) {
 	}
 
 	if fileExists(manifestParam) {
-		return manifest.NewFileManifestSource(manifestParam, interval), nil
+		return manifest.NewFileManifestSource(manifestParam, interval, resolver), nil
 	}
 
 	manifestURL, err := url.Parse(manifestParam)
@@ -67,16 +70,17 @@ func GetManifestSource(clicontext *cli.Context) (manifest.Source, error) {
 
 	switch scheme := manifestURL.Scheme; scheme {
 	case "file":
-		return manifest.NewFileManifestSource(manifestURL.Path, interval), nil
+		return manifest.NewFileManifestSource(manifestURL.Path, interval, resolver), nil
 	case "http", "https":
-		return manifest.NewURLManifestSource(manifestParam, interval), nil
+		return manifest.NewURLManifestSource(manifestParam, interval, resolver), nil
 	}
 	return nil, fmt.Errorf("You must define manifest source. E.g. --manifest path/to/file.yml")
 }
 
-func GetStateReporter(clicontext *cli.Context, info *model.DeviceInfo, client *runtime.ContainerdClient) (state.Reporter, error) {
+// GetStateReporter initialises new state reporter based on CLI parameters
+func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, client *runtime.ContainerdClient) (state.Reporter, error) {
 	return state.NewConsoleStateReporter(
-		info,
+		resolver,
 		client,
 		clicontext.GlobalDuration("state-update-interval"),
 	), nil

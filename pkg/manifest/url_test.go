@@ -7,10 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ernoaapa/can/pkg/device"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUrlSource(t *testing.T) {
+	resolver := device.NewResolver(map[string]string{})
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `
 - metadata:
@@ -32,7 +34,7 @@ func TestUrlSource(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	source := NewURLManifestSource(ts.URL, 100*time.Millisecond)
+	source := NewURLManifestSource(ts.URL, 100*time.Millisecond, resolver)
 	updates := source.GetUpdates()
 
 	select {

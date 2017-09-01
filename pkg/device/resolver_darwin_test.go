@@ -10,7 +10,8 @@ func TestGetInfo(t *testing.T) {
 	labels := map[string]string{
 		"foo": "bar",
 	}
-	info := GetInfo(labels)
+
+	info := NewResolver(labels).GetInfo()
 
 	assert.NotEmpty(t, info.BootID, "should resolve BootID")
 	assert.NotEmpty(t, info.MachineID, "should resolve MachineID")

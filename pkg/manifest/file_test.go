@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ernoaapa/can/pkg/device"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,6 +21,7 @@ func createTempFile(t *testing.T, data []byte) string {
 }
 
 func TestFileSource(t *testing.T) {
+	resolver := device.NewResolver(map[string]string{})
 	filePath := createTempFile(t, []byte(`
 - metadata:
     name: "foo"
@@ -38,7 +40,7 @@ func TestFileSource(t *testing.T) {
         image: "docker.io/library/hello-world:latest"
 `))
 
-	source := NewFileManifestSource(filePath, 100*time.Millisecond)
+	source := NewFileManifestSource(filePath, 100*time.Millisecond, resolver)
 	updates := source.GetUpdates()
 
 	select {

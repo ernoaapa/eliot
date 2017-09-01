@@ -6,11 +6,11 @@ import (
 )
 
 // GetInfo resolves information about the device
-func GetInfo(labels map[string]string) *model.DeviceInfo {
+func (r *Resolver) GetInfo() *model.DeviceInfo {
 	osInfo := goInfo.GetInfo()
 
 	return &model.DeviceInfo{
-		Labels:   labels,
+		Labels:   r.labels,
 		Platform: osInfo.Platform,
 		OS:       osInfo.GoOS,
 		Kernel:   osInfo.Kernel,

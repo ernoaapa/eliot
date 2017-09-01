@@ -69,15 +69,15 @@ func main() {
 	}
 
 	app.Action = func(clicontext *cli.Context) error {
-		deviceInfo := device.GetInfo(utils.GetLabels(clicontext))
+		resolver := device.NewResolver(utils.GetLabels(clicontext))
 		client := utils.GetRuntimeClient(clicontext)
 
-		source, err := utils.GetManifestSource(clicontext)
+		source, err := utils.GetManifestSource(clicontext, resolver)
 		if err != nil {
 			return err
 		}
 
-		reporter, err := utils.GetStateReporter(clicontext, deviceInfo, client)
+		reporter, err := utils.GetStateReporter(clicontext, resolver, client)
 		if err != nil {
 			return err
 		}

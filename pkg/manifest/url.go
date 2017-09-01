@@ -1,6 +1,8 @@
 package manifest
 
 import (
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -9,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
 )
 
@@ -16,13 +19,15 @@ import (
 type URLManifestSource struct {
 	manifestURL string
 	interval    time.Duration
+	resolver    *device.Resolver
 }
 
 // NewURLManifestSource creates new url source what updates the state intervally
-func NewURLManifestSource(manifestURL string, interval time.Duration) *URLManifestSource {
+func NewURLManifestSource(manifestURL string, interval time.Duration, resolver *device.Resolver) *URLManifestSource {
 	return &URLManifestSource{
 		manifestURL: manifestURL,
 		interval:    interval,
+		resolver:    resolver,
 	}
 }
 
@@ -45,7 +50,11 @@ func (s *URLManifestSource) GetUpdates() chan []model.Pod {
 }
 
 func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {
-	resp, err := http.Get(s.manifestURL)
+	body, err := json.Marshal(s.resolver.GetInfo())
+	if err != nil {
+		return pods, errors.Wrap(err, "Error wile marshalling device info to JSON")
+	}
+	resp, err := http.Post(s.manifestURL, "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		return pods, errors.Wrapf(err, "Cannot download manifest file [%s]", s.manifestURL)
 	}
@@ -58,7 +67,6 @@ func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {
 
 	if strings.HasSuffix(strings.ToLower(s.manifestURL), "json") {
 		return unmarshalJSON(data)
-	} else {
-		return unmarshalYaml(data)
 	}
+	return unmarshalYaml(data)
 }

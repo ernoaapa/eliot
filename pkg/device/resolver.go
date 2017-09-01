@@ -7,6 +7,18 @@ import (
 	"strings"
 )
 
+// Resolver provides information about the device
+type Resolver struct {
+	labels map[string]string
+}
+
+// NewResolver creates new resolver with static device labels
+func NewResolver(labels map[string]string) *Resolver {
+	return &Resolver{
+		labels,
+	}
+}
+
 func resolveFirst(name string, resolvers ...func() string) string {
 	for _, resolver := range resolvers {
 		result := resolver()

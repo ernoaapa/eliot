@@ -4,23 +4,23 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
-	"github.com/fatih/structs"
 	log "github.com/sirupsen/logrus"
 )
 
 // ConsoleStateReporter is Reporter implementation what just prints status to stdout
 type ConsoleStateReporter struct {
-	info     *model.DeviceInfo
+	resolver *device.Resolver
 	client   *runtime.ContainerdClient
 	interval time.Duration
 }
 
 // NewConsoleStateReporter creates new ConsoleStateReporter
-func NewConsoleStateReporter(info *model.DeviceInfo, client *runtime.ContainerdClient, interval time.Duration) *ConsoleStateReporter {
+func NewConsoleStateReporter(resolver *device.Resolver, client *runtime.ContainerdClient, interval time.Duration) *ConsoleStateReporter {
 	return &ConsoleStateReporter{
-		info,
+		resolver,
 		client,
 		interval,
 	}
@@ -28,15 +28,6 @@ func NewConsoleStateReporter(info *model.DeviceInfo, client *runtime.ContainerdC
 
 // Start starts printing status to console with given interval
 func (r *ConsoleStateReporter) Start() {
-	r.registerDevice()
-	r.runReportLoop()
-}
-
-func (r *ConsoleStateReporter) registerDevice() {
-	log.WithFields(structs.Map(r.info)).Infoln("Device registered")
-}
-
-func (r *ConsoleStateReporter) runReportLoop() {
 	for {
 		states, err := getCurrentState(r.client)
 		if err != nil {

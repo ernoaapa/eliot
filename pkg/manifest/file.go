@@ -9,6 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
 )
 
@@ -16,16 +17,18 @@ import (
 type FileManifestSource struct {
 	filePath string
 	interval time.Duration
+	resolver *device.Resolver
 }
 
 // NewFileManifestSource creates new file source what updates intervally
-func NewFileManifestSource(filePath string, interval time.Duration) *FileManifestSource {
+func NewFileManifestSource(filePath string, interval time.Duration, resolver *device.Resolver) *FileManifestSource {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		log.Panicf("Unable to open state, file [%s] does not exist!", filePath)
 	}
 	return &FileManifestSource{
 		filePath: filePath,
 		interval: interval,
+		resolver: resolver,
 	}
 }
 
