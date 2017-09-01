@@ -1,7 +1,7 @@
 package device
 
 import (
-	"github.com/ernoaapa/layery/pkg/model"
+	"github.com/ernoaapa/can/pkg/model"
 	"github.com/matishsiao/goInfo"
 )
 

@@ -2,8 +2,8 @@ package state
 
 import (
 	"github.com/containerd/containerd"
-	"github.com/ernoaapa/layery/pkg/model"
-	"github.com/ernoaapa/layery/pkg/runtime"
+	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/runtime"
 )
 
 func getCurrentState(client *runtime.ContainerdClient) (result map[string]*model.DeviceState, err error) {

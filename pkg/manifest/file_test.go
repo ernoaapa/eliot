@@ -48,7 +48,7 @@ func TestFileSource(t *testing.T) {
 		assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
 
 		assert.Equal(t, "my-namespace", pods[0].GetNamespace(), "Should set default namespace")
-		assert.Equal(t, "layeryd", pods[1].GetNamespace(), "Should set default namespace")
+		assert.Equal(t, "cand", pods[1].GetNamespace(), "Should set default namespace")
 	case <-time.After(200 * time.Millisecond):
 		assert.FailNow(t, "Didn't receive update in two second")
 	}

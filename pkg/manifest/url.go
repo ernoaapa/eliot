@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/ernoaapa/layery/pkg/model"
+	"github.com/ernoaapa/can/pkg/model"
 )
 
 // URLManifestSource is source what reads manifest from file

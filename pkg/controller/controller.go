@@ -5,8 +5,8 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/errdefs"
-	"github.com/ernoaapa/layery/pkg/model"
-	"github.com/ernoaapa/layery/pkg/runtime"
+	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

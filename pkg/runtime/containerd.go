@@ -8,7 +8,7 @@ import (
 	"github.com/containerd/containerd"
 	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
 	"github.com/containerd/containerd/plugin"
-	"github.com/ernoaapa/layery/pkg/model"
+	"github.com/ernoaapa/can/pkg/model"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
@@ -191,7 +191,7 @@ func (c *ContainerdClient) EnsureImagePulled(namespace, ref string) (image conta
 	return image, nil
 }
 
-// GetNamespaces return all namespaces what layeryd manages
+// GetNamespaces return all namespaces what cand manages
 func (c *ContainerdClient) GetNamespaces() ([]string, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()

@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/coreos/etcd/version"
-	"github.com/ernoaapa/layery/pkg/controller"
-	"github.com/ernoaapa/layery/pkg/device"
-	utils "github.com/ernoaapa/layery/pkg/utils"
+	"github.com/ernoaapa/can/pkg/controller"
+	"github.com/ernoaapa/can/pkg/device"
+	utils "github.com/ernoaapa/can/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -20,8 +20,8 @@ var (
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "layeryd"
-	app.Usage = "Layery daemon"
+	app.Name = "cand"
+	app.Usage = "Can daemon"
 	app.Version = version.Version
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{

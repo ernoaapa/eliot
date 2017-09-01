@@ -13,10 +13,10 @@
 # limitations under the License.
 
 # The binary to build (just the basename).
-BIN := layeryd
+BIN := cand
 
 # This repo's root import path (under GOPATH).
-PKG := github.com/ernoaapa/layery
+PKG := github.com/ernoaapa/can
 
 # Where to push the docker image.
 REGISTRY ?= ernoaapa

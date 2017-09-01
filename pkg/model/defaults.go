@@ -1,7 +1,7 @@
 package model
 
 // DefaultNamespace is namespace what each pod get if there is no metadata.namespace
-var DefaultNamespace = "layeryd"
+var DefaultNamespace = "cand"
 
 // Defaults set default values to pod definitions
 func Defaults(pods []Pod) (result []Pod) {

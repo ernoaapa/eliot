@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ernoaapa/layery/pkg/manifest"
-	"github.com/ernoaapa/layery/pkg/model"
-	"github.com/ernoaapa/layery/pkg/runtime"
-	"github.com/ernoaapa/layery/pkg/state"
+	"github.com/ernoaapa/can/pkg/manifest"
+	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/runtime"
+	"github.com/ernoaapa/can/pkg/state"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
