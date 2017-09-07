@@ -13,7 +13,7 @@ import (
 
 // Sync start and stop containers to match with target pods
 func Sync(client *runtime.ContainerdClient, allPods []model.Pod) (err error) {
-	log.Debugln("Received update, start updating containerd")
+	log.Debugf("Received update, start updating containerd: %v", allPods)
 	namespaces, err := client.GetNamespaces()
 	if err != nil {
 		return errors.Wrapf(err, "Failed to list namespaces when syncing containers")

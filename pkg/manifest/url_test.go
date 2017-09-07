@@ -14,6 +14,9 @@ import (
 func TestUrlSource(t *testing.T) {
 	resolver := device.NewResolver(map[string]string{})
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "PUT", r.Method, "Should make PUT request")
+
+		w.Header().Set(contentTypeHeader, yamlContentType)
 		fmt.Fprintln(w, `
 - metadata:
     name: "foo"
@@ -47,5 +50,26 @@ func TestUrlSource(t *testing.T) {
 		assert.Equal(t, "cand", pods[1].GetNamespace(), "Should set default namespace")
 	case <-time.After(200 * time.Millisecond):
 		assert.FailNow(t, "Didn't receive update in two second")
+	}
+}
+
+func TestUrlSourceHandlesUnauthorized(t *testing.T) {
+	resolver := device.NewResolver(map[string]string{})
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Header().Set(contentTypeHeader, jsonContentType)
+		w.Write([]byte("Whoops not authorized!"))
+
+	}))
+	defer ts.Close()
+
+	source := NewURLManifestSource(ts.URL, 100*time.Millisecond, resolver)
+	updates := source.GetUpdates()
+
+	select {
+	case <-updates:
+		assert.FailNow(t, "Where did you got that info?!")
+	case <-time.After(200 * time.Millisecond):
+		// Ok, didn't fail...
 	}
 }

@@ -7,14 +7,14 @@ type DeviceInfo struct {
 
 	// The machine id is an ID identifying a specific Linux/Unix installation.
 	// It does not change if hardware is replaced.
-	MachineID string `json:"machine_id"`
+	MachineID string `json:"machineId"`
 
 	// The system uuid is the main board product UUID,
 	// as set by the board manufacturer and encoded in the BIOS DMI information
-	SystemUUID string `json:"system_uuid"`
+	SystemUUID string `json:"systemUuid"`
 
 	// A random ID that is regenerated on each boot
-	BootID string `json:"boot_id"`
+	BootID string `json:"bootId"`
 
 	// Device operating system. One of 386, amd64, arm, s390x, and so on.
 	Arch string `json:"arch"`
