@@ -14,8 +14,10 @@ var (
 
 // Pod is set of containers
 type Pod struct {
-	Metadata Metadata `validate:"hasName"  json:"metadata" yaml:"metadata"`
-	Spec     Spec     `validate:"required" json:"spec"     yaml:"spec"`
+	UID      string    `                    json:"uid"     yaml:"uid"`
+	Metadata Metadata  `validate:"hasName"  json:"metadata" yaml:"metadata"`
+	Spec     Spec      `validate:"required" json:"spec"     yaml:"spec"`
+	Status   PodStatus `                    json:"status"   yaml:"status"`
 }
 
 // GetName returns pod name from metadata
@@ -56,13 +58,28 @@ type Spec struct {
 
 // Container defines what image should be running
 type Container struct {
-	ID        string `                                          json:"id"        yaml:"id"`
-	Name      string `validate:"required,gt=0,alphanumOrDash"   json:"name"      yaml:"name"`
-	Image     string `validate:"required,gt=0,imageRef"         json:"image"     yaml:"image"`
-	Namespace string `validate:"omitempty,gt=0,alphanumOrDash"  json:"namespace" yaml:"namespace"`
+	ID    string
+	Name  string `validate:"required,gt=0,alphanumOrDash"   json:"name"      yaml:"name"`
+	Image string `validate:"required,gt=0,imageRef"         json:"image"     yaml:"image"`
 }
 
 // BuildContainerID creates unique id for the container from parent pod name
 func BuildContainerID(podName, containerName string) string {
 	return fmt.Sprintf("%s-%s", podName, containerName)
+}
+
+// PodStatus represents latest known state of pod
+type PodStatus struct {
+	ContainerStatuses []ContainerStatus `json:"containerStatuses" yaml:"containerStatuses"`
+}
+
+// ContainerStatus represents one container status
+type ContainerStatus struct {
+	ContainerID string `json:"containerId" yaml:"containerId"`
+
+	Image string `json:"image" yaml:"image"`
+
+	Ready bool `json:"ready" yaml:"ready"`
+
+	State string `json:"state" yaml:"state"`
 }

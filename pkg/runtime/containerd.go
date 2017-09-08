@@ -7,6 +7,7 @@ import (
 
 	"github.com/containerd/containerd"
 	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
+	tasks "github.com/containerd/containerd/api/services/tasks/v1"
 	"github.com/containerd/containerd/plugin"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/pkg/errors"
@@ -110,7 +111,9 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
-	created, err := client.NewContainer(ctx, container.ID,
+	created, err := client.NewContainer(ctx,
+		container.ID,
+		containerd.WithContainerLabels(getContainerLabels(pod, container)),
 		containerd.WithSpec(spec),
 		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshotView(container.ID, image),
@@ -216,4 +219,25 @@ func getNamespaces(namespaces []namespaces.Namespace) (result []string) {
 		}
 	}
 	return result
+}
+
+// GetContainerTaskStatus resolves container status or return UNKNOWN
+func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
+
+	ctx, cancel := c.getContext()
+	defer cancel()
+
+	client, err := c.getConnection(model.DefaultNamespace)
+	if err != nil {
+		return "UNKNOWN"
+	}
+
+	resp, err := client.TaskService().Get(ctx, &tasks.GetRequest{
+		ContainerID: containerID,
+	})
+	if err != nil {
+		return "UNKNOWN"
+	}
+
+	return resp.Process.Status.String()
 }

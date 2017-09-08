@@ -1,7 +1,6 @@
 package state
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/ernoaapa/can/pkg/device"
@@ -40,12 +39,26 @@ func (r *ConsoleStateReporter) Start() {
 }
 
 // Report implements Reporter interface by printing out the state to console
-func (r *ConsoleStateReporter) report(states map[string]*model.DeviceState) error {
-
-	for namespace, state := range states {
-		log.WithFields(log.Fields{
-			"nr of pods": fmt.Sprintf("%d containers", len(state.Pods)),
-		}).Infof("%s state update", namespace)
+func (r *ConsoleStateReporter) report(podsWithStates []*model.Pod) error {
+	for _, pod := range podsWithStates {
+		states := getContainerStateCounts(pod.Status.ContainerStatuses)
+		log.WithFields(states).Infof("%s pod containers state", pod.GetName())
 	}
 	return nil
+}
+
+func getContainerStateCounts(statuses []model.ContainerStatus) log.Fields {
+	result := map[string]int{}
+	for _, status := range statuses {
+		if _, ok := result[status.State]; !ok {
+			result[status.State] = 0
+		}
+		result[status.State] = result[status.State] + 1
+	}
+
+	fields := log.Fields{}
+	for key, value := range result {
+		fields[key] = value
+	}
+	return fields
 }
