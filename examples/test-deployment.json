@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "name": "test-deployment"
+  },
+  "spec": {
+    "selector": {
+      "foo": "bar"
+    },
+    "template": {
+      "metadata": {
+        "name": "my-service"
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "foo-1",
+            "image": "docker.io/library/hello-world:latest"
+          }
+        ]
+      }
+    }
+  }
+}

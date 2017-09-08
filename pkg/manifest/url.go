@@ -63,7 +63,7 @@ func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {
 	if err != nil {
 		return pods, errors.Wrap(err, "Error wile marshalling device info to JSON")
 	}
-	resp, err := put(s.manifestURL, "application/json", bytes.NewBuffer(body))
+	resp, err := put(s.manifestURL, jsonContentType, bytes.NewBuffer(body))
 	if err != nil {
 		return pods, errors.Wrapf(err, "Cannot download manifest file [%s]", s.manifestURL)
 	}
