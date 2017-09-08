@@ -18,6 +18,7 @@ func Sync(client *runtime.ContainerdClient, allPods []model.Pod) (err error) {
 	if err != nil {
 		return errors.Wrapf(err, "Failed to list namespaces when syncing containers")
 	}
+	namespaces = append(namespaces, getNamespaces(allPods)...)
 
 	log.Debugf("Found namespaces: %s", namespaces)
 	for _, namespace := range namespaces {
@@ -54,6 +55,14 @@ func Sync(client *runtime.ContainerdClient, allPods []model.Pod) (err error) {
 		}
 	}
 	return nil
+}
+
+func getNamespaces(pods []model.Pod) []string {
+	result := []string{}
+	for _, pod := range pods {
+		result = append(result, pod.GetNamespace())
+	}
+	return result
 }
 
 func getRemovedContainers(active []containerd.Container, pods []model.Pod) (remove []containerd.Container) {
