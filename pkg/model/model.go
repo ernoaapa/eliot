@@ -70,16 +70,13 @@ func BuildContainerID(podName, containerName string) string {
 
 // PodStatus represents latest known state of pod
 type PodStatus struct {
-	ContainerStatuses []ContainerStatus `json:"containerStatuses" yaml:"containerStatuses"`
+	ContainerStatuses []ContainerStatus `validate:"dive"   json:"containerStatuses,omitempty"   yaml:"containerStatuses,omitempty"`
 }
 
 // ContainerStatus represents one container status
 type ContainerStatus struct {
-	ContainerID string `json:"containerId" yaml:"containerId"`
-
-	Image string `json:"image" yaml:"image"`
-
-	Ready bool `json:"ready" yaml:"ready"`
-
-	State string `json:"state" yaml:"state"`
+	ContainerID string `json:"containerId,omitempty"  yaml:"containerId,omitempty"`
+	Image       string `json:"image,omitempty"        yaml:"image,omitempty"`
+	Ready       bool   `json:"ready,omitempty"        yaml:"ready,omitempty"`
+	State       string `json:"state,omitempty"        yaml:"state,omitempty"`
 }

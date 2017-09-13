@@ -79,10 +79,16 @@ func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver) (mani
 
 // GetStateReporter initialises new state reporter based on CLI parameters
 func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, client *runtime.ContainerdClient) (state.Reporter, error) {
-	return state.NewConsoleStateReporter(
+	// return state.NewConsoleStateReporter(
+	// 	resolver,
+	// 	client,
+	// 	clicontext.GlobalDuration("state-update-interval"),
+	// ), nil
+	return state.NewURLStateReporter(
 		resolver,
 		client,
 		clicontext.GlobalDuration("state-update-interval"),
+		"http://localhost:3000/api/devices/localtest/pods",
 	), nil
 }
 
