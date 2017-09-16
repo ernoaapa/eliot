@@ -14,7 +14,7 @@
         "containers": [
           {
             "name": "foo-1",
-            "image": "docker.io/library/hello-world:latest"
+            "image": "docker.io/eaapa/hello-world:latest"
           }
         ]
       }
