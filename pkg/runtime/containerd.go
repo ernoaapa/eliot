@@ -229,6 +229,7 @@ func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
 
 	client, err := c.getConnection(model.DefaultNamespace)
 	if err != nil {
+		log.Warnf("Unable to get connection for resolving task status for containerID %s", containerID)
 		return "UNKNOWN"
 	}
 
@@ -236,6 +237,7 @@ func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
 		ContainerID: containerID,
 	})
 	if err != nil {
+		log.Warnf("Unable to resolve Container task status: %s", err)
 		return "UNKNOWN"
 	}
 
