@@ -1,10 +1,10 @@
 kernel:
-  image: linuxkit/kernel:4.9.44
+  image: linuxkit/kernel:4.9.50
   cmdline: "console=tty0 console=ttyS0 console=ttyAMA0"
 init:
-  - linuxkit/init:9abee9a05602bba53b44267426e7fdd6047fc40e
+  - linuxkit/init:851e9c3ad0574d640b733b92fdb26c368d2f7f8f
   - linuxkit/runc:a1b564248a0d0b118c11e61db9f84ecf41dd2d2a
-  - linuxkit/containerd:dce2f2c17a03c3b5bc215a47ebb5ec81cfeeba03
+  - linuxkit/containerd:06876ceef325e49e9ba119659357768d5df89075
   - linuxkit/ca-certificates:e44b0a66df5a102c0e220f0066b0d904710dcb10
 onboot:
   - name: sysctl
@@ -26,14 +26,27 @@ services:
     capabilities:
       - all
     binds:
-      - /containerd-shim:/containerd-shim
+      - /usr/bin/ctr:/usr/bin/ctr # ctr for debugging
+      - /containers:/containers # ctr requires access to be able to manage containers
+      - /run/containerd:/run/containerd # need access to sockets
+  - name: cand
+    image: ernoaapa/cand-amd64:63f2878
+    command: ["/cand", "--debug", "--labels", "foo=bar", "--manifest", "http://192.168.1.102:3000/api/devices/localtest/manifest"]
+    capabilities:
+      - all
+    binds:
       - /containers:/containers
-      - /usr/bin/ctr:/usr/bin/ctr
+      - /run/containerd:/run/containerd
+      - /etc/resolv.conf:/etc/resolv.conf
+      - /etc/machine-id:/etc/machine-id
 files:
   - path: root/.ssh/authorized_keys
     source: ~/.ssh/id_rsa.pub
     mode: "0600"
     optional: true
+  - path: /etc/machine-id
+    contents: "104CECBC-6037-5FCF-AF75-80EB7040CD11"
+    mode: "0600"
 trust:
   org:
     - linuxkit
