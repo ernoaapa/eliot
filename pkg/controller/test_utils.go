@@ -59,7 +59,7 @@ func (c *FakeClient) GetContainerTask(container containerd.Container) (task cont
 	return container.Task(nil, nil)
 }
 func (c *FakeClient) GetContainerTaskStatus(containerID string) string {
-	return ""
+	return "UNKNOWN"
 }
 
 func (c *FakeClient) verifyExpectations(createdCount, startedCount, stoppedCount int) {

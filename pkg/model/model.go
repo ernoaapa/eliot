@@ -77,6 +77,5 @@ type PodStatus struct {
 type ContainerStatus struct {
 	ContainerID string `json:"containerId,omitempty"  yaml:"containerId,omitempty"`
 	Image       string `json:"image,omitempty"        yaml:"image,omitempty"`
-	Ready       bool   `json:"ready,omitempty"        yaml:"ready,omitempty"`
 	State       string `json:"state,omitempty"        yaml:"state,omitempty"`
 }
