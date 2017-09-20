@@ -80,16 +80,6 @@ func (c *ContainerdClient) GetContainers(namespace string) (containers []contain
 	return containers, nil
 }
 
-// CreateContainers create all given container definitions
-func (c *ContainerdClient) CreateContainers(pod model.Pod, containers []model.Container) error {
-	for _, container := range containers {
-		if err := c.CreateContainer(pod, container); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // CreateContainer creates given container
 func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) error {
 	ctx, cancel := c.getContext()
@@ -138,17 +128,6 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		return errors.Wrapf(err, "Failed to start task in container", created.ID())
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
-	return nil
-}
-
-// StopContainers stop all given containers
-func (c *ContainerdClient) StopContainers(containers []containerd.Container) error {
-	for _, container := range containers {
-		err := c.StopContainer(container)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

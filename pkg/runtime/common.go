@@ -15,18 +15,18 @@ var (
 )
 
 func GetLabelFor(labels map[string]string, key string) string {
-	return labels[getLabelKeyFor(key)]
+	return labels[GetLabelKeyFor(key)]
 }
 
-func getLabelKeyFor(name string) string {
+func GetLabelKeyFor(name string) string {
 	return fmt.Sprintf("%s.%s", ContainerLabelPrefix, name)
 }
 
 func getContainerLabels(pod model.Pod, container model.Container) map[string]string {
 	labels := make(map[string]string)
-	labels[getLabelKeyFor(PodUIDSuffix)] = pod.UID
-	labels[getLabelKeyFor(PodNameSuffix)] = pod.GetName()
-	labels[getLabelKeyFor(PodNamespaceSuffix)] = pod.GetNamespace()
-	labels[getLabelKeyFor(ContainerNameSuffix)] = container.Name
+	labels[GetLabelKeyFor(PodUIDSuffix)] = pod.UID
+	labels[GetLabelKeyFor(PodNameSuffix)] = pod.GetName()
+	labels[GetLabelKeyFor(PodNamespaceSuffix)] = pod.GetNamespace()
+	labels[GetLabelKeyFor(ContainerNameSuffix)] = container.Name
 	return labels
 }

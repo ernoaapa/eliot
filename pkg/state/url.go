@@ -19,13 +19,13 @@ import (
 // URLStateReporter is Reporter implementation what PUT data to url
 type URLStateReporter struct {
 	resolver *device.Resolver
-	client   *runtime.ContainerdClient
+	client   runtime.Client
 	interval time.Duration
 	url      string
 }
 
 // NewURLStateReporter creates new URLStateReporter
-func NewURLStateReporter(resolver *device.Resolver, client *runtime.ContainerdClient, interval time.Duration, url string) *URLStateReporter {
+func NewURLStateReporter(resolver *device.Resolver, client runtime.Client, interval time.Duration, url string) *URLStateReporter {
 	return &URLStateReporter{
 		resolver,
 		client,

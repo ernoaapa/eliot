@@ -18,7 +18,7 @@ func Defaults(pods []Pod) (result []Pod) {
 
 func defaultContainers(podName string, containers []Container) (result []Container) {
 	for _, container := range containers {
-		container.ID = BuildContainerID(podName, container.Name)
+		container.ID = BuildContainerID()
 		result = append(result, container)
 	}
 	return result

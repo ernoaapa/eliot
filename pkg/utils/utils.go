@@ -39,7 +39,7 @@ func GetLabels(clicontext *cli.Context) map[string]string {
 }
 
 // GetRuntimeClient initialises new runtime client from CLI parameters
-func GetRuntimeClient(clicontext *cli.Context) *runtime.ContainerdClient {
+func GetRuntimeClient(clicontext *cli.Context) runtime.Client {
 	return runtime.NewContainerdClient(
 		context.Background(),
 		clicontext.GlobalDuration("timeout"),
@@ -78,7 +78,7 @@ func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver) (mani
 }
 
 // GetStateReporter initialises new state reporter based on CLI parameters
-func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, client *runtime.ContainerdClient) (state.Reporter, error) {
+func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, client runtime.Client) (state.Reporter, error) {
 	// return state.NewConsoleStateReporter(
 	// 	resolver,
 	// 	client,

@@ -20,8 +20,8 @@ func TestGetContainerLabels(t *testing.T) {
 	}
 	result := getContainerLabels(pod, container)
 
-	assert.Equal(t, "some-long-uid", result[getLabelKeyFor("pod.uid")])
-	assert.Equal(t, "my-pod", result[getLabelKeyFor("pod.name")])
-	assert.Equal(t, "my-namespace", result[getLabelKeyFor("pod.namespace")])
-	assert.Equal(t, "my-container", result[getLabelKeyFor("container.name")])
+	assert.Equal(t, "some-long-uid", result[GetLabelKeyFor("pod.uid")])
+	assert.Equal(t, "my-pod", result[GetLabelKeyFor("pod.name")])
+	assert.Equal(t, "my-namespace", result[GetLabelKeyFor("pod.namespace")])
+	assert.Equal(t, "my-container", result[GetLabelKeyFor("container.name")])
 }

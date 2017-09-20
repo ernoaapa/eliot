@@ -27,5 +27,5 @@ func TestPodGetNamespace(t *testing.T) {
 }
 
 func TestContainerBuildID(t *testing.T) {
-	assert.Equal(t, BuildContainerID("foo", "podname"), "foo-podname", "should build valid id")
+	assert.Equal(t, 36, len(BuildContainerID()), "should build valid id")
 }

@@ -1,9 +1,9 @@
 package model
 
 import (
-	"fmt"
 	"sync"
 
+	"github.com/satori/go.uuid"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -63,9 +63,9 @@ type Container struct {
 	Image string `validate:"required,gt=0,imageRef"         json:"image"     yaml:"image"`
 }
 
-// BuildContainerID creates unique id for the container from parent pod name
-func BuildContainerID(podName, containerName string) string {
-	return fmt.Sprintf("%s-%s", podName, containerName)
+// BuildContainerID creates unique id for the container
+func BuildContainerID() string {
+	return uuid.NewV4().String()
 }
 
 // PodStatus represents latest known state of pod

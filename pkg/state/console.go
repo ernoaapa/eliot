@@ -12,12 +12,12 @@ import (
 // ConsoleStateReporter is Reporter implementation what just prints status to stdout
 type ConsoleStateReporter struct {
 	resolver *device.Resolver
-	client   *runtime.ContainerdClient
+	client   runtime.Client
 	interval time.Duration
 }
 
 // NewConsoleStateReporter creates new ConsoleStateReporter
-func NewConsoleStateReporter(resolver *device.Resolver, client *runtime.ContainerdClient, interval time.Duration) *ConsoleStateReporter {
+func NewConsoleStateReporter(resolver *device.Resolver, client runtime.Client, interval time.Duration) *ConsoleStateReporter {
 	return &ConsoleStateReporter{
 		resolver,
 		client,

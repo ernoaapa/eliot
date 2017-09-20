@@ -6,7 +6,7 @@ import (
 	"github.com/ernoaapa/can/pkg/runtime"
 )
 
-func getCurrentState(client *runtime.ContainerdClient) (result []*model.Pod, err error) {
+func getCurrentState(client runtime.Client) (result []*model.Pod, err error) {
 	result = []*model.Pod{}
 	namespaces, err := client.GetNamespaces()
 	if err != nil {
@@ -24,7 +24,7 @@ func getCurrentState(client *runtime.ContainerdClient) (result []*model.Pod, err
 	return result, nil
 }
 
-func constructPodsFromContainerInfo(client *runtime.ContainerdClient, containers []containerd.Container) []*model.Pod {
+func constructPodsFromContainerInfo(client runtime.Client, containers []containerd.Container) []*model.Pod {
 	podsByName := make(map[string]*model.Pod)
 
 	for _, container := range containers {
@@ -56,7 +56,7 @@ func constructPodsFromContainerInfo(client *runtime.ContainerdClient, containers
 	return getValues(podsByName)
 }
 
-func resolveContainerStatus(client *runtime.ContainerdClient, container containerd.Container) model.ContainerStatus {
+func resolveContainerStatus(client runtime.Client, container containerd.Container) model.ContainerStatus {
 	return model.ContainerStatus{
 		ContainerID: container.ID(),
 		Image:       container.Info().Image,

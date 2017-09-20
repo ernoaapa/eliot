@@ -37,5 +37,5 @@ func TestDefaults(t *testing.T) {
 	assert.Equal(t, "cand", result[0].GetNamespace(), "should set default namespace")
 	assert.Equal(t, "my-namespace", result[1].GetNamespace(), "should not change namespace")
 
-	assert.Equal(t, "foobar-foo", result[1].Spec.Containers[0].ID, "should build container ID")
+	assert.NotEmpty(t, result[1].Spec.Containers[0].ID, "should build container ID")
 }
