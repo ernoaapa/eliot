@@ -81,23 +81,23 @@ func (c *ContainerdClient) GetContainers(namespace string) (containers []contain
 }
 
 // CreateContainer creates given container
-func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) error {
+func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) (containerd.Container, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
 	client, err := c.getConnection(pod.GetNamespace())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	image, err := c.EnsureImagePulled(pod.GetNamespace(), container.Image)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	spec, err := containerd.GenerateSpec(ctx, client, nil, containerd.WithImageConfig(image))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
@@ -111,21 +111,27 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	)
 	if err != nil {
 		c.resetConnection()
-		return errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
+		return nil, errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
+	return created, nil
+}
 
-	log.Debugf("Create task in container: %s", created.ID())
-	task, err := created.NewTask(ctx, containerd.NullIO)
+func (c *ContainerdClient) StartContainer(container containerd.Container) error {
+	ctx, cancel := c.getContext()
+	defer cancel()
+
+	log.Debugf("Create task in container: %s", container.ID())
+	task, err := container.NewTask(ctx, containerd.NullIO)
 	if err != nil {
 		c.resetConnection()
-		return errors.Wrapf(err, "Error while creating task for container [%s]", created.ID())
+		return errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())
 	}
 
 	log.Debugln("Starting task...")
 	err = task.Start(ctx)
 	if err != nil {
 		c.resetConnection()
-		return errors.Wrapf(err, "Failed to start task in container", created.ID())
+		return errors.Wrapf(err, "Failed to start task in container", container.ID())
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
 	return nil
@@ -198,6 +204,14 @@ func getNamespaces(namespaces []namespaces.Namespace) (result []string) {
 		}
 	}
 	return result
+}
+
+// GetContainerTask fetch container task information
+func (c *ContainerdClient) GetContainerTask(container containerd.Container) (containerd.Task, error) {
+	ctx, cancel := c.getContext()
+	defer cancel()
+
+	return container.Task(ctx, nil)
 }
 
 // GetContainerTaskStatus resolves container status or return UNKNOWN

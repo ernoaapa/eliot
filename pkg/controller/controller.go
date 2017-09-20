@@ -30,47 +30,86 @@ func Sync(client runtime.Client, allPods []model.Pod) (err error) {
 		}
 
 		if len(containers) > 0 {
-			log.Debugf("Found running containers in namespace %s: %d", namespace, len(containers))
+			log.Debugf("Found %d containers in namespace %s", len(containers), namespace)
 		} else {
 			log.Debugf("No running containers in namespace %s", namespace)
 		}
 
-		for _, pod := range pods {
-			create := getMissingContainers(pod, containers)
-
-			if len(create) > 0 {
-				log.WithFields(log.Fields{
-					"namespace": namespace,
-					"create":    len(create),
-					"running":   len(containers),
-				}).Debugf("Missing containers in namespace %s", namespace)
-
-				for _, container := range create {
-					if err := client.CreateContainer(pod, container); err != nil {
-						return err
-					}
-				}
-			} else {
-				log.Debugf("No missing containers in namespace %s", namespace)
-			}
+		if err := cleanupRemovedContainers(client, namespace, pods, containers); err != nil {
+			return err
 		}
 
-		remove := getRemovedContainers(containers, pods)
+		active, err := createMissingContainers(client, namespace, pods, containers)
+		if err != nil {
+			return err
+		}
 
-		if len(remove) > 0 {
+		if err := ensureContainerTasksRunning(client, namespace, pods, active); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func cleanupRemovedContainers(client runtime.Client, namespace string, pods []model.Pod, containers []containerd.Container) error {
+
+	remove := getRemovedContainers(containers, pods)
+
+	if len(remove) > 0 {
+		log.WithFields(log.Fields{
+			"namespace": namespace,
+			"remove":    len(remove),
+		}).Debugf("Remove containers from namespace %s", namespace)
+
+		for _, container := range remove {
+			err := client.StopContainer(container)
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		log.Debugf("No containers to remove from namespace %s", namespace)
+	}
+	return nil
+}
+
+func createMissingContainers(client runtime.Client, namespace string, pods []model.Pod, containers []containerd.Container) ([]containerd.Container, error) {
+	createdContainers := []containerd.Container{}
+	for _, pod := range pods {
+		create := getMissingContainers(pod, containers)
+
+		if len(create) > 0 {
 			log.WithFields(log.Fields{
 				"namespace": namespace,
-				"remove":    len(remove),
-			}).Debugf("Remove containers from namespace %s", namespace)
+				"create":    len(create),
+			}).Debugf("Missing containers in namespace %s", namespace)
 
-			for _, container := range remove {
-				err := client.StopContainer(container)
-				if err != nil {
-					return err
+			for _, container := range create {
+				created, createErr := client.CreateContainer(pod, container)
+				if createErr != nil {
+					return nil, errors.Wrapf(createErr, "Failed to create container %s %s", pod.GetName(), container.Name)
 				}
+				createdContainers = append(createdContainers, created)
 			}
 		} else {
-			log.Debugf("No containers to remove from namespace %s", namespace)
+			log.Debugf("No missing containers in namespace %s for pod %s", namespace, pod.GetName())
+		}
+	}
+	return append(containers, createdContainers...), nil
+}
+
+func ensureContainerTasksRunning(client runtime.Client, namespace string, pods []model.Pod, containers []containerd.Container) error {
+	for _, container := range containers {
+		_, err := client.GetContainerTask(container)
+		if err != nil {
+			if errdefs.IsNotFound(err) {
+				startErr := client.StartContainer(container)
+				if startErr != nil {
+					return startErr
+				}
+			} else {
+				return errors.Wrapf(err, "Cannot ensure container task running, get container task returned unexpected error")
+			}
 		}
 	}
 	return nil
