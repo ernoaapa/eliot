@@ -26,9 +26,14 @@ services:
     capabilities:
       - all
     binds:
+      - /root/.ssh:/root/.ssh
+      - /etc/resolv.conf:/etc/resolv.conf
+      - /usr/bin/runc:/usr/bin/runc
       - /usr/bin/ctr:/usr/bin/ctr # ctr for debugging
       - /containers:/containers # ctr requires access to be able to manage containers
       - /run/containerd:/run/containerd # need access to sockets
+      - /run/containerd/containerd.sock:/run/containerd/containerd.sock
+      - /tmp:/tmp
   - name: cand
     image: ernoaapa/cand-amd64:63f2878
     command: ["/cand", "--debug", "--labels", "foo=bar", "--manifest", "http://192.168.1.102:3000/api/devices/localtest/manifest"]
