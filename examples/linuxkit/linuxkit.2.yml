@@ -36,7 +36,7 @@ services:
       - /tmp:/tmp
   - name: cand
     image: ernoaapa/cand-amd64:a973dd1
-    command: ["/cand", "--debug", "--labels", "camera=true,name=first", "--manifest", "https://can.ngrok.io/api/devices/first/manifest", "--report", "https://can.ngrok.io/api/devices/first/pods"]
+    command: ["/cand", "--debug", "--labels", "camera=true,name=third,sensor=true", "--manifest", "https://can.ngrok.io/api/devices/third/manifest", "--report", "https://can.ngrok.io/api/devices/third/pods"]
     capabilities:
       - all
     binds:
@@ -50,7 +50,7 @@ files:
     mode: "0600"
     optional: true
   - path: /etc/machine-id
-    contents: "104CECBC-6037-5FCF-AF75-80EB7040CD11"
+    contents: "6D806CDA-FDE6-4CED-B6DF-1F1B425D7B5B"
     mode: "0600"
 trust:
   org:

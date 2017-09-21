@@ -49,6 +49,11 @@ func main() {
 		},
 
 		cli.StringFlag{
+			Name:  "report",
+			Usage: "Where to send pod status. E.g. 'console' or 'http://foo.bar.com'",
+		},
+
+		cli.StringFlag{
 			Name:  "manifest-update-interval",
 			Usage: "Interval to update desired state",
 			Value: "10s",

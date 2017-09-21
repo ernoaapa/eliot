@@ -69,6 +69,8 @@ func (r *URLStateReporter) report(podsWithStates []*model.Pod) error {
 		log.Debugf("Received error response (code %d): %s", resp.StatusCode, string(data[:]))
 		return fmt.Errorf("Url replied with status code [%d]", resp.StatusCode)
 	}
+
+	log.Debugf("Sent state report succesfully!")
 	return nil
 }
 
