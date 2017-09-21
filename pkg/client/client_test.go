@@ -51,7 +51,7 @@ func TestClientGetDeployments(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(deployments), "Should have one deployment")
-	assert.Equal(t, "test-deployment", deployments[0].Metadata["name"], "Should have metadata.name")
+	assert.Equal(t, "test-deployment", deployments[0].GetName(), "Should have metadata.name")
 	assert.Equal(t, 1, len(deployments[0].Spec.Template.Spec.Containers), "Should have one container spec in pod template")
 }
 
@@ -80,5 +80,5 @@ func TestClientCreateDeployment(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.NotNil(t, created)
-	assert.Equal(t, deployment.Metadata["name"], created.Metadata["name"], "Should have same metadata.name")
+	assert.Equal(t, deployment.GetName(), created.GetName(), "Should have same metadata.name")
 }

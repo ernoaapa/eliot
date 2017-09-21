@@ -34,11 +34,11 @@ func constructPodsFromContainerInfo(client runtime.Client, containers []containe
 		if _, ok := podsByName[podName]; !ok {
 			podsByName[podName] = &model.Pod{
 				UID: getPodUIDFromLabels(labels),
-				Metadata: model.Metadata{
-					"name":      podName,
-					"namespace": podNamespace,
-				},
-				Spec: model.Spec{
+				Metadata: model.NewMetadata(
+					podName,
+					podNamespace,
+				),
+				Spec: model.PodSpec{
 					Containers: []model.Container{},
 				},
 				Status: model.PodStatus{

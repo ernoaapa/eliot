@@ -17,7 +17,7 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 				"name":      "hello-world",
 				"namespace": "test",
 			},
-			Spec: model.Spec{
+			Spec: model.PodSpec{
 				Containers: []model.Container{
 					model.Container{
 						Name:  "hello-world-first",
@@ -51,7 +51,7 @@ func TestSyncStopRemovedContainers(t *testing.T) {
 				"namespace": "cand",
 				"name":      "my-pod",
 			},
-			Spec: model.Spec{
+			Spec: model.PodSpec{
 				Containers: []model.Container{
 					model.Container{
 						Name:  "container-name",
@@ -80,7 +80,7 @@ func TestSyncStartsMissingContainerTask(t *testing.T) {
 				"namespace": "cand",
 				"name":      "my-pod",
 			},
-			Spec: model.Spec{
+			Spec: model.PodSpec{
 				Containers: []model.Container{
 					model.Container{
 						Name:  "container-name",

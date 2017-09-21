@@ -2,9 +2,9 @@ package model
 
 // Deployment model
 type Deployment struct {
-	ID       string         `json:"id"`
-	Metadata Metadata       `json:"metadata"`
-	Spec     DeploymentSpec `json:"spec"`
+	Metadata
+	ID   string         `json:"id"`
+	Spec DeploymentSpec `json:"spec"`
 }
 
 // DeploymentSpec model

@@ -12,7 +12,7 @@ func TestDefaults(t *testing.T) {
 			Metadata: Metadata{
 				"name": "foobar",
 			},
-			Spec: Spec{
+			Spec: PodSpec{
 				Containers: []Container{},
 			},
 		},
@@ -21,7 +21,7 @@ func TestDefaults(t *testing.T) {
 				"name":      "foobar",
 				"namespace": "my-namespace",
 			},
-			Spec: Spec{
+			Spec: PodSpec{
 				Containers: []Container{
 					Container{
 						Name:  "foo",

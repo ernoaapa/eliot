@@ -12,7 +12,7 @@ func TestValidationIsValid(t *testing.T) {
 			Metadata: Metadata{
 				"name": "foo",
 			},
-			Spec: Spec{
+			Spec: PodSpec{
 				Containers: []Container{
 					Container{
 						Name:  "foo-1",
@@ -36,14 +36,14 @@ func TestValidationRequiresSpec(t *testing.T) {
 	assert.Error(t, Validate([]Pod{
 		Pod{
 			Metadata: Metadata{"name": "foo"},
-			Spec:     Spec{},
+			Spec:     PodSpec{},
 		},
 	}), "should return error if no containers defined")
 
 	assert.Error(t, Validate([]Pod{
 		Pod{
 			Metadata: Metadata{"name": "foo"},
-			Spec: Spec{
+			Spec: PodSpec{
 				Containers: []Container{},
 			},
 		},
@@ -56,7 +56,7 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 			Metadata: Metadata{
 				"name": "foo",
 			},
-			Spec: Spec{
+			Spec: PodSpec{
 				Containers: []Container{
 					Container{
 						Image: "foobar",
@@ -71,7 +71,7 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 			Metadata: Metadata{
 				"name": "foo",
 			},
-			Spec: Spec{
+			Spec: PodSpec{
 				Containers: []Container{
 					Container{
 						Name: "foo",
@@ -86,7 +86,7 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 			Metadata: Metadata{
 				"name": "foo",
 			},
-			Spec: Spec{
+			Spec: PodSpec{
 				Containers: []Container{
 					Container{
 						Name:  "foo",

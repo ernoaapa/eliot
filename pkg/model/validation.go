@@ -3,9 +3,15 @@ package model
 import (
 	"log"
 	"regexp"
+	"sync"
 
 	imageref "github.com/containerd/containerd/reference"
 	validator "gopkg.in/go-playground/validator.v9"
+)
+
+var (
+	validate *validator.Validate
+	once     sync.Once
 )
 
 func getValidator() *validator.Validate {
