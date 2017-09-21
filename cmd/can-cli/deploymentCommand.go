@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -25,7 +26,7 @@ var deploymentCommand = cli.Command{
 				},
 			},
 			Action: func(clicontext *cli.Context) error {
-				client := getClient(clicontext)
+				client := cmd.GetClient(clicontext)
 
 				deployment, err := readFromFile(clicontext.String("file"))
 				if err != nil {

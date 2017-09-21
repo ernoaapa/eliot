@@ -1,4 +1,4 @@
-package utils
+package cmd
 
 import (
 	"context"
@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ernoaapa/can/pkg/client"
+	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/manifest"
 	"github.com/ernoaapa/can/pkg/runtime"
@@ -16,6 +18,18 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
+
+func GetClient(clicontext *cli.Context) *client.Client {
+	configPath := clicontext.GlobalString("config")
+	config, err := config.GetConfig(configPath)
+	if err != nil {
+		log.Fatalf("Error while reading configuration file [%s]: %s", configPath, err)
+	}
+	return client.NewClient(
+		config.GetCurrentEndpoint().URL,
+		config.GetCurrentUser().Token,
+	)
+}
 
 // GetLabels return --labels CLI parameter value as string map
 func GetLabels(clicontext *cli.Context) map[string]string {

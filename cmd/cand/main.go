@@ -4,10 +4,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/coreos/etcd/version"
+	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
-	utils "github.com/ernoaapa/can/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -22,7 +21,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "cand"
 	app.Usage = "Can daemon"
-	app.Version = version.Version
+	app.Version = VersionString
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "debug",
@@ -74,15 +73,15 @@ func main() {
 	}
 
 	app.Action = func(clicontext *cli.Context) error {
-		resolver := device.NewResolver(utils.GetLabels(clicontext))
-		client := utils.GetRuntimeClient(clicontext)
+		resolver := device.NewResolver(cmd.GetLabels(clicontext))
+		client := cmd.GetRuntimeClient(clicontext)
 
-		source, err := utils.GetManifestSource(clicontext, resolver)
+		source, err := cmd.GetManifestSource(clicontext, resolver)
 		if err != nil {
 			return err
 		}
 
-		reporter, err := utils.GetStateReporter(clicontext, resolver, client)
+		reporter, err := cmd.GetStateReporter(clicontext, resolver, client)
 		if err != nil {
 			return err
 		}
