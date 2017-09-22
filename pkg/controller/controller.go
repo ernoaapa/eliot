@@ -8,10 +8,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Controller is responsible for keeping the containers in desired state
+type Controller struct {
+	client runtime.Client
+}
+
+// New creates new container controller
+func New(client runtime.Client) *Controller {
+	return &Controller{
+		client,
+	}
+}
+
 // Sync start and stop containers to match with target pods
-func Sync(client runtime.Client, manifest podsManifest) (err error) {
+func (c *Controller) Sync(manifest podsManifest) (err error) {
 	log.Debugf("Received update, start updating containerd: %v", manifest)
-	namespaces, err := client.GetNamespaces()
+	namespaces, err := c.client.GetNamespaces()
 	if err != nil {
 		return errors.Wrapf(err, "Failed to list namespaces when syncing containers")
 	}
@@ -20,27 +32,27 @@ func Sync(client runtime.Client, manifest podsManifest) (err error) {
 	log.Debugf("Syncing namespaces: %s", namespaces)
 	for _, namespace := range namespaces {
 		manifest := manifest.filterPodsByNamespace(namespace)
-		state, err := client.GetContainersByPods(namespace)
+		state, err := c.client.GetContainersByPods(namespace)
 		if err != nil {
 			return err
 		}
 
-		if err := cleanupRemovedContainers(client, namespace, manifest, state); err != nil {
+		if err := c.cleanupRemovedContainers(namespace, manifest, state); err != nil {
 			return err
 		}
 
-		if err := createMissingContainers(client, namespace, manifest, state); err != nil {
+		if err := c.createMissingContainers(namespace, manifest, state); err != nil {
 			return err
 		}
 
-		if err := ensureContainerTasksRunning(client, manifest, state); err != nil {
+		if err := c.ensureContainerTasksRunning(manifest, state); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func cleanupRemovedContainers(client runtime.Client, namespace string, pods podsManifest, state containersState) error {
+func (c *Controller) cleanupRemovedContainers(namespace string, pods podsManifest, state containersState) error {
 	remove := getRemovedContainers(pods, state)
 
 	if len(remove) > 0 {
@@ -50,7 +62,7 @@ func cleanupRemovedContainers(client runtime.Client, namespace string, pods pods
 		}).Debugf("Remove containers from namespace %s", namespace)
 
 		for _, container := range remove {
-			err := client.StopContainer(container.ID)
+			err := c.client.StopContainer(container.ID)
 			if err != nil {
 				return err
 			}
@@ -79,7 +91,7 @@ func getRemovedContainers(pods podsManifest, state containersState) (remove []mo
 	return remove
 }
 
-func createMissingContainers(client runtime.Client, namespace string, pods podsManifest, state containersState) error {
+func (c *Controller) createMissingContainers(namespace string, pods podsManifest, state containersState) error {
 	for _, pod := range pods {
 		create := getMissingContainers(pod, state)
 
@@ -90,7 +102,7 @@ func createMissingContainers(client runtime.Client, namespace string, pods podsM
 			}).Debugf("Missing containers in namespace %s", namespace)
 
 			for _, container := range create {
-				createErr := client.CreateContainer(pod, container)
+				createErr := c.client.CreateContainer(pod, container)
 				if createErr != nil {
 					return errors.Wrapf(createErr, "Failed to create container %s %s", pod.GetName(), container.Name)
 				}
@@ -111,18 +123,18 @@ func getMissingContainers(pod model.Pod, state containersState) (create []model.
 	return create
 }
 
-func ensureContainerTasksRunning(client runtime.Client, pods podsManifest, state containersState) error {
+func (c *Controller) ensureContainerTasksRunning(pods podsManifest, state containersState) error {
 	for _, pod := range pods {
 		for _, container := range pod.Spec.Containers {
 			if state.containsContainer(pod.GetName(), container) {
 				existingContainerID := state.findContainerID(pod.GetName(), container)
-				running, err := client.IsContainerRunning(existingContainerID)
+				running, err := c.client.IsContainerRunning(existingContainerID)
 				if err != nil {
 					return errors.Wrapf(err, "Cannot ensure existing container task running state, get container task returned unexpected error")
 				}
 				if !running {
 					log.Warnf("Detected existing container not running, restarting container [%s]", existingContainerID)
-					startErr := client.StartContainer(existingContainerID)
+					startErr := c.client.StartContainer(existingContainerID)
 					if startErr != nil {
 						return startErr
 					}
@@ -130,7 +142,7 @@ func ensureContainerTasksRunning(client runtime.Client, pods podsManifest, state
 					log.Debugf("Container [%s] running and healthy", existingContainerID)
 				}
 			} else {
-				startErr := client.StartContainer(container.ID)
+				startErr := c.client.StartContainer(container.ID)
 				if startErr != nil {
 					return errors.Wrapf(startErr, "Error while starting new container %s", container.ID)
 				}

@@ -33,7 +33,7 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 		},
 	}
 
-	err := Sync(clientMock, pods)
+	err := New(clientMock).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 
@@ -70,7 +70,7 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 		},
 	}
 
-	err := Sync(clientMock, pods)
+	err := New(clientMock).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 
@@ -103,7 +103,7 @@ func TestSyncStartsMissingContainerTask(t *testing.T) {
 		},
 	}
 
-	err := Sync(clientMock, pods)
+	err := New(clientMock).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 

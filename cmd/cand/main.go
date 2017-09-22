@@ -91,10 +91,12 @@ func main() {
 		}
 		go reporter.Start()
 
+		controller := controller.New(client)
+
 		log.Infoln("Started, start waiting for changes in source")
 
 		for {
-			err := controller.Sync(client, <-sourceUpdates)
+			err := controller.Sync(<-sourceUpdates)
 			if err != nil {
 				log.Warnf("Failed to update state to containerd: %s", err)
 			}
