@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/ernoaapa/can/pkg/utils"
@@ -10,21 +12,46 @@ import (
 
 // Controller is responsible for keeping the containers in desired state
 type Controller struct {
-	client runtime.Client
-	out    chan<- []model.Pod
+	client   runtime.Client
+	interval time.Duration
+	in       <-chan []model.Pod
+	out      chan<- []model.Pod
+	manifest podsManifest
 }
 
 // New creates new container controller
-func New(client runtime.Client, out chan<- []model.Pod) *Controller {
+func New(client runtime.Client, interval time.Duration, in <-chan []model.Pod, out chan<- []model.Pod) *Controller {
 	return &Controller{
-		client,
-		out,
+		client:   client,
+		interval: interval,
+		in:       in,
+		out:      out,
+	}
+}
+
+// Start the controller sync process
+// Waits for update from in channel or after given interval runs sync()
+func (c *Controller) Start() {
+	for {
+		select {
+		case update := <-c.in:
+			c.manifest = update
+			err := c.Sync(c.manifest)
+			if err != nil {
+				log.Warnf("Failed to update container state: %s", err)
+			}
+		case <-time.After(c.interval):
+			err := c.Sync(c.manifest)
+			if err != nil {
+				log.Warnf("Failed to update container state: %s", err)
+			}
+		}
 	}
 }
 
 // Sync start and stop containers to match with target pods
 func (c *Controller) Sync(manifest podsManifest) (err error) {
-	log.Debugf("Received update, start syncing containers: %v", manifest)
+	log.Debugf("Sync containers: %v", manifest)
 	namespaces, err := c.client.GetNamespaces()
 	if err != nil {
 		return errors.Wrapf(err, "Failed to list namespaces when syncing containers")
@@ -56,6 +83,9 @@ func (c *Controller) Sync(manifest podsManifest) (err error) {
 	if err != nil {
 		return errors.Wrapf(err, "Failed to forward current state, failed to resolve current state!")
 	}
+
+	log.Debugf("Controller sync completed!")
+
 	select {
 	case c.out <- state:
 		return nil

@@ -2,9 +2,10 @@ package main
 
 import (
 	"os"
+	"sync"
+	"time"
 
 	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
 	log "github.com/sirupsen/logrus"
@@ -52,10 +53,16 @@ func main() {
 			Usage: "Where to send pod status. E.g. 'console' or 'http://foo.bar.com'",
 		},
 
-		cli.StringFlag{
+		cli.DurationFlag{
 			Name:  "manifest-update-interval",
 			Usage: "Interval to update desired state",
-			Value: "10s",
+			Value: 10 * time.Second,
+		},
+
+		cli.DurationFlag{
+			Name:  "update-interval",
+			Usage: "Interval for updating state",
+			Value: 1 * time.Second,
 		},
 	}
 
@@ -67,8 +74,8 @@ func main() {
 	}
 
 	app.Action = func(clicontext *cli.Context) error {
+		var wg sync.WaitGroup
 		resolver := device.NewResolver(cmd.GetLabels(clicontext))
-		client := cmd.GetRuntimeClient(clicontext)
 
 		sourceUpdates := make(chan []model.Pod)
 		stateUpdates := make(chan []model.Pod)
@@ -77,24 +84,33 @@ func main() {
 		if err != nil {
 			return err
 		}
-		go source.Start()
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			source.Start()
+		}()
 
 		reporter, err := cmd.GetStateReporter(clicontext, resolver, stateUpdates)
 		if err != nil {
 			return err
 		}
-		go reporter.Start()
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			reporter.Start()
+		}()
 
-		controller := controller.New(client, stateUpdates)
+		controller := cmd.GetController(clicontext, sourceUpdates, stateUpdates)
 
-		log.Infoln("Started, start waiting for changes in source")
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			controller.Start()
+		}()
 
-		for {
-			err := controller.Sync(<-sourceUpdates)
-			if err != nil {
-				log.Warnf("Failed to update state to containerd: %s", err)
-			}
-		}
+		log.Infoln("Started!")
+		wg.Wait()
+		return nil
 	}
 
 	if err := app.Run(os.Args); err != nil {

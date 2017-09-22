@@ -2,12 +2,14 @@ package controller
 
 import (
 	"testing"
+	"time"
 
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSyncStartsMultiContainerPod(t *testing.T) {
+	in := make(chan []model.Pod)
 	out := make(chan []model.Pod)
 	clientMock := &FakeClient{t, []string{"default"}, map[string]map[string][]FakeContainer{}, 0, 0, 0}
 	pods := []model.Pod{
@@ -34,7 +36,7 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 		},
 	}
 
-	err := New(clientMock, out).Sync(pods)
+	err := New(clientMock, 1*time.Second, in, out).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 
@@ -42,6 +44,7 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 }
 
 func TestSyncStopRemovedPodContainers(t *testing.T) {
+	in := make(chan []model.Pod)
 	out := make(chan []model.Pod)
 	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
 		"cand": map[string][]FakeContainer{
@@ -72,7 +75,7 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 		},
 	}
 
-	err := New(clientMock, out).Sync(pods)
+	err := New(clientMock, 1*time.Second, in, out).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 
@@ -80,6 +83,7 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 }
 
 func TestSyncStartsMissingContainerTask(t *testing.T) {
+	in := make(chan []model.Pod)
 	out := make(chan []model.Pod)
 	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
 		"cand": map[string][]FakeContainer{
@@ -106,7 +110,7 @@ func TestSyncStartsMissingContainerTask(t *testing.T) {
 		},
 	}
 
-	err := New(clientMock, out).Sync(pods)
+	err := New(clientMock, 1*time.Second, in, out).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 

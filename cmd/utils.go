@@ -6,12 +6,12 @@ import (
 	"net/url"
 	"os"
 	"strings"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/can/pkg/client"
 	"github.com/ernoaapa/can/pkg/config"
+	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/manifest"
 	"github.com/ernoaapa/can/pkg/model"
@@ -21,6 +21,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// GetClient creates new cloud API client
 func GetClient(clicontext *cli.Context) *client.Client {
 	configPath := clicontext.GlobalString("config")
 	config, err := config.GetConfig(configPath)
@@ -70,10 +71,7 @@ func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver, out c
 	}
 	manifestParam := clicontext.String("manifest")
 
-	interval, err := time.ParseDuration(clicontext.String("manifest-update-interval"))
-	if err != nil {
-		return nil, fmt.Errorf("Unable to parse update interval [%s]. Example --manifest-update-interval 1s", clicontext.String("interval"))
-	}
+	interval := clicontext.Duration("manifest-update-interval")
 
 	if fileExists(manifestParam) {
 		return manifest.NewFileManifestSource(manifestParam, interval, resolver, out), nil
@@ -115,6 +113,13 @@ func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, in <-c
 		in,
 		reportParam,
 	), nil
+}
+
+// GetController creates new Controller
+func GetController(clicontext *cli.Context, in <-chan []model.Pod, out chan<- []model.Pod) *controller.Controller {
+	client := GetRuntimeClient(clicontext)
+	interval := clicontext.Duration("update-interval")
+	return controller.New(client, interval, in, out)
 }
 
 func fileExists(path string) bool {
