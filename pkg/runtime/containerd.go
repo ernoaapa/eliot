@@ -8,9 +8,10 @@ import (
 	"github.com/containerd/containerd"
 	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
 	tasks "github.com/containerd/containerd/api/services/tasks/v1"
+	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/plugin"
-	"github.com/docker/docker/api/errdefs"
 	"github.com/ernoaapa/can/pkg/model"
+	mapper "github.com/ernoaapa/can/pkg/runtime/containerd"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
@@ -64,47 +65,47 @@ func (c *ContainerdClient) resetConnection() {
 	c.client = nil
 }
 
-// GetContainers return all containerd containers
-func (c *ContainerdClient) GetContainers(namespace string) (containers []containerd.Container, err error) {
+// GetContainersByPods return all containers active in containerd grouped by pod name
+func (c *ContainerdClient) GetContainersByPods(namespace string) (map[string][]model.Container, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
 	client, err := c.getConnection(namespace)
 	if err != nil {
-		return containers, err
+		return nil, err
 	}
-	containers, err = client.Containers(ctx)
+	containers, err := client.Containers(ctx)
 	if err != nil {
 		c.resetConnection()
-		return containers, errors.Wrap(err, "Error while getting list of containers")
+		return nil, errors.Wrap(err, "Error while getting list of containers")
 	}
-	return containers, nil
+	return mapper.MapToModelByPodNames(containers), nil
 }
 
 // CreateContainer creates given container
-func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) (containerd.Container, error) {
+func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, err := c.getConnection(pod.GetNamespace())
-	if err != nil {
-		return nil, err
+	client, connectionErr := c.getConnection(pod.GetNamespace())
+	if connectionErr != nil {
+		return connectionErr
 	}
 
-	image, err := c.ensureImagePulled(pod.GetNamespace(), container.Image)
-	if err != nil {
-		return nil, err
+	image, pullErr := c.ensureImagePulled(pod.GetNamespace(), container.Image)
+	if pullErr != nil {
+		return pullErr
 	}
 
-	spec, err := containerd.GenerateSpec(ctx, client, nil, containerd.WithImageConfig(image))
-	if err != nil {
-		return nil, err
+	spec, specErr := containerd.GenerateSpec(ctx, client, nil, containerd.WithImageConfig(image))
+	if specErr != nil {
+		return specErr
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
-	created, err := client.NewContainer(ctx,
+	_, err := client.NewContainer(ctx,
 		container.ID,
-		containerd.WithContainerLabels(getContainerLabels(pod, container)),
+		containerd.WithContainerLabels(mapper.NewContainerLabels(pod, container)),
 		containerd.WithSpec(spec),
 		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshotView(container.ID, image),
@@ -112,14 +113,20 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	)
 	if err != nil {
 		c.resetConnection()
-		return nil, errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
+		return errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
-	return created, nil
+	return nil
 }
 
-func (c *ContainerdClient) StartContainer(container containerd.Container) error {
+// StartContainer starts the already created container
+func (c *ContainerdClient) StartContainer(containerID string) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
+
+	container, err := c.client.LoadContainer(ctx, containerID)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to load container with id %s, cannot start it", containerID)
+	}
 
 	log.Debugf("Create task in container: %s", container.ID())
 	task, err := container.NewTask(ctx, containerd.NullIO)
@@ -139,9 +146,14 @@ func (c *ContainerdClient) StartContainer(container containerd.Container) error 
 }
 
 // StopContainer stops given container
-func (c *ContainerdClient) StopContainer(container containerd.Container) error {
+func (c *ContainerdClient) StopContainer(containerID string) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
+
+	container, err := c.client.LoadContainer(ctx, containerID)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to load container with id %s, cannot stop it", containerID)
+	}
 
 	task, err := container.Task(ctx, nil)
 	if err == nil {
@@ -206,10 +218,15 @@ func getNamespaces(namespaces []namespaces.Namespace) (result []string) {
 	return result
 }
 
-// IsContainerRunning fetch container task information
-func (c *ContainerdClient) IsContainerRunning(container containerd.Container) (bool, error) {
+// IsContainerRunning returns true if container running. If cannot resolve, return false with error
+func (c *ContainerdClient) IsContainerRunning(containerID string) (bool, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
+
+	container, loadErr := c.client.LoadContainer(ctx, containerID)
+	if loadErr != nil {
+		return false, errors.Wrapf(loadErr, "Failed to load container with id %s, cannot resolve running state", containerID)
+	}
 
 	_, err := container.Task(ctx, nil)
 	if err != nil {

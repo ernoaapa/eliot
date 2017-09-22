@@ -1,60 +1,84 @@
 package controller
 
 import (
-	"context"
 	"testing"
 
-	"github.com/containerd/containerd"
-	"github.com/containerd/containerd/containers"
-	"github.com/containerd/containerd/errdefs"
 	"github.com/ernoaapa/can/pkg/model"
-	"github.com/ernoaapa/can/pkg/runtime"
-	specs "github.com/opencontainers/runtime-spec/specs-go"
-	uuid "github.com/satori/go.uuid"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
+// FakeClient is runtime.Client implementation for tests to remove dependency to actual containerd
 type FakeClient struct {
 	t            *testing.T
 	namespaces   []string
-	containers   []containerd.Container
+	containers   map[string]map[string][]FakeContainer
 	createdCount int
 	startedCount int
 	stoppedCount int
 }
 
-func (c *FakeClient) GetContainers(namespace string) (containers []containerd.Container, err error) {
-	for _, container := range c.containers {
-		if container.Info().Labels[runtime.GetLabelKeyFor(runtime.PodNamespaceSuffix)] == namespace {
-			containers = append(containers, container)
+// GetContainersByPods fake impl.
+func (c *FakeClient) GetContainersByPods(namespace string) (map[string][]model.Container, error) {
+	for podNamespace, podContainers := range c.containers {
+		if podNamespace == namespace {
+			result := map[string][]model.Container{}
+			for podName, containers := range podContainers {
+				result[podName] = []model.Container{}
+				for _, fakeContainer := range containers {
+					result[podName] = append(result[podName], model.Container{
+						ID:    fakeContainer.ID,
+						Name:  fakeContainer.Name,
+						Image: fakeContainer.Image,
+					})
+				}
+			}
+			return result, nil
 		}
 	}
-	return containers, nil
+	return make(map[string][]model.Container), nil
 }
 
-func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) (created containerd.Container, err error) {
+// CreateContainer fake impl.
+func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) error {
 	c.createdCount++
-	return fakeCreatedContainer(pod.GetNamespace(), pod.GetName(), container.Name), nil
+	return nil
 }
 
-func (c *FakeClient) StartContainer(container containerd.Container) error {
+// StartContainer fake impl.
+func (c *FakeClient) StartContainer(containerID string) error {
 	c.startedCount++
 	return nil
 }
 
-func (c *FakeClient) StopContainer(container containerd.Container) error {
+// StopContainer fake impl.
+func (c *FakeClient) StopContainer(containerID string) error {
 	c.stoppedCount++
 	return nil
 }
 
+// GetNamespaces fake impl.
 func (c *FakeClient) GetNamespaces() ([]string, error) {
 	return c.namespaces, nil
 }
 
-func (c *FakeClient) IsContainerRunning(container containerd.Container) (bool, error) {
-	return true, nil
+// IsContainerRunning fake impl.
+func (c *FakeClient) IsContainerRunning(containerID string) (bool, error) {
+	log.Debugf("container runnin %s", containerID)
+	for _, podContainers := range c.containers {
+		for _, containers := range podContainers {
+			for _, fakeContainer := range containers {
+				if fakeContainer.ID == containerID {
+					log.Debugf("is running, %s, %s", containerID, fakeContainer.isRunning)
+					return fakeContainer.isRunning, nil
+				}
+			}
+		}
+	}
+	return false, nil
 }
 
+// GetContainerTaskStatus fake impl.
 func (c *FakeClient) GetContainerTaskStatus(containerID string) string {
 	return "UNKNOWN"
 }
@@ -65,73 +89,27 @@ func (c *FakeClient) verifyExpectations(createdCount, startedCount, stoppedCount
 	assert.Equal(c.t, stoppedCount, c.stoppedCount, "Container stop count should match")
 }
 
+// FakeContainer is model.Container with some test related information, e.g. is it running
 type FakeContainer struct {
-	id        string
-	labels    map[string]string
+	ID        string
+	Name      string
+	Image     string
 	isRunning bool
 }
 
-func (c *FakeContainer) ID() string {
-	return c.id
+func fakeRunningContainer(containerName, image string) FakeContainer {
+	return newFakeContainer(containerName, image, true)
 }
 
-func (c *FakeContainer) Info() containers.Container {
-	return containers.Container{
-		Labels: c.labels,
-	}
+func fakeCreatedContainer(containerName, image string) FakeContainer {
+	return newFakeContainer(containerName, image, false)
 }
 
-func (c *FakeContainer) Delete(context.Context, ...containerd.DeleteOpts) error {
-	return nil
-}
-
-func (c *FakeContainer) NewTask(context.Context, containerd.IOCreation, ...containerd.NewTaskOpts) (task containerd.Task, err error) {
-	return task, err
-}
-
-func (c *FakeContainer) Spec() (*specs.Spec, error) {
-	return nil, nil
-}
-
-func (c *FakeContainer) Task(context.Context, containerd.IOAttach) (task containerd.Task, err error) {
-	if c.isRunning {
-		return task, nil
-	}
-	return task, errdefs.ErrNotFound
-}
-
-func (c *FakeContainer) Image(context.Context) (image containerd.Image, err error) {
-	return image, nil
-}
-
-func (c *FakeContainer) Labels(context.Context) (labels map[string]string, err error) {
-	return labels, nil
-}
-
-func (c *FakeContainer) SetLabels(context.Context, map[string]string) (labels map[string]string, err error) {
-	return labels, nil
-}
-
-func fakeRunningContainer(namespace, podName, containerName string) containerd.Container {
-	return newFakeContainer(namespace, podName, containerName, true)
-}
-
-func fakeCreatedContainer(namespace, podName, containerName string) containerd.Container {
-	return newFakeContainer(namespace, podName, containerName, false)
-}
-
-func newFakeContainer(namespace, podName, containerName string, isRunning bool) containerd.Container {
-	uid := uuid.NewV4().String()
-
-	labels := map[string]string{}
-	labels[runtime.GetLabelKeyFor(runtime.PodUIDSuffix)] = uid
-	labels[runtime.GetLabelKeyFor(runtime.PodNameSuffix)] = podName
-	labels[runtime.GetLabelKeyFor(runtime.PodNamespaceSuffix)] = namespace
-	labels[runtime.GetLabelKeyFor(runtime.ContainerNameSuffix)] = containerName
-
-	return &FakeContainer{
-		id:        uid,
-		labels:    labels,
+func newFakeContainer(containerName, image string, isRunning bool) FakeContainer {
+	return FakeContainer{
+		ID:        containerName,
+		Name:      containerName,
+		Image:     image,
 		isRunning: isRunning,
 	}
 }

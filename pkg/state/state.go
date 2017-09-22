@@ -1,7 +1,6 @@
 package state
 
 import (
-	"github.com/containerd/containerd"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
 )
@@ -14,53 +13,47 @@ func getCurrentState(client runtime.Client) (result []*model.Pod, err error) {
 	}
 
 	for _, namespace := range namespaces {
-		containers, err := client.GetContainers(namespace)
+		containers, err := client.GetContainersByPods(namespace)
 		if err != nil {
 			return result, err
 		}
 
-		result = append(result, constructPodsFromContainerInfo(client, containers)...)
+		result = append(result, constructPodsFromContainerInfo(client, namespace, containers)...)
 	}
 	return result, nil
 }
 
-func constructPodsFromContainerInfo(client runtime.Client, containers []containerd.Container) []*model.Pod {
+func constructPodsFromContainerInfo(client runtime.Client, namespace string, containersByPods map[string][]model.Container) []*model.Pod {
 	podsByName := make(map[string]*model.Pod)
 
-	for _, container := range containers {
-		labels := container.Info().Labels
-		podName := getPodNameFromLabels(labels)
-		podNamespace := getPodNamespaceFromLabels(labels)
-		if _, ok := podsByName[podName]; !ok {
-			podsByName[podName] = &model.Pod{
-				UID: getPodUIDFromLabels(labels),
-				Metadata: model.NewMetadata(
-					podName,
-					podNamespace,
-				),
-				Spec: model.PodSpec{
-					Containers: []model.Container{},
-				},
-				Status: model.PodStatus{
-					ContainerStatuses: []model.ContainerStatus{},
-				},
-			}
+	for podName, containers := range containersByPods {
+		podsByName[podName] = &model.Pod{
+			Metadata: model.NewMetadata(
+				podName,
+				namespace,
+			),
+			Spec: model.PodSpec{
+				Containers: containers,
+			},
+			Status: model.PodStatus{
+				ContainerStatuses: []model.ContainerStatus{},
+			},
 		}
-		podsByName[podName].Spec.Containers = append(podsByName[podName].Spec.Containers, model.Container{
-			Name:  getContainerNameFromLabels(labels),
-			Image: container.Info().Image,
-		})
 
-		podsByName[podName].Status.ContainerStatuses = append(podsByName[podName].Status.ContainerStatuses, resolveContainerStatus(client, container))
+		for _, container := range containers {
+			podsByName[podName].Status.ContainerStatuses =
+				append(podsByName[podName].Status.ContainerStatuses, resolveContainerStatus(client, container))
+		}
 	}
+
 	return getValues(podsByName)
 }
 
-func resolveContainerStatus(client runtime.Client, container containerd.Container) model.ContainerStatus {
+func resolveContainerStatus(client runtime.Client, container model.Container) model.ContainerStatus {
 	return model.ContainerStatus{
-		ContainerID: container.ID(),
-		Image:       container.Info().Image,
-		State:       client.GetContainerTaskStatus(container.ID()),
+		ContainerID: container.ID,
+		Image:       container.Image,
+		State:       client.GetContainerTaskStatus(container.ID),
 	}
 }
 

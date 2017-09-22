@@ -3,13 +3,12 @@ package controller
 import (
 	"testing"
 
-	"github.com/containerd/containerd"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSyncStartsMultiContainerPod(t *testing.T) {
-	clientMock := &FakeClient{t, []string{"default"}, []containerd.Container{}, 0, 0, 0}
+	clientMock := &FakeClient{t, []string{"default"}, map[string]map[string][]FakeContainer{}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
 			UID: "1",
@@ -20,10 +19,12 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 			Spec: model.PodSpec{
 				Containers: []model.Container{
 					model.Container{
+						ID:    "hello-world-first",
 						Name:  "hello-world-first",
 						Image: "docker.io/eaapa/hello-world:latest",
 					},
 					model.Container{
+						ID:    "hello-world-second",
 						Name:  "hello-world-second",
 						Image: "docker.io/eaapa/hello-world:latest",
 					},
@@ -39,10 +40,16 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 	clientMock.verifyExpectations(2, 2, 0)
 }
 
-func TestSyncStopRemovedContainers(t *testing.T) {
-	clientMock := &FakeClient{t, []string{"default", "cand"}, []containerd.Container{
-		fakeRunningContainer("cand", "my-pod", "container-name"),
-		fakeRunningContainer("cand", "other-pod", "will-be-removed"),
+func TestSyncStopRemovedPodContainers(t *testing.T) {
+	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
+		"cand": map[string][]FakeContainer{
+			"my-pod": []FakeContainer{
+				fakeRunningContainer("container-name", "docker.io/eaapa/hello-world:latest"),
+			},
+			"other-pod": []FakeContainer{
+				fakeRunningContainer("will-be-removed", "docker.io/eaapa/hello-world:latest"),
+			},
+		},
 	}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
@@ -54,6 +61,7 @@ func TestSyncStopRemovedContainers(t *testing.T) {
 			Spec: model.PodSpec{
 				Containers: []model.Container{
 					model.Container{
+						ID:    "container-name",
 						Name:  "container-name",
 						Image: "docker.io/eaapa/hello-world:latest",
 					},
@@ -70,8 +78,12 @@ func TestSyncStopRemovedContainers(t *testing.T) {
 }
 
 func TestSyncStartsMissingContainerTask(t *testing.T) {
-	clientMock := &FakeClient{t, []string{"default", "cand"}, []containerd.Container{
-		fakeCreatedContainer("cand", "my-pod", "container-name"),
+	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
+		"cand": map[string][]FakeContainer{
+			"my-pod": []FakeContainer{
+				fakeCreatedContainer("container-name", "docker.io/eaapa/hello-world:latest"),
+			},
+		},
 	}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
