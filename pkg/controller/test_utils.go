@@ -47,17 +47,14 @@ func (c *FakeClient) StopContainer(container containerd.Container) error {
 	return nil
 }
 
-func (c *FakeClient) EnsureImagePulled(namespace, ref string) (image containerd.Image, err error) {
-	return image, nil
-}
-
 func (c *FakeClient) GetNamespaces() ([]string, error) {
 	return c.namespaces, nil
 }
 
-func (c *FakeClient) GetContainerTask(container containerd.Container) (task containerd.Task, err error) {
-	return container.Task(nil, nil)
+func (c *FakeClient) IsContainerRunning(container containerd.Container) (bool, error) {
+	return true, nil
 }
+
 func (c *FakeClient) GetContainerTaskStatus(containerID string) string {
 	return "UNKNOWN"
 }

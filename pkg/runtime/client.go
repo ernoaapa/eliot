@@ -11,8 +11,7 @@ type Client interface {
 	CreateContainer(pod model.Pod, container model.Container) (containerd.Container, error)
 	StartContainer(container containerd.Container) error
 	StopContainer(container containerd.Container) error
-	EnsureImagePulled(namespace, ref string) (image containerd.Image, err error)
 	GetNamespaces() ([]string, error)
-	GetContainerTask(container containerd.Container) (containerd.Task, error)
+	IsContainerRunning(container model.Container) (bool, error)
 	GetContainerTaskStatus(containerID string) string
 }

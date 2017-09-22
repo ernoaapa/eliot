@@ -9,6 +9,7 @@ import (
 	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
 	tasks "github.com/containerd/containerd/api/services/tasks/v1"
 	"github.com/containerd/containerd/plugin"
+	"github.com/docker/docker/api/errdefs"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/pkg/errors"
 
@@ -90,7 +91,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		return nil, err
 	}
 
-	image, err := c.EnsureImagePulled(pod.GetNamespace(), container.Image)
+	image, err := c.ensureImagePulled(pod.GetNamespace(), container.Image)
 	if err != nil {
 		return nil, err
 	}
@@ -153,8 +154,7 @@ func (c *ContainerdClient) StopContainer(container containerd.Container) error {
 	return nil
 }
 
-// EnsureImagePulled pulls the image reference to ensure image is fetched
-func (c *ContainerdClient) EnsureImagePulled(namespace, ref string) (image containerd.Image, err error) {
+func (c *ContainerdClient) ensureImagePulled(namespace, ref string) (image containerd.Image, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -206,12 +206,19 @@ func getNamespaces(namespaces []namespaces.Namespace) (result []string) {
 	return result
 }
 
-// GetContainerTask fetch container task information
-func (c *ContainerdClient) GetContainerTask(container containerd.Container) (containerd.Task, error) {
+// IsContainerRunning fetch container task information
+func (c *ContainerdClient) IsContainerRunning(container containerd.Container) (bool, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	return container.Task(ctx, nil)
+	_, err := container.Task(ctx, nil)
+	if err != nil {
+		if errdefs.IsNotFound(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 // GetContainerTaskStatus resolves container status or return UNKNOWN

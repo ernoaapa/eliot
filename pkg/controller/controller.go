@@ -100,15 +100,14 @@ func createMissingContainers(client runtime.Client, namespace string, pods []mod
 
 func ensureContainerTasksRunning(client runtime.Client, namespace string, pods []model.Pod, containers []containerd.Container) error {
 	for _, container := range containers {
-		_, err := client.GetContainerTask(container)
+		running, err := client.IsContainerRunning(container)
 		if err != nil {
-			if errdefs.IsNotFound(err) {
-				startErr := client.StartContainer(container)
-				if startErr != nil {
-					return startErr
-				}
-			} else {
-				return errors.Wrapf(err, "Cannot ensure container task running, get container task returned unexpected error")
+			return errors.Wrapf(err, "Cannot ensure container task running, get container task returned unexpected error")
+		}
+		if !running {
+			startErr := client.StartContainer(container)
+			if startErr != nil {
+				return startErr
 			}
 		}
 	}
