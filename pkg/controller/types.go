@@ -65,6 +65,15 @@ func (c containersState) containsContainer(podName string, target model.Containe
 	return false
 }
 
+func (c containersState) findContainerID(podName string, target model.Container) string {
+	for _, container := range c.getPodContainers(podName) {
+		if containersMatch(container, target) {
+			return container.ID
+		}
+	}
+	return ""
+}
+
 func containersMatch(container model.Container, target model.Container) bool {
 	return container.Name == target.Name &&
 		container.Image == target.Image
