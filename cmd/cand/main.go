@@ -7,6 +7,7 @@ import (
 	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
+	"github.com/ernoaapa/can/pkg/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -76,10 +77,13 @@ func main() {
 		resolver := device.NewResolver(cmd.GetLabels(clicontext))
 		client := cmd.GetRuntimeClient(clicontext)
 
-		source, err := cmd.GetManifestSource(clicontext, resolver)
+		sourceUpdates := make(chan []model.Pod)
+
+		source, err := cmd.GetManifestSource(clicontext, resolver, sourceUpdates)
 		if err != nil {
 			return err
 		}
+		go source.Start()
 
 		reporter, err := cmd.GetStateReporter(clicontext, resolver, client)
 		if err != nil {
@@ -87,11 +91,10 @@ func main() {
 		}
 		go reporter.Start()
 
-		changes := source.GetUpdates()
 		log.Infoln("Started, start waiting for changes in source")
 
 		for {
-			err := controller.Sync(client, <-changes)
+			err := controller.Sync(client, <-sourceUpdates)
 			if err != nil {
 				log.Warnf("Failed to update state to containerd: %s", err)
 			}

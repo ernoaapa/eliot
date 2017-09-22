@@ -13,6 +13,7 @@ import (
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/manifest"
+	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/ernoaapa/can/pkg/state"
 	"github.com/pkg/errors"
@@ -62,7 +63,7 @@ func GetRuntimeClient(clicontext *cli.Context) runtime.Client {
 }
 
 // GetManifestSource initialises new manifest source based on CLI parameters
-func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver) (manifest.Source, error) {
+func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver, out chan<- []model.Pod) (manifest.Source, error) {
 	if !clicontext.IsSet("manifest") {
 		return nil, fmt.Errorf("You must define --manifest parameter")
 	}
@@ -74,7 +75,7 @@ func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver) (mani
 	}
 
 	if fileExists(manifestParam) {
-		return manifest.NewFileManifestSource(manifestParam, interval, resolver), nil
+		return manifest.NewFileManifestSource(manifestParam, interval, resolver, out), nil
 	}
 
 	manifestURL, err := url.Parse(manifestParam)
@@ -84,9 +85,9 @@ func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver) (mani
 
 	switch scheme := manifestURL.Scheme; scheme {
 	case "file":
-		return manifest.NewFileManifestSource(manifestURL.Path, interval, resolver), nil
+		return manifest.NewFileManifestSource(manifestURL.Path, interval, resolver, out), nil
 	case "http", "https":
-		return manifest.NewURLManifestSource(manifestParam, interval, resolver), nil
+		return manifest.NewURLManifestSource(manifestParam, interval, resolver, out), nil
 	}
 	return nil, fmt.Errorf("You must define manifest source. E.g. --manifest path/to/file.yml")
 }

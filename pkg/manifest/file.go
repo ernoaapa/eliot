@@ -18,10 +18,12 @@ type FileManifestSource struct {
 	filePath string
 	interval time.Duration
 	resolver *device.Resolver
+	out      chan<- []model.Pod
+	running  bool
 }
 
 // NewFileManifestSource creates new file source what updates intervally
-func NewFileManifestSource(filePath string, interval time.Duration, resolver *device.Resolver) *FileManifestSource {
+func NewFileManifestSource(filePath string, interval time.Duration, resolver *device.Resolver, out chan<- []model.Pod) *FileManifestSource {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		log.Panicf("Unable to open state, file [%s] does not exist!", filePath)
 	}
@@ -29,25 +31,31 @@ func NewFileManifestSource(filePath string, interval time.Duration, resolver *de
 		filePath: filePath,
 		interval: interval,
 		resolver: resolver,
+		out:      out,
 	}
 }
 
-// GetUpdates return channel for manifest changes
-func (s *FileManifestSource) GetUpdates() chan []model.Pod {
-	updates := make(chan []model.Pod)
-	go func() {
-		for {
-			pods, err := s.getPods()
-			if err != nil {
-				log.Printf("Error while fetching manifest: %s", err)
-			} else {
-				updates <- pods
-			}
-
-			time.Sleep(s.interval)
+// Start the manifest file update process
+func (s *FileManifestSource) Start() {
+	s.running = true
+	for {
+		pods, err := s.getPods()
+		if err != nil {
+			log.Printf("Error while fetching manifest: %s", err)
+		} else {
+			s.out <- pods
 		}
-	}()
-	return updates
+
+		time.Sleep(s.interval)
+		if !s.running {
+			return
+		}
+	}
+}
+
+// Stop the file update polling
+func (s *FileManifestSource) Stop() {
+	s.running = false
 }
 
 func (s *FileManifestSource) getPods() (pods []model.Pod, err error) {

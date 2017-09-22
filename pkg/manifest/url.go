@@ -29,33 +29,37 @@ type URLManifestSource struct {
 	manifestURL string
 	interval    time.Duration
 	resolver    *device.Resolver
+	out         chan<- []model.Pod
+	running     bool
 }
 
 // NewURLManifestSource creates new url source what updates the state intervally
-func NewURLManifestSource(manifestURL string, interval time.Duration, resolver *device.Resolver) *URLManifestSource {
+func NewURLManifestSource(manifestURL string, interval time.Duration, resolver *device.Resolver, out chan<- []model.Pod) *URLManifestSource {
 	return &URLManifestSource{
 		manifestURL: manifestURL,
 		interval:    interval,
 		resolver:    resolver,
+		out:         out,
 	}
 }
 
-// GetUpdates return channel for manifest changes
-func (s *URLManifestSource) GetUpdates() chan []model.Pod {
-	updates := make(chan []model.Pod)
-	go func() {
-		for {
-			log.Debugf("Load manifest from %s", s.manifestURL)
-			pods, err := s.getPods()
-			if err != nil {
-				log.Warnf("Error while fetching manifest: %s", err)
-			} else {
-				updates <- pods
-			}
-			time.Sleep(s.interval)
+// Start url source update process
+func (s *URLManifestSource) Start() {
+	for {
+		log.Debugf("Load manifest from %s", s.manifestURL)
+		pods, err := s.getPods()
+		if err != nil {
+			log.Warnf("Error while fetching manifest: %s", err)
+		} else {
+			s.out <- pods
 		}
-	}()
-	return updates
+		time.Sleep(s.interval)
+	}
+}
+
+// Stop the file update polling
+func (s *URLManifestSource) Stop() {
+	s.running = false
 }
 
 func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {

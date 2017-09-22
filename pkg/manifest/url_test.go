@@ -8,10 +8,12 @@ import (
 	"time"
 
 	"github.com/ernoaapa/can/pkg/device"
+	"github.com/ernoaapa/can/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUrlSource(t *testing.T) {
+	updates := make(chan []model.Pod)
 	resolver := device.NewResolver(map[string]string{})
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method, "Should make PUT request")
@@ -37,8 +39,9 @@ func TestUrlSource(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	source := NewURLManifestSource(ts.URL, 100*time.Millisecond, resolver)
-	updates := source.GetUpdates()
+	source := NewURLManifestSource(ts.URL, 100*time.Millisecond, resolver, updates)
+	go source.Start()
+	defer source.Stop()
 
 	select {
 	case pods := <-updates:
@@ -54,6 +57,7 @@ func TestUrlSource(t *testing.T) {
 }
 
 func TestUrlSourceHandlesUnauthorized(t *testing.T) {
+	updates := make(chan []model.Pod)
 	resolver := device.NewResolver(map[string]string{})
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -63,8 +67,9 @@ func TestUrlSourceHandlesUnauthorized(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	source := NewURLManifestSource(ts.URL, 100*time.Millisecond, resolver)
-	updates := source.GetUpdates()
+	source := NewURLManifestSource(ts.URL, 100*time.Millisecond, resolver, updates)
+	go source.Start()
+	defer source.Stop()
 
 	select {
 	case <-updates:

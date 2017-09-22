@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ernoaapa/can/pkg/device"
+	"github.com/ernoaapa/can/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,6 +22,7 @@ func createTempFile(t *testing.T, data []byte) string {
 }
 
 func TestFileSource(t *testing.T) {
+	out := make(chan []model.Pod)
 	resolver := device.NewResolver(map[string]string{})
 	filePath := createTempFile(t, []byte(`
 - metadata:
@@ -40,11 +42,12 @@ func TestFileSource(t *testing.T) {
         image: "docker.io/library/hello-world:latest"
 `))
 
-	source := NewFileManifestSource(filePath, 100*time.Millisecond, resolver)
-	updates := source.GetUpdates()
+	source := NewFileManifestSource(filePath, 100*time.Millisecond, resolver, out)
+	go source.Start()
+	defer source.Stop()
 
 	select {
-	case pods := <-updates:
+	case pods := <-out:
 		assert.Equal(t, 2, len(pods), "Should have one pod spec")
 		assert.Equal(t, "foo", pods[0].GetName(), "Should unmarshal name")
 		assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
