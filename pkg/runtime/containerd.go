@@ -23,7 +23,6 @@ var (
 
 // ContainerdClient is containerd client wrapper
 type ContainerdClient struct {
-	client  *containerd.Client
 	context context.Context
 	timeout time.Duration
 	address string
@@ -61,10 +60,6 @@ func (c *ContainerdClient) getConnection(namespace string) (*containerd.Client, 
 	return client, nil
 }
 
-func (c *ContainerdClient) resetConnection() {
-	c.client = nil
-}
-
 // GetContainersByPods return all containers active in containerd grouped by pod name
 func (c *ContainerdClient) GetContainersByPods(namespace string) (map[string][]model.Container, error) {
 	ctx, cancel := c.getContext()
@@ -76,7 +71,6 @@ func (c *ContainerdClient) GetContainersByPods(namespace string) (map[string][]m
 	}
 	containers, err := client.Containers(ctx)
 	if err != nil {
-		c.resetConnection()
 		return nil, errors.Wrap(err, "Error while getting list of containers")
 	}
 	return mapper.MapToModelByPodNames(containers), nil
@@ -112,7 +106,6 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 	)
 	if err != nil {
-		c.resetConnection()
 		return errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
 	return nil
@@ -123,7 +116,12 @@ func (c *ContainerdClient) StartContainer(containerID string) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	container, err := c.client.LoadContainer(ctx, containerID)
+	client, connectionErr := c.getConnection(model.DefaultNamespace)
+	if connectionErr != nil {
+		return connectionErr
+	}
+
+	container, err := client.LoadContainer(ctx, containerID)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to load container with id %s, cannot start it", containerID)
 	}
@@ -131,14 +129,12 @@ func (c *ContainerdClient) StartContainer(containerID string) error {
 	log.Debugf("Create task in container: %s", container.ID())
 	task, err := container.NewTask(ctx, containerd.NullIO)
 	if err != nil {
-		c.resetConnection()
 		return errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())
 	}
 
 	log.Debugln("Starting task...")
 	err = task.Start(ctx)
 	if err != nil {
-		c.resetConnection()
 		return errors.Wrapf(err, "Failed to start task in container", container.ID())
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
@@ -150,7 +146,12 @@ func (c *ContainerdClient) StopContainer(containerID string) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	container, err := c.client.LoadContainer(ctx, containerID)
+	client, connectionErr := c.getConnection(model.DefaultNamespace)
+	if connectionErr != nil {
+		return connectionErr
+	}
+
+	container, err := client.LoadContainer(ctx, containerID)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to load container with id %s, cannot stop it", containerID)
 	}
@@ -160,7 +161,6 @@ func (c *ContainerdClient) StopContainer(containerID string) error {
 		task.Delete(ctx, containerd.WithProcessKill)
 	}
 	if err := container.Delete(ctx, containerd.WithSnapshotCleanup); err != nil {
-		c.resetConnection()
 		return errors.Wrapf(err, "Failed to delete container %s", container.ID())
 	}
 	return nil
@@ -177,14 +177,12 @@ func (c *ContainerdClient) ensureImagePulled(namespace, ref string) (image conta
 
 	image, err = client.Pull(ctx, ref)
 	if err != nil {
-		c.resetConnection()
 		return image, errors.Wrapf(err, "Error pulling image [%s]", ref)
 	}
 
 	log.Debugf("Unpacking container image [%s]...", image.Target().Digest)
 	err = image.Unpack(ctx, snapshotter)
 	if err != nil {
-		c.resetConnection()
 		return image, errors.Wrapf(err, "Error while unpacking image [%s]", image.Target().Digest)
 	}
 
@@ -196,9 +194,9 @@ func (c *ContainerdClient) GetNamespaces() ([]string, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, err := c.getConnection(model.DefaultNamespace)
-	if err != nil {
-		return nil, err
+	client, connErr := c.getConnection(model.DefaultNamespace)
+	if connErr != nil {
+		return nil, connErr
 	}
 
 	resp, err := client.NamespaceService().List(ctx, &namespaces.ListNamespacesRequest{})
@@ -223,7 +221,12 @@ func (c *ContainerdClient) IsContainerRunning(containerID string) (bool, error) 
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	container, loadErr := c.client.LoadContainer(ctx, containerID)
+	client, connErr := c.getConnection(model.DefaultNamespace)
+	if connErr != nil {
+		return false, connErr
+	}
+
+	container, loadErr := client.LoadContainer(ctx, containerID)
 	if loadErr != nil {
 		return false, errors.Wrapf(loadErr, "Failed to load container with id %s, cannot resolve running state", containerID)
 	}
