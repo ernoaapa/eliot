@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"time"
 
 	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/controller"
@@ -58,12 +57,6 @@ func main() {
 			Usage: "Interval to update desired state",
 			Value: "10s",
 		},
-
-		cli.DurationFlag{
-			Name:  "state-update-interval",
-			Usage: "interval for reporting current state",
-			Value: 5 * time.Second,
-		},
 	}
 
 	app.Before = func(context *cli.Context) error {
@@ -78,6 +71,7 @@ func main() {
 		client := cmd.GetRuntimeClient(clicontext)
 
 		sourceUpdates := make(chan []model.Pod)
+		stateUpdates := make(chan []model.Pod)
 
 		source, err := cmd.GetManifestSource(clicontext, resolver, sourceUpdates)
 		if err != nil {
@@ -85,13 +79,13 @@ func main() {
 		}
 		go source.Start()
 
-		reporter, err := cmd.GetStateReporter(clicontext, resolver, client)
+		reporter, err := cmd.GetStateReporter(clicontext, resolver, stateUpdates)
 		if err != nil {
 			return err
 		}
 		go reporter.Start()
 
-		controller := controller.New(client)
+		controller := controller.New(client, stateUpdates)
 
 		log.Infoln("Started, start waiting for changes in source")
 

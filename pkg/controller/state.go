@@ -1,12 +1,12 @@
-package state
+package controller
 
 import (
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
 )
 
-func getCurrentState(client runtime.Client) (result []*model.Pod, err error) {
-	result = []*model.Pod{}
+func getCurrentState(client runtime.Client) (result []model.Pod, err error) {
+	result = []model.Pod{}
 	namespaces, err := client.GetNamespaces()
 	if err != nil {
 		return result, err
@@ -23,11 +23,9 @@ func getCurrentState(client runtime.Client) (result []*model.Pod, err error) {
 	return result, nil
 }
 
-func constructPodsFromContainerInfo(client runtime.Client, namespace string, containersByPods map[string][]model.Container) []*model.Pod {
-	podsByName := make(map[string]*model.Pod)
-
+func constructPodsFromContainerInfo(client runtime.Client, namespace string, containersByPods map[string][]model.Container) (result []model.Pod) {
 	for podName, containers := range containersByPods {
-		podsByName[podName] = &model.Pod{
+		result = append(result, model.Pod{
 			Metadata: model.NewMetadata(
 				podName,
 				namespace,
@@ -36,17 +34,20 @@ func constructPodsFromContainerInfo(client runtime.Client, namespace string, con
 				Containers: containers,
 			},
 			Status: model.PodStatus{
-				ContainerStatuses: []model.ContainerStatus{},
+				ContainerStatuses: resolveContainerStatuses(client, containers),
 			},
-		}
-
-		for _, container := range containers {
-			podsByName[podName].Status.ContainerStatuses =
-				append(podsByName[podName].Status.ContainerStatuses, resolveContainerStatus(client, container))
-		}
+		})
 	}
 
-	return getValues(podsByName)
+	return result
+}
+
+func resolveContainerStatuses(client runtime.Client, containers []model.Container) []model.ContainerStatus {
+	containerStatuses := []model.ContainerStatus{}
+	for _, container := range containers {
+		containerStatuses = append(containerStatuses, resolveContainerStatus(client, container))
+	}
+	return containerStatuses
 }
 
 func resolveContainerStatus(client runtime.Client, container model.Container) model.ContainerStatus {
@@ -57,8 +58,8 @@ func resolveContainerStatus(client runtime.Client, container model.Container) mo
 	}
 }
 
-func getValues(podsByName map[string]*model.Pod) []*model.Pod {
-	values := []*model.Pod{}
+func getValues(podsByName map[string]model.Pod) []model.Pod {
+	values := []model.Pod{}
 	for _, pod := range podsByName {
 		values = append(values, pod)
 	}

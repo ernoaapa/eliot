@@ -1,46 +1,35 @@
 package state
 
 import (
-	"time"
-
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
-	"github.com/ernoaapa/can/pkg/runtime"
 	log "github.com/sirupsen/logrus"
 )
 
 // ConsoleStateReporter is Reporter implementation what just prints status to stdout
 type ConsoleStateReporter struct {
 	resolver *device.Resolver
-	client   runtime.Client
-	interval time.Duration
+	in       <-chan []model.Pod
 }
 
 // NewConsoleStateReporter creates new ConsoleStateReporter
-func NewConsoleStateReporter(resolver *device.Resolver, client runtime.Client, interval time.Duration) *ConsoleStateReporter {
+func NewConsoleStateReporter(resolver *device.Resolver, in <-chan []model.Pod) *ConsoleStateReporter {
 	return &ConsoleStateReporter{
 		resolver,
-		client,
-		interval,
+		in,
 	}
 }
 
-// Start starts printing status to console with given interval
+// Start printing state to console
 func (r *ConsoleStateReporter) Start() {
 	for {
-		states, err := getCurrentState(r.client)
-		if err != nil {
-			log.Errorf("Error while reporting current device state: %s", err)
-		} else {
-			r.report(states)
-		}
-		time.Sleep(r.interval)
+		r.report(<-r.in)
 	}
 }
 
 // Report implements Reporter interface by printing out the state to console
-func (r *ConsoleStateReporter) report(podsWithStates []*model.Pod) error {
-	for _, pod := range podsWithStates {
+func (r *ConsoleStateReporter) report(state []model.Pod) error {
+	for _, pod := range state {
 		states := getContainerStateCounts(pod.Status.ContainerStatuses)
 		log.WithFields(states).Infof("%s pod containers state", pod.GetName())
 	}

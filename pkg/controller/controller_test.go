@@ -8,6 +8,7 @@ import (
 )
 
 func TestSyncStartsMultiContainerPod(t *testing.T) {
+	out := make(chan []model.Pod)
 	clientMock := &FakeClient{t, []string{"default"}, map[string]map[string][]FakeContainer{}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
@@ -33,7 +34,7 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 		},
 	}
 
-	err := New(clientMock).Sync(pods)
+	err := New(clientMock, out).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 
@@ -41,6 +42,7 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 }
 
 func TestSyncStopRemovedPodContainers(t *testing.T) {
+	out := make(chan []model.Pod)
 	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
 		"cand": map[string][]FakeContainer{
 			"my-pod": []FakeContainer{
@@ -70,7 +72,7 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 		},
 	}
 
-	err := New(clientMock).Sync(pods)
+	err := New(clientMock, out).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 
@@ -78,6 +80,7 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 }
 
 func TestSyncStartsMissingContainerTask(t *testing.T) {
+	out := make(chan []model.Pod)
 	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
 		"cand": map[string][]FakeContainer{
 			"my-pod": []FakeContainer{
@@ -103,7 +106,7 @@ func TestSyncStartsMissingContainerTask(t *testing.T) {
 		},
 	}
 
-	err := New(clientMock).Sync(pods)
+	err := New(clientMock, out).Sync(pods)
 
 	assert.NoError(t, err, "Sync should not return error")
 

@@ -7,11 +7,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
-	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,37 +17,31 @@ import (
 // URLStateReporter is Reporter implementation what PUT data to url
 type URLStateReporter struct {
 	resolver *device.Resolver
-	client   runtime.Client
-	interval time.Duration
+	in       <-chan []model.Pod
 	url      string
 }
 
 // NewURLStateReporter creates new URLStateReporter
-func NewURLStateReporter(resolver *device.Resolver, client runtime.Client, interval time.Duration, url string) *URLStateReporter {
+func NewURLStateReporter(resolver *device.Resolver, in <-chan []model.Pod, url string) *URLStateReporter {
 	return &URLStateReporter{
 		resolver,
-		client,
-		interval,
+		in,
 		url,
 	}
 }
 
-// Start starts printing status to console with given interval
+// Start reporting state to the given url
 func (r *URLStateReporter) Start() {
 	for {
-		states, err := getCurrentState(r.client)
-		if err != nil {
-			log.Errorf("Error while reporting current device state: %s", err)
-		} else {
-			r.report(states)
-		}
-		time.Sleep(r.interval)
+		r.report(<-r.in)
 	}
 }
 
 // Report implements Reporter interface by printing out the state to console
-func (r *URLStateReporter) report(podsWithStates []*model.Pod) error {
-	body, err := json.Marshal(podsWithStates)
+func (r *URLStateReporter) report(state []model.Pod) error {
+	log.Debugf("Received updated state, send it to url [%s]", r.url)
+
+	body, err := json.Marshal(state)
 	if err != nil {
 		return errors.Wrap(err, "Error while marshalling device info to JSON")
 	}

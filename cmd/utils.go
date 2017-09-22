@@ -3,11 +3,12 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/can/pkg/client"
 	"github.com/ernoaapa/can/pkg/config"
@@ -93,13 +94,15 @@ func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver, out c
 }
 
 // GetStateReporter initialises new state reporter based on CLI parameters
-func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, client runtime.Client) (state.Reporter, error) {
+func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, in <-chan []model.Pod) (state.Reporter, error) {
+	if !clicontext.IsSet("report") {
+		return nil, fmt.Errorf("You must define --report parameter. E.g. 'console' or some url")
+	}
 	reportParam := clicontext.String("report")
 	if reportParam == "console" {
 		return state.NewConsoleStateReporter(
 			resolver,
-			client,
-			clicontext.GlobalDuration("state-update-interval"),
+			in,
 		), nil
 	}
 	_, err := url.Parse(reportParam)
@@ -109,8 +112,7 @@ func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, client
 
 	return state.NewURLStateReporter(
 		resolver,
-		client,
-		clicontext.GlobalDuration("state-update-interval"),
+		in,
 		reportParam,
 	), nil
 }

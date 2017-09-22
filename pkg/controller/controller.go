@@ -11,18 +11,20 @@ import (
 // Controller is responsible for keeping the containers in desired state
 type Controller struct {
 	client runtime.Client
+	out    chan<- []model.Pod
 }
 
 // New creates new container controller
-func New(client runtime.Client) *Controller {
+func New(client runtime.Client, out chan<- []model.Pod) *Controller {
 	return &Controller{
 		client,
+		out,
 	}
 }
 
 // Sync start and stop containers to match with target pods
 func (c *Controller) Sync(manifest podsManifest) (err error) {
-	log.Debugf("Received update, start updating containerd: %v", manifest)
+	log.Debugf("Received update, start syncing containers: %v", manifest)
 	namespaces, err := c.client.GetNamespaces()
 	if err != nil {
 		return errors.Wrapf(err, "Failed to list namespaces when syncing containers")
@@ -49,7 +51,18 @@ func (c *Controller) Sync(manifest podsManifest) (err error) {
 			return err
 		}
 	}
-	return nil
+
+	state, err := getCurrentState(c.client)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to forward current state, failed to resolve current state!")
+	}
+	select {
+	case c.out <- state:
+		return nil
+	default:
+		log.Warnf("Controller state output is blocking, state reporter not processing messages?")
+		return nil
+	}
 }
 
 func (c *Controller) cleanupRemovedContainers(namespace string, pods podsManifest, state containersState) error {
