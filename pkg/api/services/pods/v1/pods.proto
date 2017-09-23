@@ -1,0 +1,43 @@
+syntax = "proto3";
+package cand.services.pods.v1;
+
+option go_package = "pkg/api/services/pods/v1;pods";
+
+// Pods provides visibility to the pods.
+service Pods {
+	rpc List(ListPodsRequest) returns (ListPodsResponse);
+}
+
+message ListPodsRequest {
+	string namespace = 1;
+}
+
+message ListPodsResponse {
+	repeated Pod pods = 1;
+}
+
+message Pod {
+	map<string, string> metadata = 1;
+	PodSpec spec = 2;
+	PodStatus status = 3;
+}
+
+message PodSpec {
+	repeated Container containers = 1;
+}
+
+message Container {
+	string ID = 1;
+	string name = 2;
+	string image = 3;
+}
+
+message PodStatus {
+	repeated ContainerStatus containerStatuses = 1;
+}
+
+message ContainerStatus {
+	string containerID = 1;
+	string image = 2;
+	string state = 3;
+}

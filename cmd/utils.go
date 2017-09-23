@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/ernoaapa/can/pkg/client"
+	"github.com/ernoaapa/can/pkg/api"
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
@@ -22,16 +24,22 @@ import (
 )
 
 // GetClient creates new cloud API client
-func GetClient(clicontext *cli.Context) *client.Client {
+func GetClient(clicontext *cli.Context) *api.Client {
+	config := GetConfig(clicontext)
+	return api.NewClient(
+		config.GetCurrentContext().Namespace,
+		config.GetCurrentEndpoint().URL,
+	)
+}
+
+// GetConfig parse yaml config and return Config
+func GetConfig(clicontext *cli.Context) *config.Config {
 	configPath := clicontext.GlobalString("config")
-	config, err := config.GetConfig(configPath)
+	config, err := config.GetConfig(expandTilde(configPath))
 	if err != nil {
 		log.Fatalf("Error while reading configuration file [%s]: %s", configPath, err)
 	}
-	return client.NewClient(
-		config.GetCurrentEndpoint().URL,
-		config.GetCurrentUser().Token,
-	)
+	return config
 }
 
 // GetLabels return --labels CLI parameter value as string map
@@ -125,4 +133,14 @@ func GetController(clicontext *cli.Context, in <-chan []model.Pod, out chan<- []
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
+}
+
+func expandTilde(path string) string {
+	usr, _ := user.Current()
+	dir := usr.HomeDir
+
+	if path[:2] == "~/" {
+		return filepath.Join(dir, path[2:])
+	}
+	return path
 }

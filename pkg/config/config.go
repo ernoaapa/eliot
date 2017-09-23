@@ -23,15 +23,15 @@ type Endpoint struct {
 
 // User is authenticated user
 type User struct {
-	Name  string `yaml:"name"`
-	Token string `yaml:"token"`
+	Name string `yaml:"name"`
 }
 
 // Context represents single user in single endpoint
 type Context struct {
-	Name     string `yaml:"name"`
-	User     string `yaml:"user"`
-	Endpoint string `yaml:"endpoint"`
+	Name      string `yaml:"name"`
+	User      string `yaml:"user"`
+	Endpoint  string `yaml:"endpoint"`
+	Namespace string `yaml:"namespace"`
 }
 
 // GetConfig reads current config from user home directory
