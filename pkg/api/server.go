@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net"
 
 	"golang.org/x/net/context"
@@ -16,7 +15,7 @@ import (
 type Server struct {
 	client runtime.Client
 	grpc   *grpc.Server
-	port   int
+	listen string
 }
 
 // List is pods List implementation
@@ -31,10 +30,10 @@ func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.Lis
 }
 
 // NewServer creates new API server
-func NewServer(port int, client runtime.Client) *Server {
+func NewServer(listen string, client runtime.Client) *Server {
 	apiserver := &Server{
 		client: client,
-		port:   port,
+		listen: listen,
 	}
 
 	apiserver.grpc = grpc.NewServer()
@@ -45,9 +44,9 @@ func NewServer(port int, client runtime.Client) *Server {
 
 // Serve starts the server to serve GRPC server
 func (s *Server) Serve() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", s.port))
+	lis, err := net.Listen("tcp", s.listen)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to start API server to listen port []", s.port)
+		return errors.Wrapf(err, "Failed to start API server to listen [%s]", s.listen)
 	}
 	return s.grpc.Serve(lis)
 }

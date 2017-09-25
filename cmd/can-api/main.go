@@ -30,6 +30,11 @@ func main() {
 			Usage: "address for containerd's GRPC server",
 			Value: "/run/containerd/containerd.sock",
 		},
+		cli.StringFlag{
+			Name:  "listen",
+			Usage: "GRPC host:port what to listen for client connections",
+			Value: "localhost:5000",
+		},
 	}
 
 	app.Before = func(context *cli.Context) error {
@@ -48,7 +53,10 @@ func main() {
 
 	app.Action = func(clicontext *cli.Context) error {
 		client := cmd.GetRuntimeClient(clicontext)
-		server := api.NewServer(5000, client)
+		listen := clicontext.String("listen")
+		server := api.NewServer(listen, client)
+
+		log.Infof("Start to listen %s....", listen)
 		return server.Serve()
 	}
 
