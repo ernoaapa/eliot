@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ernoaapa/can/pkg/printers"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/can/pkg/api"
@@ -128,6 +130,11 @@ func GetController(clicontext *cli.Context, in <-chan []model.Pod, out chan<- []
 	client := GetRuntimeClient(clicontext)
 	interval := clicontext.Duration("update-interval")
 	return controller.New(client, interval, in, out)
+}
+
+// GetPrinter returns printer for formating resources output
+func GetPrinter(clicontext *cli.Context) printers.ResourcePrinter {
+	return printers.NewHumanReadablePrinter()
 }
 
 func fileExists(path string) bool {

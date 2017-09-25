@@ -29,7 +29,34 @@ func TestPrint(t *testing.T) {
 		},
 	}
 
-	printer.PrintPods(data, &buffer)
+	printer.PrintPodsTable(data, &buffer)
+
+	result := buffer.String()
+
+	log.Debugln(result)
+
+	assert.True(t, len(result) > 0, "Should write something to the writer")
+}
+
+func TestPrint(t *testing.T) {
+	log.SetLevel(log.DebugLevel)
+	var buffer bytes.Buffer
+	printer := NewHumanReadablePrinter()
+
+	data := &pb.Pod{
+		Metadata: map[string]string{
+			"name":      "foo",
+			"namespace": "cand",
+		},
+		Spec: &pb.PodSpec{
+			Containers: []*pb.Container{
+				&pb.Container{},
+				&pb.Container{},
+			},
+		},
+	}
+
+	printer.PrintPodDetails(data, &buffer)
 
 	result := buffer.String()
 

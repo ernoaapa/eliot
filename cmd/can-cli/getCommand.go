@@ -23,8 +23,8 @@ var getCommand = cli.Command{
 				}
 
 				writer := printers.GetNewTabWriter(os.Stdout)
-				writerErr := printers.NewHumanReadablePrinter().PrintPods(pods, writer)
-				return writerErr
+				printer := cmd.GetPrinter(clicontext)
+				return printer.PrintPodsTable(pods, writer)
 			},
 		},
 	},

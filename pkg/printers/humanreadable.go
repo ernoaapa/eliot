@@ -6,6 +6,7 @@ import (
 	"log"
 
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/printers/humanreadable"
 )
 
 // HumanReadablePrinter is an implementation of ResourcePrinter which prints
@@ -18,22 +19,29 @@ func NewHumanReadablePrinter() *HumanReadablePrinter {
 	return &HumanReadablePrinter{}
 }
 
-const podTemplate = `NAMESPACE	NAME	CONTAINERS{{range .}}
-{{.Metadata.namespace}}	{{.Metadata.name}}	{{len .Spec.Containers}}
-{{else}}
-No pods
-{{end}}
-`
-
-// PrintPods writes list of Pods in human readable format to the writer
-func (p *HumanReadablePrinter) PrintPods(data []*pb.Pod, writer io.Writer) error {
-	t := template.New("pods")
-	t, err := t.Parse(podTemplate)
+// PrintPodsTable writes list of Pods in human readable table format to the writer
+func (p *HumanReadablePrinter) PrintPodsTable(pods []*pb.Pod, writer io.Writer) error {
+	t := template.New("pods-table")
+	t, err := t.Parse(humanreadable.PodsTableTemplate)
 	if err != nil {
 		log.Fatalf("Invalid pod template: %s", err)
 	}
 
-	if err := t.Execute(writer, data); err != nil {
+	if err := t.Execute(writer, pods); err != nil {
+		return err
+	}
+	return nil
+}
+
+// PrintPodDetails writes list of pods in human readable detailed format to the writer
+func (p *HumanReadablePrinter) PrintPodDetails(pod *pb.Pod, writer io.Writer) error {
+	t := template.New("pod-details")
+	t, err := t.Parse(humanreadable.PodDetailsTemplate)
+	if err != nil {
+		log.Fatalf("Invalid pod template: %s", err)
+	}
+
+	if err := t.Execute(writer, pod); err != nil {
 		return err
 	}
 	return nil
