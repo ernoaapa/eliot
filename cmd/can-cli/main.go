@@ -38,7 +38,7 @@ func main() {
 	}
 
 	app.Commands = []cli.Command{
-		podsCommand,
+		getCommand,
 	}
 
 	if err := app.Run(os.Args); err != nil {

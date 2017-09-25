@@ -6,7 +6,7 @@ var (
 )
 
 // Metadata is any random metadata
-type Metadata map[string]interface{}
+type Metadata map[string]string
 
 // NewMetadata creates new metadata with name and metadata fields
 func NewMetadata(name, namespace string) Metadata {
@@ -44,11 +44,7 @@ func (m Metadata) HasMetadataValue(key string) bool {
 
 // GetMetadataValue return metadata value or empty string with key
 func (m Metadata) GetMetadataValue(key string) string {
-	value := m[key]
-	if value == nil {
-		return ""
-	}
-	return m[key].(string)
+	return m[key]
 }
 
 // SetMetadataValue updates metadata value by key

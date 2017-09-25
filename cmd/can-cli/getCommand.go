@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var podsCommand = cli.Command{
+var getCommand = cli.Command{
 	Name: "get",
 	Subcommands: []cli.Command{
 		{

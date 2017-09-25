@@ -25,7 +25,7 @@ func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.Lis
 		return nil, err
 	}
 	return &pb.ListPodsResponse{
-		Pods: mapPodsToApiModel(pods),
+		Pods: mapPodsToAPIModel(pods),
 	}, nil
 }
 

@@ -26,11 +26,7 @@ func (c *FakeClient) GetContainers(namespace string) (map[string][]model.Contain
 			for podName, containers := range podContainers {
 				result[podName] = []model.Container{}
 				for _, fakeContainer := range containers {
-					result[podName] = append(result[podName], model.Container{
-						ID:    fakeContainer.ID,
-						Name:  fakeContainer.Name,
-						Image: fakeContainer.Image,
-					})
+					result[podName] = append(result[podName], fakeToModel(fakeContainer))
 				}
 			}
 			return result, nil
@@ -111,5 +107,20 @@ func newFakeContainer(containerName, image string, isRunning bool) FakeContainer
 		Name:      containerName,
 		Image:     image,
 		isRunning: isRunning,
+	}
+}
+
+func fakeToModels(fakes []FakeContainer) (result []model.Container) {
+	for _, fake := range fakes {
+		result = append(result, fakeToModel(fake))
+	}
+	return result
+}
+
+func fakeToModel(fake FakeContainer) model.Container {
+	return model.Container{
+		ID:    fake.ID,
+		Name:  fake.Name,
+		Image: fake.Image,
 	}
 }
