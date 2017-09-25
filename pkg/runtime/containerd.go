@@ -60,8 +60,8 @@ func (c *ContainerdClient) getConnection(namespace string) (*containerd.Client, 
 	return client, nil
 }
 
-// GetContainersByPods return all containers active in containerd grouped by pod name
-func (c *ContainerdClient) GetContainersByPods(namespace string) (map[string][]model.Container, error) {
+// GetContainers return all containers active in containerd grouped by pod name
+func (c *ContainerdClient) GetContainers(namespace string) (map[string][]model.Container, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 

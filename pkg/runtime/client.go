@@ -6,7 +6,7 @@ import (
 
 // Client is interface for underlying container implementation
 type Client interface {
-	GetContainersByPods(namespace string) (containersByPods map[string][]model.Container, err error)
+	GetContainers(namespace string) (containersByPods map[string][]model.Container, err error)
 	CreateContainer(pod model.Pod, container model.Container) error
 	StartContainer(containerID string) error
 	StopContainer(containerID string) error

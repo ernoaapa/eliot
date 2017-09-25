@@ -18,9 +18,9 @@ type Server struct {
 	listen string
 }
 
-// List is pods List implementation
+// List is 'pods' service List implementation
 func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.ListPodsResponse, error) {
-	pods, err := s.client.GetContainersByPods(req.GetNamespace())
+	pods, err := s.client.GetContainers(req.GetNamespace())
 	if err != nil {
 		return nil, err
 	}

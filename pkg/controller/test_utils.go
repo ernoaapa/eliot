@@ -18,8 +18,8 @@ type FakeClient struct {
 	stoppedCount int
 }
 
-// GetContainersByPods fake impl.
-func (c *FakeClient) GetContainersByPods(namespace string) (map[string][]model.Container, error) {
+// GetContainers fake impl.
+func (c *FakeClient) GetContainers(namespace string) (map[string][]model.Container, error) {
 	for podNamespace, podContainers := range c.containers {
 		if podNamespace == namespace {
 			result := map[string][]model.Container{}
