@@ -44,6 +44,25 @@ func (c *Client) GetPods() ([]*pb.Pod, error) {
 	return resp.GetPods(), nil
 }
 
+// CreatePod creates new pod to the target server
+func (c *Client) CreatePod(pod *pb.Pod) (*pb.Pod, error) {
+	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pb.NewPodsClient(conn)
+	resp, err := client.Create(context.Background(), &pb.CreatePodRequest{
+		Pod: pod,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetPod(), nil
+}
+
 // GetLogs calls server and fetches pod logs
 func (c *Client) GetLogs(containerID string, stdout, stderr io.Writer) error {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())

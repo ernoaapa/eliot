@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPrint(t *testing.T) {
+func TestPrintTable(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	var buffer bytes.Buffer
 	printer := NewHumanReadablePrinter()
@@ -38,7 +38,7 @@ func TestPrint(t *testing.T) {
 	assert.True(t, len(result) > 0, "Should write something to the writer")
 }
 
-func TestPrint(t *testing.T) {
+func TestPrintDetails(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	var buffer bytes.Buffer
 	printer := NewHumanReadablePrinter()

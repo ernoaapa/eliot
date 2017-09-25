@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"io"
 	"testing"
 
 	"github.com/ernoaapa/can/pkg/model"
@@ -19,7 +20,7 @@ type FakeClient struct {
 }
 
 // GetContainers fake impl.
-func (c *FakeClient) GetContainers(namespace string) (map[string][]model.Container, error) {
+func (c *FakeClient) GetAllContainers(namespace string) (map[string][]model.Container, error) {
 	for podNamespace, podContainers := range c.containers {
 		if podNamespace == namespace {
 			result := map[string][]model.Container{}
@@ -33,6 +34,22 @@ func (c *FakeClient) GetContainers(namespace string) (map[string][]model.Contain
 		}
 	}
 	return make(map[string][]model.Container), nil
+}
+
+// GetContainers fake impl.
+func (c *FakeClient) GetContainers(namespace, podName string) (result []model.Container, err error) {
+	for podNamespace, podContainers := range c.containers {
+		if podNamespace == namespace {
+			for name, containers := range podContainers {
+				if name == podName {
+					for _, fakeContainer := range containers {
+						result = append(result, fakeToModel(fakeContainer))
+					}
+				}
+			}
+		}
+	}
+	return result, err
 }
 
 // CreateContainer fake impl.
@@ -77,6 +94,11 @@ func (c *FakeClient) IsContainerRunning(containerID string) (bool, error) {
 // GetContainerTaskStatus fake impl.
 func (c *FakeClient) GetContainerTaskStatus(containerID string) string {
 	return "UNKNOWN"
+}
+
+// GetLogs fake impl.
+func (c *FakeClient) GetLogs(namespace, podName string, stdin io.Reader, stdout, stderr io.Writer) error {
+	return nil
 }
 
 func (c *FakeClient) verifyExpectations(createdCount, startedCount, stoppedCount int) {

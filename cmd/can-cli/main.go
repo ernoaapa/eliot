@@ -41,6 +41,7 @@ func main() {
 		getCommand,
 		describeCommand,
 		logsCommand,
+		runCommand,
 	}
 
 	if err := app.Run(os.Args); err != nil {

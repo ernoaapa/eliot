@@ -61,7 +61,7 @@ func (c *Controller) Sync(manifest podsManifest) (err error) {
 	log.Debugf("Syncing namespaces: %s", namespaces)
 	for _, namespace := range namespaces {
 		manifest := manifest.filterPodsByNamespace(namespace)
-		state, err := c.client.GetContainers(namespace)
+		state, err := c.client.GetAllContainers(namespace)
 		if err != nil {
 			return err
 		}

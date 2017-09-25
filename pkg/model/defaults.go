@@ -8,14 +8,19 @@ var DefaultNamespace = "cand"
 // Defaults set default values to pod definitions
 func Defaults(pods []Pod) (result []Pod) {
 	for _, pod := range pods {
-		if pod.GetNamespace() == "" {
-			pod.SetNamespace(DefaultNamespace)
-		}
-
-		pod.Spec.Containers = defaultContainers(pod.GetName(), pod.Spec.Containers)
-		result = append(result, pod)
+		result = append(result, Default(pod))
 	}
 	return result
+}
+
+// Default set default values to Pod model
+func Default(pod Pod) Pod {
+	if pod.GetNamespace() == "" {
+		pod.SetNamespace(DefaultNamespace)
+	}
+
+	pod.Spec.Containers = defaultContainers(pod.GetName(), pod.Spec.Containers)
+	return pod
 }
 
 func defaultContainers(podName string, containers []Container) (result []Container) {

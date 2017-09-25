@@ -4,8 +4,8 @@ package humanreadable
 const PodDetailsTemplate = `Name: {{.Metadata.name}}
 Namespace:	{{.Metadata.namespace}}
 Containers:{{range .Spec.Containers}}
-  {{.ID}}:
-    Name: {{.Name}}
+  {{.Name}}:
+    ContainerID: {{.ID}}
     Image: {{.Image}}
 {{else}}
   (No containers)

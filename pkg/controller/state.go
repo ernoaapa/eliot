@@ -13,7 +13,7 @@ func getCurrentState(client runtime.Client) (result []model.Pod, err error) {
 	}
 
 	for _, namespace := range namespaces {
-		containers, err := client.GetContainers(namespace)
+		containers, err := client.GetAllContainers(namespace)
 		if err != nil {
 			return result, err
 		}

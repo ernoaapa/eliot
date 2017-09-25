@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	"github.com/ernoaapa/can/pkg/api/mapping"
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/api/stream"
 	"github.com/ernoaapa/can/pkg/runtime"
@@ -20,14 +21,35 @@ type Server struct {
 	listen string
 }
 
+// Create is 'pods' service Create implementation
+func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.CreatePodResponse, error) {
+	pod := mapping.MapPodToInternalModel(req.Pod)
+
+	for _, container := range pod.Spec.Containers {
+		err := s.client.CreateContainer(pod, container)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	containers, err := s.client.GetContainers(pod.GetNamespace(), pod.GetName())
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to fetch created containers info")
+	}
+
+	return &pb.CreatePodResponse{
+		Pod: mapping.MapPodToAPIModel(pod.GetNamespace(), pod.GetName(), containers),
+	}, nil
+}
+
 // List is 'pods' service List implementation
 func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.ListPodsResponse, error) {
-	containersByPods, err := s.client.GetContainers(req.GetNamespace())
+	containersByPods, err := s.client.GetAllContainers(req.GetNamespace())
 	if err != nil {
 		return nil, err
 	}
 	return &pb.ListPodsResponse{
-		Pods: mapPodsToAPIModel(req.GetNamespace(), containersByPods),
+		Pods: mapping.MapPodsToAPIModel(req.GetNamespace(), containersByPods),
 	}, nil
 }
 
