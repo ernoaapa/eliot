@@ -44,6 +44,21 @@ func (c *Client) GetPods() ([]*pb.Pod, error) {
 	return resp.GetPods(), nil
 }
 
+// GetPod return Pod by name
+func (c *Client) GetPod(podName string) (*pb.Pod, error) {
+	pods, err := c.GetPods()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, pod := range pods {
+		if pod.Metadata["name"] == podName {
+			return pod, nil
+		}
+	}
+	return nil, fmt.Errorf("No pod found with name [%s]", podName)
+}
+
 // CreatePod creates new pod to the target server
 func (c *Client) CreatePod(pod *pb.Pod) (*pb.Pod, error) {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
