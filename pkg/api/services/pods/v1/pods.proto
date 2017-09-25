@@ -6,6 +6,7 @@ option go_package = "pkg/api/services/pods/v1;pods";
 // Pods provides visibility to the pods.
 service Pods {
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
+	rpc Logs(GetLogsRequest) returns (stream GetLogsResponse);
 }
 
 message ListPodsRequest {
@@ -14,6 +15,20 @@ message ListPodsRequest {
 
 message ListPodsResponse {
 	repeated Pod pods = 1;
+}
+
+message GetLogsRequest {
+	string namespace = 1;
+	string containerID = 2;
+}
+
+message GetLogsResponse {
+	enum Type {
+    STDOUT = 0;
+    STDERR = 1;
+	}
+	Type type = 1;
+	bytes line = 2;
 }
 
 message Pod {

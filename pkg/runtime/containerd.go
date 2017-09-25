@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/containerd/containerd"
@@ -243,7 +244,6 @@ func (c *ContainerdClient) IsContainerRunning(containerID string) (bool, error) 
 
 // GetContainerTaskStatus resolves container status or return UNKNOWN
 func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
-
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -262,4 +262,33 @@ func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
 	}
 
 	return resp.Process.Status.String()
+}
+
+// GetLogs returns pod logs
+func (c *ContainerdClient) GetLogs(namespace, containerID string, stdin io.Reader, stdout, stderr io.Writer) error {
+	ctx, cancel := c.getContext()
+	defer cancel()
+
+	client, err := c.getConnection(namespace)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to get connection for streaming logs")
+	}
+
+	container, err := client.LoadContainer(ctx, containerID)
+	if err != nil {
+		return errors.Wrapf(err, "Cannot return container logs for containerID [%s] in namespace [%s]", containerID, namespace)
+	}
+
+	task, taskErr := container.Task(ctx, containerd.WithAttach(stdin, stdout, stderr))
+	if taskErr != nil {
+		return taskErr
+	}
+
+	status, err := task.Wait(ctx)
+	if err != nil {
+		return err
+	}
+
+	exitStatus := <-status
+	return exitStatus.Error()
 }

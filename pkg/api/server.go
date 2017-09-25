@@ -6,8 +6,10 @@ import (
 	"golang.org/x/net/context"
 
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/api/stream"
 	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -27,6 +29,17 @@ func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.Lis
 	return &pb.ListPodsResponse{
 		Pods: mapPodsToAPIModel(req.GetNamespace(), containersByPods),
 	}, nil
+}
+
+// Logs returns container logs
+func (s *Server) Logs(req *pb.GetLogsRequest, resp pb.Pods_LogsServer) error {
+	log.Debugf("Get logs for container [%s] in namespace [%s]", req.GetContainerID(), req.GetNamespace())
+	return s.client.GetLogs(
+		req.GetNamespace(), req.GetContainerID(),
+		&stream.EmptyStdin{},
+		stream.NewLogsWriter(resp, pb.GetLogsResponse_STDOUT),
+		stream.NewLogsWriter(resp, pb.GetLogsResponse_STDERR),
+	)
 }
 
 // NewServer creates new API server

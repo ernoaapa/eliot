@@ -40,6 +40,7 @@ func main() {
 	app.Commands = []cli.Command{
 		getCommand,
 		describeCommand,
+		logsCommand,
 	}
 
 	if err := app.Run(os.Args); err != nil {

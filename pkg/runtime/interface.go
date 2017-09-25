@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"io"
+
 	"github.com/ernoaapa/can/pkg/model"
 )
 
@@ -13,4 +15,5 @@ type Client interface {
 	GetNamespaces() ([]string, error)
 	IsContainerRunning(containerID string) (bool, error)
 	GetContainerTaskStatus(containerID string) string
+	GetLogs(namespace, podName string, stdin io.Reader, stdout, stderr io.Writer) error
 }
