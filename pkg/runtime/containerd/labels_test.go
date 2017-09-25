@@ -22,6 +22,5 @@ func TestNewContainerLabels(t *testing.T) {
 
 	assert.Equal(t, "some-long-uid", result["io.can.pod.uid"])
 	assert.Equal(t, "my-pod", result["io.can.pod.name"])
-	assert.Equal(t, "my-namespace", result["io.can.pod.namespace"])
 	assert.Equal(t, "my-container", result["io.can.container.name"])
 }

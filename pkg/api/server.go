@@ -20,12 +20,12 @@ type Server struct {
 
 // List is 'pods' service List implementation
 func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.ListPodsResponse, error) {
-	pods, err := s.client.GetContainers(req.GetNamespace())
+	containersByPods, err := s.client.GetContainers(req.GetNamespace())
 	if err != nil {
 		return nil, err
 	}
 	return &pb.ListPodsResponse{
-		Pods: mapPodsToAPIModel(pods),
+		Pods: mapPodsToAPIModel(req.GetNamespace(), containersByPods),
 	}, nil
 }
 

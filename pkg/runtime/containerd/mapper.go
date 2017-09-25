@@ -11,6 +11,10 @@ func MapToModelByPodNames(containers []containerd.Container) map[string][]model.
 	for _, container := range containers {
 		labels := ContainerLabels(container.Info().Labels)
 		podName := labels.getPodName()
+		if podName == "" {
+			// container is not cand managed container so add it under 'system' pod in namespace 'default'
+			podName = "system"
+		}
 		containerName := labels.getContainerName()
 
 		if _, ok := result[podName]; !ok {

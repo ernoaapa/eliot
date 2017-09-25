@@ -79,10 +79,9 @@ func newFakeContainer(namespace, podName, containerName string, isRunning bool) 
 	uid := uuid.NewV4().String()
 
 	labels := map[string]string{}
-	labels[getLabelKeyFor(PodUIDSuffix)] = uid
-	labels[getLabelKeyFor(PodNameSuffix)] = podName
-	labels[getLabelKeyFor(PodNamespaceSuffix)] = namespace
-	labels[getLabelKeyFor(ContainerNameSuffix)] = containerName
+	labels[buildLabelKeyFor(podUIDLabel)] = uid
+	labels[buildLabelKeyFor(podNameLabel)] = podName
+	labels[buildLabelKeyFor(containerNameLabel)] = containerName
 
 	return &FakeContainer{
 		id:        uid,

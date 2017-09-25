@@ -5,12 +5,10 @@ import (
 	"github.com/ernoaapa/can/pkg/model"
 )
 
-func mapPodsToAPIModel(containersByPods map[string][]model.Container) (result []*pb.Pod) {
+func mapPodsToAPIModel(namespace string, containersByPods map[string][]model.Container) (result []*pb.Pod) {
 	for podName, containers := range containersByPods {
 		result = append(result, &pb.Pod{
-			Metadata: map[string]string{
-				"name": podName,
-			},
+			Metadata: model.NewMetadata(podName, namespace),
 			Spec: &pb.PodSpec{
 				Containers: mapContainersToAPIModel(containers),
 			},
