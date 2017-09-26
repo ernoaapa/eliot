@@ -58,9 +58,11 @@ func (s *Server) Logs(req *pb.GetLogsRequest, resp pb.Pods_LogsServer) error {
 	log.Debugf("Get logs for container [%s] in namespace [%s]", req.GetContainerID(), req.Namespace)
 	return s.client.GetLogs(
 		req.Namespace, req.GetContainerID(),
-		&stream.EmptyStdin{},
-		stream.NewLogsWriter(resp, pb.GetLogsResponse_STDOUT),
-		stream.NewLogsWriter(resp, pb.GetLogsResponse_STDERR),
+		runtime.AttachIO{
+			Stdin:  &stream.EmptyStdin{},
+			Stdout: stream.NewLogsWriter(resp, pb.GetLogsResponse_STDOUT),
+			Stderr: stream.NewLogsWriter(resp, pb.GetLogsResponse_STDERR),
+		},
 	)
 }
 

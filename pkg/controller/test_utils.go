@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"io"
 	"testing"
 
 	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/runtime"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -97,7 +97,7 @@ func (c *FakeClient) GetContainerTaskStatus(containerID string) string {
 }
 
 // GetLogs fake impl.
-func (c *FakeClient) GetLogs(namespace, podName string, stdin io.Reader, stdout, stderr io.Writer) error {
+func (c *FakeClient) GetLogs(namespace, podName string, io runtime.AttachIO) error {
 	return nil
 }
 

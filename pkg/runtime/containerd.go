@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 	"fmt"
-	"io"
 	"time"
 
 	"github.com/containerd/containerd"
@@ -274,7 +273,7 @@ func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
 }
 
 // GetLogs returns pod logs
-func (c *ContainerdClient) GetLogs(namespace, containerID string, stdin io.Reader, stdout, stderr io.Writer) error {
+func (c *ContainerdClient) GetLogs(namespace, containerID string, io AttachIO) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -288,7 +287,7 @@ func (c *ContainerdClient) GetLogs(namespace, containerID string, stdin io.Reade
 		return errors.Wrapf(err, "Cannot return container logs for containerID [%s] in namespace [%s]", containerID, namespace)
 	}
 
-	task, taskErr := container.Task(ctx, containerd.WithAttach(stdin, stdout, stderr))
+	task, taskErr := container.Task(ctx, containerd.WithAttach(io.Stdin, io.Stdout, io.Stderr))
 	if taskErr != nil {
 		return taskErr
 	}
