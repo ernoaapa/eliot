@@ -29,7 +29,8 @@ func TestPrintTable(t *testing.T) {
 		},
 	}
 
-	printer.PrintPodsTable(data, &buffer)
+	err := printer.PrintPodsTable(data, &buffer)
+	assert.NoError(t, err, "Printing pods table should not return error")
 
 	result := buffer.String()
 
@@ -56,7 +57,8 @@ func TestPrintDetails(t *testing.T) {
 		},
 	}
 
-	printer.PrintPodDetails(data, &buffer)
+	err := printer.PrintPodDetails(data, &buffer)
+	assert.NoError(t, err, "Printing pod details should not return error")
 
 	result := buffer.String()
 

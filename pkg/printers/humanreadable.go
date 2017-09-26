@@ -1,6 +1,7 @@
 package printers
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -21,15 +22,21 @@ func NewHumanReadablePrinter() *HumanReadablePrinter {
 
 // PrintPodsTable writes list of Pods in human readable table format to the writer
 func (p *HumanReadablePrinter) PrintPodsTable(pods []*pb.Pod, writer io.Writer) error {
+	fmt.Fprintln(writer, humanreadable.PodsTableHeader)
 	t := template.New("pods-table")
-	t, err := t.Parse(humanreadable.PodsTableTemplate)
+	t, err := t.Parse(humanreadable.PodsTableRowTemplate)
 	if err != nil {
 		log.Fatalf("Invalid pod template: %s", err)
 	}
 
-	if err := t.Execute(writer, pods); err != nil {
-		return err
+	for _, pod := range pods {
+		if err := t.Execute(writer, pod); err != nil {
+			return err
+		}
 	}
+	// TODO: For some reason, don't output without printing something to the writer
+	// Find out how to flush the writer
+	fmt.Fprintln(writer, "\n")
 	return nil
 }
 
