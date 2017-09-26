@@ -11,7 +11,7 @@ import (
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/plugin"
 	"github.com/ernoaapa/can/pkg/model"
-	mapping "github.com/ernoaapa/can/pkg/runtime/mapping/containerd"
+	"github.com/ernoaapa/can/pkg/runtime/containerd/mapping"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"

@@ -1,4 +1,4 @@
-package containerd
+package mapping
 
 import (
 	"github.com/containerd/containerd"
