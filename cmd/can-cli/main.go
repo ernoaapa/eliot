@@ -31,6 +31,11 @@ func main() {
 			EnvVar: "CAN_CONFIG",
 			Value:  "~/.can/config",
 		},
+		cli.StringFlag{
+			Name:   "namespace",
+			Usage:  "Namespace to use with commands. By default reads from config.",
+			EnvVar: "CAN_NAMESPACE",
+		},
 	}, cmd.GlobalFlags...)
 
 	app.Commands = []cli.Command{

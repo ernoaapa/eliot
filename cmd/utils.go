@@ -46,8 +46,12 @@ func GlobalBefore(context *cli.Context) error {
 // GetClient creates new cloud API client
 func GetClient(clicontext *cli.Context) *api.Client {
 	config := GetConfig(clicontext)
+	namespace := config.GetCurrentContext().Namespace
+	if clicontext.GlobalIsSet("namespace") {
+		namespace = clicontext.GlobalString("namespace")
+	}
 	return api.NewClient(
-		config.GetCurrentContext().Namespace,
+		namespace,
 		config.GetCurrentEndpoint().URL,
 	)
 }
