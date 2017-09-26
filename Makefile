@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # The binary to build (just the basename).
-BIN := cand
+BIN ?= cand
 
 # This repo's root import path (under GOPATH).
 PKG := github.com/ernoaapa/can
