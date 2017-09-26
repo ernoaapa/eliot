@@ -7,6 +7,7 @@ import (
 	"log"
 
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/printers/humanreadable"
 )
 
@@ -51,5 +52,21 @@ func (p *HumanReadablePrinter) PrintPodDetails(pod *pb.Pod, writer io.Writer) er
 	if err := t.Execute(writer, pod); err != nil {
 		return err
 	}
+	return nil
+}
+
+// PrintConfig writes list of pods in human readable detailed format to the writer
+func (p *HumanReadablePrinter) PrintConfig(config *config.Config, writer io.Writer) error {
+	t := template.New("config")
+	t, err := t.Parse(humanreadable.ConfigTemplate)
+	if err != nil {
+		log.Fatalf("Invalid config template: %s", err)
+	}
+
+	if err := t.Execute(writer, config); err != nil {
+		return err
+	}
+
+	fmt.Fprintln(writer, "\n")
 	return nil
 }

@@ -51,22 +51,22 @@ func GetConfig(path string) (*Config, error) {
 }
 
 // GetCurrentUser return current user
-func (c *Config) GetCurrentUser() User {
+func (c Config) GetCurrentUser() User {
 	return c.GetUser(c.GetCurrentContext().User)
 }
 
 // GetCurrentContext return current context
-func (c *Config) GetCurrentContext() Context {
+func (c Config) GetCurrentContext() Context {
 	return c.GetContext(c.CurrentContext)
 }
 
 // GetCurrentEndpoint return current context
-func (c *Config) GetCurrentEndpoint() Endpoint {
+func (c Config) GetCurrentEndpoint() Endpoint {
 	return c.GetEndpoint(c.GetCurrentContext().Endpoint)
 }
 
 // GetContext return context by name
-func (c *Config) GetContext(name string) Context {
+func (c Config) GetContext(name string) Context {
 	for _, context := range c.Contexts {
 		if context.Name == name {
 			return context
