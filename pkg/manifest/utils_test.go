@@ -28,7 +28,7 @@ func TestUnmarshalYaml(t *testing.T) {
 	assert.NoError(t, err, "Unable unmarshal test yaml")
 
 	assert.Equal(t, 2, len(pods), "Should have pod specs")
-	assert.Equal(t, "foo", pods[0].GetName(), "Should unmarshal name")
+	assert.Equal(t, "foo", pods[0].Metadata.Name, "Should unmarshal name")
 	assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
 }
 
@@ -72,6 +72,6 @@ func TestUnmarshalJSON(t *testing.T) {
 	assert.NoError(t, err, "Unable unmarshal test yaml")
 
 	assert.Equal(t, 2, len(pods), "Should have pod specs")
-	assert.Equal(t, "foo", pods[0].GetName(), "Should unmarshal name")
+	assert.Equal(t, "foo", pods[0].Metadata.Name, "Should unmarshal name")
 	assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
 }

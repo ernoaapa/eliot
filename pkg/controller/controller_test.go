@@ -14,10 +14,9 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 	clientMock := &FakeClient{t, []string{"default"}, map[string]map[string][]FakeContainer{}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
-			UID: "1",
 			Metadata: model.Metadata{
-				"name":      "hello-world",
-				"namespace": "test",
+				Name:      "hello-world",
+				Namespace: "test",
 			},
 			Spec: model.PodSpec{
 				Containers: []model.Container{
@@ -58,10 +57,9 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 	}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
-			UID: "1",
 			Metadata: model.Metadata{
-				"namespace": "cand",
-				"name":      "my-pod",
+				Namespace: "cand",
+				Name:      "my-pod",
 			},
 			Spec: model.PodSpec{
 				Containers: []model.Container{
@@ -94,10 +92,9 @@ func TestSyncStartsMissingContainerTask(t *testing.T) {
 	}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
-			UID: "1",
 			Metadata: model.Metadata{
-				"namespace": "cand",
-				"name":      "my-pod",
+				Namespace: "cand",
+				Name:      "my-pod",
 			},
 			Spec: model.PodSpec{
 				Containers: []model.Container{

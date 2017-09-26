@@ -32,10 +32,11 @@ services:
       - /usr/bin/ctr:/usr/bin/ctr # ctr for debugging
       - /containers:/containers # ctr requires access to be able to manage containers
       - /run/containerd:/run/containerd # need access to sockets
+      - /var/log:/var/log # To be able to run 'ctr t attach' to view logs
       - /run/containerd/containerd.sock:/run/containerd/containerd.sock
       - /tmp:/tmp
   - name: cand
-    image: ernoaapa/cand-amd64:a973dd1
+    image: ernoaapa/cand-amd64:c6f9637-dirty
     command: ["/cand", "--debug", "--labels", "camera=true,name=first", "--manifest", "https://can.ngrok.io/api/devices/first/manifest", "--report", "https://can.ngrok.io/api/devices/first/pods"]
     capabilities:
       - all
@@ -44,6 +45,17 @@ services:
       - /run/containerd:/run/containerd
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
+  - name: can-api
+    image: ernoaapa/can-api-amd64:0e9c591-dirty
+    command: ["/can-api", "--debug", "--listen", "localhost:5000"]
+    capabilities:
+      - all
+    binds:
+      - /containers:/containers
+      - /run/containerd:/run/containerd
+      - /etc/resolv.conf:/etc/resolv.conf
+      - /etc/machine-id:/etc/machine-id
+      - /var/log:/var/log # To be able to serve logs through api
 files:
   - path: root/.ssh/authorized_keys
     source: ~/.ssh/id_rsa.pub

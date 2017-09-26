@@ -15,11 +15,11 @@ func Defaults(pods []Pod) (result []Pod) {
 
 // Default set default values to Pod model
 func Default(pod Pod) Pod {
-	if pod.GetNamespace() == "" {
-		pod.SetNamespace(DefaultNamespace)
+	if pod.Metadata.Namespace == "" {
+		pod.Metadata.Namespace = DefaultNamespace
 	}
 
-	pod.Spec.Containers = defaultContainers(pod.GetName(), pod.Spec.Containers)
+	pod.Spec.Containers = defaultContainers(pod.Metadata.Name, pod.Spec.Containers)
 	return pod
 }
 

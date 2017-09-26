@@ -52,7 +52,7 @@ func (c *Client) GetPod(podName string) (*pb.Pod, error) {
 	}
 
 	for _, pod := range pods {
-		if pod.Metadata["name"] == podName {
+		if pod.Metadata.Name == podName {
 			return pod, nil
 		}
 	}

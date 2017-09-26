@@ -46,11 +46,11 @@ func TestUrlSource(t *testing.T) {
 	select {
 	case pods := <-updates:
 		assert.Equal(t, 2, len(pods), "Should have one pod spec")
-		assert.Equal(t, "foo", pods[0].GetName(), "Should unmarshal name")
+		assert.Equal(t, "foo", pods[0].Metadata.Name, "Should unmarshal name")
 		assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
 
-		assert.Equal(t, "my-namespace", pods[0].GetNamespace(), "Should set default namespace")
-		assert.Equal(t, "cand", pods[1].GetNamespace(), "Should set default namespace")
+		assert.Equal(t, "my-namespace", pods[0].Metadata.Namespace, "Should set default namespace")
+		assert.Equal(t, "cand", pods[1].Metadata.Namespace, "Should set default namespace")
 	case <-time.After(200 * time.Millisecond):
 		assert.FailNow(t, "Didn't receive update in two second")
 	}

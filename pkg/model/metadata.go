@@ -5,49 +5,16 @@ var (
 	namespaceKey = "namespace"
 )
 
-// Metadata is any random metadata
-type Metadata map[string]string
+// Metadata is metadata that all resources must have
+type Metadata struct {
+	Name      string `validate:"required,gt=0,alphanumOrDash"  json:"name"          yaml:"name"`
+	Namespace string `validate:"omitempty,gt=0,alphanumOrDash"     json:"namespace"     yaml:"namespace"`
+}
 
 // NewMetadata creates new metadata with name and metadata fields
 func NewMetadata(name, namespace string) Metadata {
 	return Metadata{
-		nameKey:      name,
-		namespaceKey: namespace,
+		Name:      name,
+		Namespace: namespace,
 	}
-}
-
-// GetName returns name field from metadata
-func (m Metadata) GetName() string {
-	return m.GetMetadataValue(nameKey)
-}
-
-// SetName returns name field from metadata
-func (m Metadata) SetName(name string) {
-	m.SetMetadataValue(nameKey, name)
-}
-
-// GetNamespace returns name field from metadata
-func (m Metadata) GetNamespace() string {
-	return m.GetMetadataValue(namespaceKey)
-}
-
-// SetNamespace returns name field from metadata
-func (m Metadata) SetNamespace(namespace string) {
-	m.SetMetadataValue(namespaceKey, namespace)
-}
-
-// HasMetadataValue return true if metadata contains value
-func (m Metadata) HasMetadataValue(key string) bool {
-	_, ok := m[key]
-	return ok
-}
-
-// GetMetadataValue return metadata value or empty string with key
-func (m Metadata) GetMetadataValue(key string) string {
-	return m[key]
-}
-
-// SetMetadataValue updates metadata value by key
-func (m Metadata) SetMetadataValue(key, value string) {
-	m[key] = value
 }

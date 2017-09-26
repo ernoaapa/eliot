@@ -44,7 +44,7 @@ var describeCommand = cli.Command{
 
 func filterByPodName(pods []*pb.Pod, podName string) []*pb.Pod {
 	for _, pod := range pods {
-		if pod.GetMetadata()["name"] == podName {
+		if pod.Metadata.Name == podName {
 			return []*pb.Pod{
 				pod,
 			}

@@ -10,7 +10,7 @@ func TestDefaults(t *testing.T) {
 	pods := []Pod{
 		Pod{
 			Metadata: Metadata{
-				"name": "foobar",
+				Name: "foobar",
 			},
 			Spec: PodSpec{
 				Containers: []Container{},
@@ -18,8 +18,8 @@ func TestDefaults(t *testing.T) {
 		},
 		Pod{
 			Metadata: Metadata{
-				"name":      "foobar",
-				"namespace": "my-namespace",
+				Name:      "foobar",
+				Namespace: "my-namespace",
 			},
 			Spec: PodSpec{
 				Containers: []Container{
@@ -34,8 +34,8 @@ func TestDefaults(t *testing.T) {
 
 	result := Defaults(pods)
 
-	assert.Equal(t, "cand", result[0].GetNamespace(), "should set default namespace")
-	assert.Equal(t, "my-namespace", result[1].GetNamespace(), "should not change namespace")
+	assert.Equal(t, "cand", result[0].Metadata.Namespace, "should set default namespace")
+	assert.Equal(t, "my-namespace", result[1].Metadata.Namespace, "should not change namespace")
 
 	assert.NotEmpty(t, result[1].Spec.Containers[0].ID, "should build container ID")
 }

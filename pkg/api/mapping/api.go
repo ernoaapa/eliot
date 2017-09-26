@@ -8,7 +8,10 @@ import (
 // MapPodToInternalModel maps API Pod model to internal model
 func MapPodToInternalModel(pod *pb.Pod) model.Pod {
 	return model.Default(model.Pod{
-		Metadata: pod.Metadata,
+		Metadata: model.Metadata{
+			Name:      pod.Metadata.Name,
+			Namespace: pod.Metadata.Namespace,
+		},
 		Spec: model.PodSpec{
 			Containers: MapContainerToInternalModel(pod.Spec.Containers),
 		},

@@ -9,21 +9,21 @@ import (
 func TestPodGetName(t *testing.T) {
 	pod := Pod{
 		Metadata: Metadata{
-			"name": "foobar",
+			Name: "foobar",
 		},
 	}
 
-	assert.Equal(t, pod.GetName(), "foobar", "should return name from metadata")
+	assert.Equal(t, pod.Metadata.Name, "foobar", "should return name from metadata")
 }
 
 func TestPodGetNamespace(t *testing.T) {
 	pod := Pod{
 		Metadata: Metadata{
-			"namespace": "foobar",
+			Namespace: "foobar",
 		},
 	}
 
-	assert.Equal(t, pod.GetNamespace(), "foobar", "should return namespace from metadata")
+	assert.Equal(t, pod.Metadata.Namespace, "foobar", "should return namespace from metadata")
 }
 
 func TestContainerBuildID(t *testing.T) {

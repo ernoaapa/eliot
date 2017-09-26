@@ -8,7 +8,7 @@ type podsManifest []model.Pod
 
 func (list podsManifest) containsPod(name string) bool {
 	for _, pod := range list {
-		if pod.GetName() == name {
+		if pod.Metadata.Name == name {
 			return true
 		}
 	}
@@ -17,7 +17,7 @@ func (list podsManifest) containsPod(name string) bool {
 
 func (list podsManifest) containsContainer(podName string, target model.Container) bool {
 	for _, pod := range list {
-		if pod.GetName() == podName {
+		if pod.Metadata.Name == podName {
 			for _, container := range pod.Spec.Containers {
 				if containersMatch(container, target) {
 					return true
@@ -32,7 +32,7 @@ func (list podsManifest) containsContainer(podName string, target model.Containe
 func (list podsManifest) filterPodsByNamespace(namespace string) podsManifest {
 	result := podsManifest{}
 	for _, pod := range list {
-		if pod.GetNamespace() == namespace {
+		if pod.Metadata.Namespace == namespace {
 			result = append(result, pod)
 		}
 	}
@@ -42,9 +42,9 @@ func (list podsManifest) filterPodsByNamespace(namespace string) podsManifest {
 func (list podsManifest) getNamespaces() []string {
 	result := []string{}
 	for _, pod := range list {
-		namespace := pod.GetNamespace()
+		namespace := pod.Metadata.Namespace
 		if namespace != "" {
-			result = append(result, pod.GetNamespace())
+			result = append(result, pod.Metadata.Namespace)
 		}
 	}
 	return result

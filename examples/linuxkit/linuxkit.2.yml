@@ -35,7 +35,7 @@ services:
       - /run/containerd/containerd.sock:/run/containerd/containerd.sock
       - /tmp:/tmp
   - name: cand
-    image: ernoaapa/cand-amd64:a973dd1
+    image: ernoaapa/cand-amd64:c6f9637-dirty
     command: ["/cand", "--debug", "--labels", "camera=true,name=third,sensor=true", "--manifest", "https://can.ngrok.io/api/devices/third/manifest", "--report", "https://can.ngrok.io/api/devices/third/pods"]
     capabilities:
       - all

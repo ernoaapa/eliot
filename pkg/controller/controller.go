@@ -147,11 +147,11 @@ func (c *Controller) createMissingContainers(namespace string, pods podsManifest
 			for _, container := range create {
 				createErr := c.client.CreateContainer(pod, container)
 				if createErr != nil {
-					return errors.Wrapf(createErr, "Failed to create container %s %s", pod.GetName(), container.Name)
+					return errors.Wrapf(createErr, "Failed to create container %s %s", pod.Metadata.Name, container.Name)
 				}
 			}
 		} else {
-			log.Debugf("No missing containers in namespace %s for pod %s", namespace, pod.GetName())
+			log.Debugf("No missing containers in namespace %s for pod %s", namespace, pod.Metadata.Name)
 		}
 	}
 	return nil
@@ -159,7 +159,7 @@ func (c *Controller) createMissingContainers(namespace string, pods podsManifest
 
 func getMissingContainers(pod model.Pod, state containersState) (create []model.Container) {
 	for _, desiredContainer := range pod.Spec.Containers {
-		if !state.containsContainer(pod.GetName(), desiredContainer) {
+		if !state.containsContainer(pod.Metadata.Name, desiredContainer) {
 			create = append(create, desiredContainer)
 		}
 	}
@@ -169,8 +169,8 @@ func getMissingContainers(pod model.Pod, state containersState) (create []model.
 func (c *Controller) ensureContainerTasksRunning(pods podsManifest, state containersState) error {
 	for _, pod := range pods {
 		for _, container := range pod.Spec.Containers {
-			if state.containsContainer(pod.GetName(), container) {
-				existingContainerID := state.findContainerID(pod.GetName(), container)
+			if state.containsContainer(pod.Metadata.Name, container) {
+				existingContainerID := state.findContainerID(pod.Metadata.Name, container)
 				running, err := c.client.IsContainerRunning(existingContainerID)
 				if err != nil {
 					return errors.Wrapf(err, "Cannot ensure existing container task running state, get container task returned unexpected error")

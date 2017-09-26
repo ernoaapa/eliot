@@ -16,9 +16,9 @@ func TestPrintTable(t *testing.T) {
 
 	data := []*pb.Pod{
 		&pb.Pod{
-			Metadata: map[string]string{
-				"name":      "foo",
-				"namespace": "cand",
+			Metadata: &pb.ResourceMetadata{
+				Name:      "foo",
+				Namespace: "cand",
 			},
 			Spec: &pb.PodSpec{
 				Containers: []*pb.Container{
@@ -44,9 +44,9 @@ func TestPrintDetails(t *testing.T) {
 	printer := NewHumanReadablePrinter()
 
 	data := &pb.Pod{
-		Metadata: map[string]string{
-			"name":      "foo",
-			"namespace": "cand",
+		Metadata: &pb.ResourceMetadata{
+			Name:      "foo",
+			Namespace: "cand",
 		},
 		Spec: &pb.PodSpec{
 			Containers: []*pb.Container{

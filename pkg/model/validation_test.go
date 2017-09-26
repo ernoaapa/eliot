@@ -10,7 +10,7 @@ func TestValidationIsValid(t *testing.T) {
 	err := Validate([]Pod{
 		Pod{
 			Metadata: Metadata{
-				"name": "foo",
+				Name: "foo",
 			},
 			Spec: PodSpec{
 				Containers: []Container{
@@ -29,20 +29,20 @@ func TestValidationIsValid(t *testing.T) {
 func TestValidationRequiresSpec(t *testing.T) {
 	assert.Error(t, Validate([]Pod{
 		Pod{
-			Metadata: Metadata{"name": "foo"},
+			Metadata: Metadata{Name: "foo"},
 		},
 	}), "should return error if no spec defined")
 
 	assert.Error(t, Validate([]Pod{
 		Pod{
-			Metadata: Metadata{"name": "foo"},
+			Metadata: Metadata{Name: "foo"},
 			Spec:     PodSpec{},
 		},
 	}), "should return error if no containers defined")
 
 	assert.Error(t, Validate([]Pod{
 		Pod{
-			Metadata: Metadata{"name": "foo"},
+			Metadata: Metadata{Name: "foo"},
 			Spec: PodSpec{
 				Containers: []Container{},
 			},
@@ -54,7 +54,7 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 	assert.Error(t, Validate([]Pod{
 		Pod{
 			Metadata: Metadata{
-				"name": "foo",
+				Name: "foo",
 			},
 			Spec: PodSpec{
 				Containers: []Container{
@@ -69,7 +69,7 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 	assert.Error(t, Validate([]Pod{
 		Pod{
 			Metadata: Metadata{
-				"name": "foo",
+				Name: "foo",
 			},
 			Spec: PodSpec{
 				Containers: []Container{
@@ -84,13 +84,13 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 	assert.Error(t, Validate([]Pod{
 		Pod{
 			Metadata: Metadata{
-				"name": "foo",
+				Name: "foo",
 			},
 			Spec: PodSpec{
 				Containers: []Container{
 					Container{
 						Name:  "foo",
-						Image: "/foobar",
+						Image: "/foo",
 					},
 				},
 			},
@@ -100,7 +100,16 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 
 func TestValidationRequiresMetadata(t *testing.T) {
 	assert.Error(t, Validate([]Pod{
-		Pod{},
+		Pod{
+			Spec: PodSpec{
+				Containers: []Container{
+					Container{
+						Name:  "foo",
+						Image: "docker.io/eaapa/hello-world:latest",
+					},
+				},
+			},
+		},
 	}), "should return error if no metadata")
 }
 
@@ -109,16 +118,51 @@ func TestValidationNameMetadata(t *testing.T) {
 	assert.Error(t, Validate([]Pod{
 		Pod{
 			Metadata: Metadata{},
+			Spec: PodSpec{
+				Containers: []Container{
+					Container{
+						Name:  "foo",
+						Image: "docker.io/eaapa/hello-world:latest",
+					},
+				},
+			},
 		},
 	}), "should return error if no 'name' metadata")
 
 	assert.Error(t, Validate([]Pod{
 		Pod{
 			Metadata: Metadata{
-				"name": "#€%&/()=",
+				Name: "#€%&/()=",
+			},
+			Spec: PodSpec{
+				Containers: []Container{
+					Container{
+						Name:  "foo",
+						Image: "docker.io/eaapa/hello-world:latest",
+					},
+				},
 			},
 		},
 	}), "should return error if not alphanumeric name")
+}
+
+func TestValidationNamespaceMetadata(t *testing.T) {
+	assert.Error(t, Validate([]Pod{
+		Pod{
+			Metadata: Metadata{
+				Name:      "foo",
+				Namespace: "#€%&/()=",
+			},
+			Spec: PodSpec{
+				Containers: []Container{
+					Container{
+						Name:  "foo",
+						Image: "docker.io/eaapa/hello-world:latest",
+					},
+				},
+			},
+		},
+	}), "should return error if not alphanumeric namespace")
 }
 
 func TestImageReferenceValidation(t *testing.T) {

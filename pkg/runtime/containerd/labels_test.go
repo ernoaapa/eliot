@@ -9,10 +9,9 @@ import (
 
 func TestNewContainerLabels(t *testing.T) {
 	pod := model.Pod{
-		UID: "some-long-uid",
 		Metadata: model.Metadata{
-			"name":      "my-pod",
-			"namespace": "my-namespace",
+			Name:      "my-pod",
+			Namespace: "my-namespace",
 		},
 	}
 	container := model.Container{
@@ -20,7 +19,6 @@ func TestNewContainerLabels(t *testing.T) {
 	}
 	result := NewContainerLabels(pod, container)
 
-	assert.Equal(t, "some-long-uid", result["io.can.pod.uid"])
 	assert.Equal(t, "my-pod", result["io.can.pod.name"])
 	assert.Equal(t, "my-container", result["io.can.container.name"])
 }

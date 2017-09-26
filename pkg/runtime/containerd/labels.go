@@ -9,7 +9,6 @@ import (
 var (
 	// LabelPrefix is prefix what all container labels what cand creates get
 	labelPrefix        = "io.can"
-	podUIDLabel        = "pod.uid"
 	podNameLabel       = "pod.name"
 	containerNameLabel = "container.name"
 )
@@ -36,8 +35,7 @@ func buildLabelKeyFor(name string) string {
 // NewContainerLabels constructs new labels map for new container
 func NewContainerLabels(pod model.Pod, container model.Container) ContainerLabels {
 	labels := make(map[string]string)
-	labels[buildLabelKeyFor(podUIDLabel)] = pod.UID
-	labels[buildLabelKeyFor(podNameLabel)] = pod.GetName()
+	labels[buildLabelKeyFor(podNameLabel)] = pod.Metadata.Name
 	labels[buildLabelKeyFor(containerNameLabel)] = container.Name
 	return labels
 }

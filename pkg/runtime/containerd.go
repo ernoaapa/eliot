@@ -91,12 +91,12 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, connectionErr := c.getConnection(pod.GetNamespace())
+	client, connectionErr := c.getConnection(pod.Metadata.Namespace)
 	if connectionErr != nil {
 		return connectionErr
 	}
 
-	image, pullErr := c.ensureImagePulled(pod.GetNamespace(), container.Image)
+	image, pullErr := c.ensureImagePulled(pod.Metadata.Namespace, container.Image)
 	if pullErr != nil {
 		return pullErr
 	}

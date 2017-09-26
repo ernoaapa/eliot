@@ -41,7 +41,7 @@ message GetLogsResponse {
 }
 
 message Pod {
-	map<string, string> metadata = 1;
+	ResourceMetadata metadata = 1;
 	PodSpec spec = 2;
 	PodStatus status = 3;
 }
@@ -64,4 +64,16 @@ message ContainerStatus {
 	string containerID = 1;
 	string image = 2;
 	string state = 3;
+}
+
+// ResourceMetadata is metadata that all resources must have
+message ResourceMetadata {
+	// Name must be unique within a namespace.
+	// Cannot be updated.
+	string name = 1;
+
+	// Namespace defines space within each name must be unique.
+	// An empty namespace is equivalent to the default namespace.
+	// Cannot be updated.
+	string namespace = 2;
 }

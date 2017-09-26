@@ -31,7 +31,7 @@ func (r *ConsoleStateReporter) Start() {
 func (r *ConsoleStateReporter) report(state []model.Pod) error {
 	for _, pod := range state {
 		states := getContainerStateCounts(pod.Status.ContainerStatuses)
-		log.WithFields(states).Infof("%s pod containers state", pod.GetName())
+		log.WithFields(states).Infof("%s pod containers state", pod.Metadata.Name)
 	}
 	return nil
 }

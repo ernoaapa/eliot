@@ -35,7 +35,7 @@ func getValidator() *validator.Validate {
 }
 
 func hasValidName(metadata Metadata) bool {
-	if len(metadata.GetName()) == 0 {
+	if len(metadata.Name) == 0 {
 		return false
 	}
 	return true

@@ -31,9 +31,9 @@ var runCommand = cli.Command{
 		client := cmd.GetClient(clicontext)
 
 		pod := &pb.Pod{
-			Metadata: map[string]string{
-				"name":      name,
-				"namespace": config.GetCurrentContext().Namespace,
+			Metadata: &pb.ResourceMetadata{
+				Name:      name,
+				Namespace: config.GetCurrentContext().Namespace,
 			},
 			Spec: &pb.PodSpec{
 				Containers: []*pb.Container{

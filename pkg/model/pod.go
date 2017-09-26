@@ -2,10 +2,9 @@ package model
 
 // Pod is set of containers
 type Pod struct {
-	Metadata
-	UID    string    `                    json:"uid"     yaml:"uid"`
-	Spec   PodSpec   `validate:"required" json:"spec"     yaml:"spec"`
-	Status PodStatus `                    json:"status"   yaml:"status"`
+	Metadata Metadata  `validate:"required"  json:"metadata"   yaml:"metadata"`
+	Spec     PodSpec   `validate:"required"  json:"spec"     yaml:"spec"`
+	Status   PodStatus `                     json:"status"   yaml:"status"`
 }
 
 // PodSpec defines what containers should be running
