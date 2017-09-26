@@ -11,6 +11,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+// FakeContainer is fake representation of model.Container
 type FakeContainer struct {
 	id        string
 	labels    map[string]string

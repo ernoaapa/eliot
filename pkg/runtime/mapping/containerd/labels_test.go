@@ -17,7 +17,7 @@ func TestNewContainerLabels(t *testing.T) {
 	container := model.Container{
 		Name: "my-container",
 	}
-	result := NewContainerLabels(pod, container)
+	result := NewLabels(pod, container)
 
 	assert.Equal(t, "my-pod", result["io.can.pod.name"])
 	assert.Equal(t, "my-container", result["io.can.container.name"])

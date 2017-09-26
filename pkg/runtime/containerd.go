@@ -12,7 +12,7 @@ import (
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/plugin"
 	"github.com/ernoaapa/can/pkg/model"
-	mapper "github.com/ernoaapa/can/pkg/runtime/containerd"
+	mapping "github.com/ernoaapa/can/pkg/runtime/mapping/containerd"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
@@ -74,7 +74,7 @@ func (c *ContainerdClient) GetAllContainers(namespace string) (map[string][]mode
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while getting list of containers")
 	}
-	return mapper.MapToModelByPodNames(containers), nil
+	return mapping.MapModelByPodNamesToInternalModel(containers), nil
 }
 
 // GetContainers return pod active containers in containerd
@@ -109,7 +109,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	log.Debugf("Create new container from image %s...", image.Name())
 	_, err := client.NewContainer(ctx,
 		container.ID,
-		containerd.WithContainerLabels(mapper.NewContainerLabels(pod, container)),
+		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
 		containerd.WithSpec(spec),
 		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshotView(container.ID, image),

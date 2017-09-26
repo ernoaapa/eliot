@@ -32,8 +32,8 @@ func buildLabelKeyFor(name string) string {
 	return fmt.Sprintf("%s.%s", labelPrefix, name)
 }
 
-// NewContainerLabels constructs new labels map for new container
-func NewContainerLabels(pod model.Pod, container model.Container) ContainerLabels {
+// NewLabels constructs new labels map for new container
+func NewLabels(pod model.Pod, container model.Container) ContainerLabels {
 	labels := make(map[string]string)
 	labels[buildLabelKeyFor(podNameLabel)] = pod.Metadata.Name
 	labels[buildLabelKeyFor(containerNameLabel)] = container.Name

@@ -5,8 +5,8 @@ import (
 	"github.com/ernoaapa/can/pkg/model"
 )
 
-// MapToModelByPodNames builds from container label information pod data structure
-func MapToModelByPodNames(containers []containerd.Container) map[string][]model.Container {
+// MapModelByPodNamesToInternalModel builds from container label information pod data structure
+func MapModelByPodNamesToInternalModel(containers []containerd.Container) map[string][]model.Container {
 	result := make(map[string][]model.Container)
 	for _, container := range containers {
 		labels := ContainerLabels(container.Info().Labels)
@@ -20,21 +20,21 @@ func MapToModelByPodNames(containers []containerd.Container) map[string][]model.
 			result[podName] = []model.Container{}
 		}
 
-		result[podName] = append(result[podName], MapContainerToModel(container))
+		result[podName] = append(result[podName], MapContainerToInternalModel(container))
 	}
 	return result
 }
 
-// MapContainersToModel maps containerd models to internal model
-func MapContainersToModel(containers []containerd.Container) (result []model.Container) {
+// MapContainersToInternalModel maps containerd models to internal model
+func MapContainersToInternalModel(containers []containerd.Container) (result []model.Container) {
 	for _, container := range containers {
-		result = append(result, MapContainerToModel(container))
+		result = append(result, MapContainerToInternalModel(container))
 	}
 	return result
 }
 
-// MapContainerToModel maps containerd model to internal model
-func MapContainerToModel(container containerd.Container) model.Container {
+// MapContainerToInternalModel maps containerd model to internal model
+func MapContainerToInternalModel(container containerd.Container) model.Container {
 	labels := ContainerLabels(container.Info().Labels)
 	containerName := labels.getContainerName()
 	return model.Container{

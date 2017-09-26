@@ -7,14 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReconstructPods(t *testing.T) {
+func TestPodsMapping(t *testing.T) {
 	containers := []containerd.Container{
 		fakeRunningContainer("cand", "my-pod", "container1"),
 		fakeRunningContainer("cand", "my-pod", "container2"),
 		fakeCreatedContainer("cand", "my-other-pod", "hello-world-cont"),
 	}
 
-	result := MapToModelByPodNames(containers)
+	result := MapModelByPodNamesToInternalModel(containers)
 
 	assert.Len(t, result, 2, "Should construct two Pods from container information")
 	assert.Len(t, result["my-pod"], 2, "Should have two containers for pod 'my-pod'")
