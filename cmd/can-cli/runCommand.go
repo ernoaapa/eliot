@@ -10,22 +10,40 @@ import (
 	"github.com/urfave/cli"
 )
 
-var runCommand = cli.Command{
-	Name:  "run",
-	Usage: "List pods",
-	Action: func(clicontext *cli.Context) error {
-		if clicontext.NArg() < 2 {
-			return fmt.Errorf("You must give two parameters, NAME and IMAGE")
-		}
-		name := clicontext.Args().Get(0)
-		image := clicontext.Args().Get(1)
+var runCommandHelp = `
+	# Start new container
+	can-cli run my-pod docker.io/ernoaapa/hello-world:latest
+`
 
+var runCommand = cli.Command{
+	Name:        "run",
+	HelpName:    "run",
+	Usage:       "Start container in the device",
+	Description: "With run command, you can start new containers in the device",
+	UsageText: `can-cli run [options] NAME
+
+	 # Start new container
+	 can-cli run --image docker.io/eaapa/hello-world:latest my-pod
+`,
+	Flags: []cli.Flag{
+		cli.StringFlag{
+			Name:  "image",
+			Usage: "The container image to start",
+		},
+	},
+	Action: func(clicontext *cli.Context) error {
+		if clicontext.NArg() == 0 {
+			return fmt.Errorf("You must give NAME parameter")
+		}
+		name := clicontext.Args().First()
 		if name == "" {
 			return fmt.Errorf("NAME argument cannot be empty")
 		}
-		if image == "" {
-			return fmt.Errorf("IMAGE argument cannot be empty")
+
+		if !clicontext.IsSet("image") || clicontext.String("image") == "" {
+			return fmt.Errorf("You must define --image option")
 		}
+		image := clicontext.String("image")
 
 		config := cmd.GetConfig(clicontext)
 		client := cmd.GetClient(clicontext)

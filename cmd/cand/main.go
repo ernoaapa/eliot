@@ -12,35 +12,50 @@ import (
 	"github.com/urfave/cli"
 )
 
-// Version string to be set at compile time via command line (-ldflags "-X main.VersionString=1.2.3")
 var (
+	// Version string to be set at compile time via command line (-ldflags "-X main.VersionString=1.2.3")
 	VersionString string
-	extraCmds     = []cli.Command{}
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "cand"
-	app.Usage = "Can daemon"
+	app.Usage = `The primary "device agent"
+
+	The 'cand' is the primary "device agent" that runs on each device.
+	The agent takes a list of Pod specifications and that are provided through
+	various mechanisms and ensures that the containers described in those
+	specifications are running and healthy.
+	`
+	app.UsageText = `
+	# Defaults usually is enough
+	cand
+
+	# If containerd socket is stored somewhere else
+	cand --containerd /some/where/else/containerd.sock
+
+	# To get debug output
+	cand --debug
+	`
 	app.Version = VersionString
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:  "debug",
-			Usage: "enable debug output in logs",
-		},
+	app.Before = cmd.GlobalBefore
+	app.Flags = append([]cli.Flag{
 		cli.StringFlag{
-			Name:  "address, a",
-			Usage: "address for containerd's GRPC server",
-			Value: "/run/containerd/containerd.sock",
+			Name:   "containerd",
+			Usage:  "containerd for containerd's GRPC server",
+			EnvVar: "CAND_CONTAINERD",
+			Value:  "/run/containerd/containerd.sock",
 		},
 		cli.DurationFlag{
-			Name:  "timeout",
-			Usage: "total timeout for containerd requests",
+			Name:   "timeout",
+			EnvVar: "CAND_TIMEOUT",
+			Usage:  "Timeout for containerd requests",
 		},
 
 		cli.StringFlag{
-			Name:  "labels",
-			Usage: "Labels to add to the device info.  Labels must be key=value pairs separated by ','.",
+			Name:   "labels",
+			Usage:  "Labels to add to the device info.  Labels must be key=value pairs separated by ','",
+			EnvVar: "CAND_LABELS",
 		},
 
 		cli.StringFlag{
@@ -64,14 +79,7 @@ func main() {
 			Usage: "Interval for updating state",
 			Value: 1 * time.Second,
 		},
-	}
-
-	app.Before = func(context *cli.Context) error {
-		if context.GlobalBool("debug") {
-			log.SetLevel(log.DebugLevel)
-		}
-		return nil
-	}
+	}, cmd.GlobalFlags...)
 
 	app.Action = func(clicontext *cli.Context) error {
 		var wg sync.WaitGroup

@@ -9,19 +9,29 @@ import (
 )
 
 var logsCommand = cli.Command{
-	Name:  "logs",
-	Usage: "View pod logs",
+	Name:        "logs",
+	HelpName:    "logs",
+	Usage:       "View container log output",
+	Description: "You can use this command to view container stdout and stderr output",
+	UsageText: `can-cli logs [options] POD_NAME
+
+	 # View pod logs
+	 can-cli logs my-pod
+
+	 # If pod contains multiple containers, you must define container id
+	 can-cli logs --container some-id my-pod
+`,
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "container, c",
-			Usage: "Print logs of this container ID",
+			Usage: "Print logs of this container",
 		},
 	},
 	Action: func(clicontext *cli.Context) error {
 		client := cmd.GetClient(clicontext)
 
 		if clicontext.NArg() == 0 || clicontext.Args().First() == "" {
-			return fmt.Errorf("You must give PODNAME argument")
+			return fmt.Errorf("You must give Pod name as first argument")
 		}
 		podName := clicontext.Args().First()
 		containerID := clicontext.String("container")

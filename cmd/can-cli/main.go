@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/ernoaapa/can/cmd"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -15,27 +16,22 @@ var (
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "can"
-	app.Usage = "Can CLI"
 	app.Version = VersionString
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:  "debug",
-			Usage: "enable debug output in logs",
-		},
-		cli.StringFlag{
-			Name:  "config, c",
-			Usage: "Can server API",
-			Value: "~/.can/config",
-		},
-	}
+	app.Before = cmd.GlobalBefore
+	app.Name = "can-cli"
+	app.Usage = "commandline tool for managing 'cand'"
+	app.Description = `The 'can-cli' is tool for managing 'cand' agent in the device.
+	 With this tool, you can create, view and remove containers from the device.`
+	app.UsageText = "can-cli [global options] command [command options] [arguments...]"
 
-	app.Before = func(context *cli.Context) error {
-		if context.GlobalBool("debug") {
-			log.SetLevel(log.DebugLevel)
-		}
-		return nil
-	}
+	app.Flags = append([]cli.Flag{
+		cli.StringFlag{
+			Name:   "config, c",
+			Usage:  "Client configuration",
+			EnvVar: "CAN_CONFIG",
+			Value:  "~/.can/config",
+		},
+	}, cmd.GlobalFlags...)
 
 	app.Commands = []cli.Command{
 		getCommand,

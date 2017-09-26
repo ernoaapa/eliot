@@ -25,6 +25,24 @@ import (
 	"github.com/urfave/cli"
 )
 
+var (
+	// GlobalFlags are flags what all commands have common
+	GlobalFlags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "debug",
+			Usage: "enable debug output in logs",
+		},
+	}
+)
+
+// GlobalBefore is function what get executed before any commands executes
+func GlobalBefore(context *cli.Context) error {
+	if context.GlobalBool("debug") {
+		log.SetLevel(log.DebugLevel)
+	}
+	return nil
+}
+
 // GetClient creates new cloud API client
 func GetClient(clicontext *cli.Context) *api.Client {
 	config := GetConfig(clicontext)
@@ -70,7 +88,7 @@ func GetRuntimeClient(clicontext *cli.Context) runtime.Client {
 	return runtime.NewContainerdClient(
 		context.Background(),
 		clicontext.GlobalDuration("timeout"),
-		clicontext.GlobalString("address"),
+		clicontext.GlobalString("containerd"),
 	)
 }
 

@@ -20,22 +20,19 @@ func main() {
 	app.Name = "can-api"
 	app.Usage = "Can API server"
 	app.Version = VersionString
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:  "debug",
-			Usage: "enable debug output in logs",
-		},
+	app.Flags = append([]cli.Flag{
 		cli.StringFlag{
-			Name:  "address, a",
-			Usage: "address for containerd's GRPC server",
-			Value: "/run/containerd/containerd.sock",
+			Name:   "containerd",
+			Usage:  "containerd socket path for containerd's GRPC server",
+			EnvVar: "CAND_CONTAINERD",
+			Value:  "/run/containerd/containerd.sock",
 		},
 		cli.StringFlag{
 			Name:  "listen",
 			Usage: "GRPC host:port what to listen for client connections",
 			Value: "localhost:5000",
 		},
-	}
+	}, cmd.GlobalFlags...)
 
 	app.Before = func(context *cli.Context) error {
 		if context.GlobalBool("debug") {
