@@ -34,7 +34,7 @@ func constructPodsFromContainerInfo(client runtime.Client, namespace string, con
 				Containers: containers,
 			},
 			Status: model.PodStatus{
-				ContainerStatuses: resolveContainerStatuses(client, containers),
+				ContainerStatuses: resolveContainerStatuses(client, namespace, containers),
 			},
 		})
 	}
@@ -42,19 +42,19 @@ func constructPodsFromContainerInfo(client runtime.Client, namespace string, con
 	return result
 }
 
-func resolveContainerStatuses(client runtime.Client, containers []model.Container) []model.ContainerStatus {
+func resolveContainerStatuses(client runtime.Client, namespace string, containers []model.Container) []model.ContainerStatus {
 	containerStatuses := []model.ContainerStatus{}
 	for _, container := range containers {
-		containerStatuses = append(containerStatuses, resolveContainerStatus(client, container))
+		containerStatuses = append(containerStatuses, resolveContainerStatus(client, namespace, container))
 	}
 	return containerStatuses
 }
 
-func resolveContainerStatus(client runtime.Client, container model.Container) model.ContainerStatus {
+func resolveContainerStatus(client runtime.Client, namespace string, container model.Container) model.ContainerStatus {
 	return model.ContainerStatus{
-		ContainerID: container.ID,
-		Image:       container.Image,
-		State:       client.GetContainerTaskStatus(container.ID),
+		// TODO: ContainerID: construct full path
+		Image: container.Image,
+		State: client.GetContainerTaskStatus(namespace, container.Name),
 	}
 }
 

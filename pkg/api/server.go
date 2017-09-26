@@ -26,9 +26,11 @@ func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.
 	pod := mapping.MapPodToInternalModel(req.Pod)
 
 	for _, container := range pod.Spec.Containers {
-		err := s.client.CreateContainer(pod, container)
-		if err != nil {
-			return nil, err
+		if err := s.client.CreateContainer(pod, container); err != nil {
+			return nil, errors.Wrap(err, "Failed to create container")
+		}
+		if err := s.client.StartContainer(pod.Metadata.Namespace, container.Name); err != nil {
+			return nil, errors.Wrap(err, "Failed to start container")
 		}
 	}
 

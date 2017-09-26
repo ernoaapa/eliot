@@ -107,11 +107,11 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 
 	log.Debugf("Create new container from image %s...", image.Name())
 	_, err := client.NewContainer(ctx,
-		container.ID,
+		container.Name,
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
 		containerd.WithSpec(spec),
 		containerd.WithSnapshotter(snapshotter),
-		containerd.WithNewSnapshotView(container.ID, image),
+		containerd.WithNewSnapshotView(container.Name, image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 	)
 	if err != nil {
@@ -121,18 +121,18 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 }
 
 // StartContainer starts the already created container
-func (c *ContainerdClient) StartContainer(containerID string) error {
+func (c *ContainerdClient) StartContainer(namespace, name string) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, connectionErr := c.getConnection(model.DefaultNamespace)
+	client, connectionErr := c.getConnection(namespace)
 	if connectionErr != nil {
 		return connectionErr
 	}
 
-	container, err := client.LoadContainer(ctx, containerID)
+	container, err := client.LoadContainer(ctx, name)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to load container with id %s, cannot start it", containerID)
+		return errors.Wrapf(err, "Failed to load container [%s], cannot start it", name)
 	}
 
 	log.Debugf("Create task in container: %s", container.ID())
@@ -151,18 +151,18 @@ func (c *ContainerdClient) StartContainer(containerID string) error {
 }
 
 // StopContainer stops given container
-func (c *ContainerdClient) StopContainer(containerID string) error {
+func (c *ContainerdClient) StopContainer(namespace, name string) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, connectionErr := c.getConnection(model.DefaultNamespace)
+	client, connectionErr := c.getConnection(namespace)
 	if connectionErr != nil {
 		return connectionErr
 	}
 
-	container, err := client.LoadContainer(ctx, containerID)
+	container, err := client.LoadContainer(ctx, name)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to load container with id %s, cannot stop it", containerID)
+		return errors.Wrapf(err, "Failed to load container [%s], cannot stop it", name)
 	}
 
 	task, err := container.Task(ctx, nil)
@@ -170,7 +170,7 @@ func (c *ContainerdClient) StopContainer(containerID string) error {
 		task.Delete(ctx, containerd.WithProcessKill)
 	}
 	if err := container.Delete(ctx, containerd.WithSnapshotCleanup); err != nil {
-		return errors.Wrapf(err, "Failed to delete container %s", container.ID())
+		return errors.Wrapf(err, "Failed to delete container [%s]", container.ID())
 	}
 	return nil
 }
@@ -226,18 +226,18 @@ func getNamespaces(namespaces []namespaces.Namespace) (result []string) {
 }
 
 // IsContainerRunning returns true if container running. If cannot resolve, return false with error
-func (c *ContainerdClient) IsContainerRunning(containerID string) (bool, error) {
+func (c *ContainerdClient) IsContainerRunning(namespace, name string) (bool, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, connErr := c.getConnection(model.DefaultNamespace)
+	client, connErr := c.getConnection(namespace)
 	if connErr != nil {
 		return false, connErr
 	}
 
-	container, loadErr := client.LoadContainer(ctx, containerID)
+	container, loadErr := client.LoadContainer(ctx, name)
 	if loadErr != nil {
-		return false, errors.Wrapf(loadErr, "Failed to load container with id %s, cannot resolve running state", containerID)
+		return false, errors.Wrapf(loadErr, "Failed to load container [%s], cannot resolve running state", name)
 	}
 
 	_, err := container.Task(ctx, nil)
@@ -251,18 +251,18 @@ func (c *ContainerdClient) IsContainerRunning(containerID string) (bool, error) 
 }
 
 // GetContainerTaskStatus resolves container status or return UNKNOWN
-func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
+func (c *ContainerdClient) GetContainerTaskStatus(namespace, name string) string {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
-	client, err := c.getConnection(model.DefaultNamespace)
+	client, err := c.getConnection(namespace)
 	if err != nil {
-		log.Warnf("Unable to get connection for resolving task status for containerID %s", containerID)
+		log.Warnf("Unable to get connection for resolving task status for container %s", name)
 		return "UNKNOWN"
 	}
 
 	resp, err := client.TaskService().Get(ctx, &tasks.GetRequest{
-		ContainerID: containerID,
+		ContainerID: name,
 	})
 	if err != nil {
 		log.Warnf("Unable to resolve Container task status: %s", err)
@@ -273,7 +273,7 @@ func (c *ContainerdClient) GetContainerTaskStatus(containerID string) string {
 }
 
 // GetLogs returns pod logs
-func (c *ContainerdClient) GetLogs(namespace, containerID string, io AttachIO) error {
+func (c *ContainerdClient) GetLogs(namespace, name string, io AttachIO) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -282,9 +282,9 @@ func (c *ContainerdClient) GetLogs(namespace, containerID string, io AttachIO) e
 		return errors.Wrapf(err, "Unable to get connection for streaming logs")
 	}
 
-	container, err := client.LoadContainer(ctx, containerID)
+	container, err := client.LoadContainer(ctx, name)
 	if err != nil {
-		return errors.Wrapf(err, "Cannot return container logs for containerID [%s] in namespace [%s]", containerID, namespace)
+		return errors.Wrapf(err, "Cannot return container logs for container [%s] in namespace [%s]", name, namespace)
 	}
 
 	task, taskErr := container.Task(ctx, containerd.WithAttach(io.Stdin, io.Stdout, io.Stderr))

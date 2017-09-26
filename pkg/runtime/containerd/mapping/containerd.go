@@ -35,11 +35,8 @@ func MapContainersToInternalModel(containers []containerd.Container) (result []m
 
 // MapContainerToInternalModel maps containerd model to internal model
 func MapContainerToInternalModel(container containerd.Container) model.Container {
-	labels := ContainerLabels(container.Info().Labels)
-	containerName := labels.getContainerName()
 	return model.Container{
-		ID:    container.ID(),
-		Name:  containerName,
+		Name:  container.ID(),
 		Image: container.Info().Image,
 	}
 }

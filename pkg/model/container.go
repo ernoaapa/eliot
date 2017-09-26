@@ -2,7 +2,6 @@ package model
 
 // Container defines what image should be running
 type Container struct {
-	ID    string
 	Name  string `validate:"required,gt=0,alphanumOrDash"   json:"name"      yaml:"name"`
 	Image string `validate:"required,gt=0,imageRef"         json:"image"     yaml:"image"`
 }

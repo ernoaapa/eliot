@@ -65,10 +65,10 @@ func (c containersState) containsContainer(podName string, target model.Containe
 	return false
 }
 
-func (c containersState) findContainerID(podName string, target model.Container) string {
+func (c containersState) findContainer(podName string, target model.Container) string {
 	for _, container := range c.getPodContainers(podName) {
 		if containersMatch(container, target) {
-			return container.ID
+			return container.Name
 		}
 	}
 	return ""

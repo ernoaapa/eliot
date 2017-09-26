@@ -11,11 +11,11 @@ type Client interface {
 	GetAllContainers(namespace string) (containersByPods map[string][]model.Container, err error)
 	GetContainers(namespace, podName string) ([]model.Container, error)
 	CreateContainer(pod model.Pod, container model.Container) error
-	StartContainer(containerID string) error
-	StopContainer(containerID string) error
+	StartContainer(namespace, name string) error
+	StopContainer(namespace, name string) error
 	GetNamespaces() ([]string, error)
-	IsContainerRunning(containerID string) (bool, error)
-	GetContainerTaskStatus(containerID string) string
+	IsContainerRunning(namespace, name string) (bool, error)
+	GetContainerTaskStatus(namespace, name string) string
 	GetLogs(namespace, podName string, attach AttachIO) error
 }
 

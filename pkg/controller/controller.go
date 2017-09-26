@@ -105,7 +105,7 @@ func (c *Controller) cleanupRemovedContainers(namespace string, pods podsManifes
 		}).Debugf("Remove containers from namespace %s", namespace)
 
 		for _, container := range remove {
-			err := c.client.StopContainer(container.ID)
+			err := c.client.StopContainer(namespace, container.Name)
 			if err != nil {
 				return err
 			}
@@ -170,24 +170,24 @@ func (c *Controller) ensureContainerTasksRunning(pods podsManifest, state contai
 	for _, pod := range pods {
 		for _, container := range pod.Spec.Containers {
 			if state.containsContainer(pod.Metadata.Name, container) {
-				existingContainerID := state.findContainerID(pod.Metadata.Name, container)
-				running, err := c.client.IsContainerRunning(existingContainerID)
+				existingContainer := state.findContainer(pod.Metadata.Name, container)
+				running, err := c.client.IsContainerRunning(pod.Metadata.Namespace, existingContainer)
 				if err != nil {
 					return errors.Wrapf(err, "Cannot ensure existing container task running state, get container task returned unexpected error")
 				}
 				if !running {
-					log.Warnf("Detected existing container not running, restarting container [%s]", existingContainerID)
-					startErr := c.client.StartContainer(existingContainerID)
+					log.Warnf("Detected existing container not running, restarting container [%s]", existingContainer)
+					startErr := c.client.StartContainer(pod.Metadata.Namespace, existingContainer)
 					if startErr != nil {
 						return startErr
 					}
 				} else {
-					log.Debugf("Container [%s] running and healthy", existingContainerID)
+					log.Debugf("Container [%s] running and healthy", existingContainer)
 				}
 			} else {
-				startErr := c.client.StartContainer(container.ID)
+				startErr := c.client.StartContainer(pod.Metadata.Namespace, container.Name)
 				if startErr != nil {
-					return errors.Wrapf(startErr, "Error while starting new container %s", container.ID)
+					return errors.Wrapf(startErr, "Error while starting new container %s", container.Name)
 				}
 			}
 		}

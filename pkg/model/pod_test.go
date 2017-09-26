@@ -25,7 +25,3 @@ func TestPodGetNamespace(t *testing.T) {
 
 	assert.Equal(t, pod.Metadata.Namespace, "foobar", "should return namespace from metadata")
 }
-
-func TestContainerBuildID(t *testing.T) {
-	assert.Equal(t, 36, len(BuildContainerID()), "should build valid id")
-}

@@ -1,7 +1,5 @@
 package model
 
-import uuid "github.com/satori/go.uuid"
-
 // DefaultNamespace is namespace what each pod get if there is no metadata.namespace
 var DefaultNamespace = "cand"
 
@@ -18,20 +16,5 @@ func Default(pod Pod) Pod {
 	if pod.Metadata.Namespace == "" {
 		pod.Metadata.Namespace = DefaultNamespace
 	}
-
-	pod.Spec.Containers = defaultContainers(pod.Metadata.Name, pod.Spec.Containers)
 	return pod
-}
-
-func defaultContainers(podName string, containers []Container) (result []Container) {
-	for _, container := range containers {
-		container.ID = BuildContainerID()
-		result = append(result, container)
-	}
-	return result
-}
-
-// BuildContainerID creates unique id for the container
-func BuildContainerID() string {
-	return uuid.NewV4().String()
 }

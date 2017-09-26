@@ -8,7 +8,6 @@ import (
 	"github.com/containerd/containerd/errdefs"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
 // FakeContainer is fake representation of model.Container
@@ -77,14 +76,11 @@ func fakeCreatedContainer(namespace, podName, containerName string) containerd.C
 }
 
 func newFakeContainer(namespace, podName, containerName string, isRunning bool) containerd.Container {
-	uid := uuid.NewV4().String()
-
 	labels := map[string]string{}
 	labels[buildLabelKeyFor(podNameLabel)] = podName
-	labels[buildLabelKeyFor(containerNameLabel)] = containerName
 
 	return &FakeContainer{
-		id:        uid,
+		id:        containerName,
 		labels:    labels,
 		isRunning: isRunning,
 	}

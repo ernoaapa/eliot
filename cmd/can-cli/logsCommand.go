@@ -34,7 +34,7 @@ var logsCommand = cli.Command{
 			return fmt.Errorf("You must give Pod name as first argument")
 		}
 		podName := clicontext.Args().First()
-		containerID := clicontext.String("container")
+		containerName := clicontext.String("container")
 
 		pod, err := client.GetPod(podName)
 		if err != nil {
@@ -45,14 +45,14 @@ var logsCommand = cli.Command{
 		if containerCount == 0 {
 			return fmt.Errorf("Pod [%s] don't have any containers", podName)
 		} else if containerCount == 1 {
-			if containerID == "" {
-				containerID = pod.Spec.Containers[0].ID
+			if containerName == "" {
+				containerName = pod.Spec.Containers[0].Name
 			}
 		}
-		if containerID == "" {
+		if containerName == "" {
 			return fmt.Errorf("Pod [%s] contains %d containers, you must define --container flag", podName, containerCount)
 		}
 
-		return client.GetLogs(containerID, os.Stdout, os.Stderr)
+		return client.GetLogs(containerName, os.Stdout, os.Stderr)
 	},
 }

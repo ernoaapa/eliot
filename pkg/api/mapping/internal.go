@@ -33,7 +33,6 @@ func MapPodToAPIModel(namespace, podName string, containers []model.Container) *
 func MapContainersToAPIModel(containers []model.Container) (result []*pb.Container) {
 	for _, container := range containers {
 		result = append(result, &pb.Container{
-			ID:    container.ID,
 			Name:  container.Name,
 			Image: container.Image,
 		})

@@ -5,7 +5,6 @@ import (
 
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,13 +58,13 @@ func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) e
 }
 
 // StartContainer fake impl.
-func (c *FakeClient) StartContainer(containerID string) error {
+func (c *FakeClient) StartContainer(namespace, containerID string) error {
 	c.startedCount++
 	return nil
 }
 
 // StopContainer fake impl.
-func (c *FakeClient) StopContainer(containerID string) error {
+func (c *FakeClient) StopContainer(namespace, containerID string) error {
 	c.stoppedCount++
 	return nil
 }
@@ -76,14 +75,14 @@ func (c *FakeClient) GetNamespaces() ([]string, error) {
 }
 
 // IsContainerRunning fake impl.
-func (c *FakeClient) IsContainerRunning(containerID string) (bool, error) {
-	log.Debugf("container runnin %s", containerID)
-	for _, podContainers := range c.containers {
-		for _, containers := range podContainers {
-			for _, fakeContainer := range containers {
-				if fakeContainer.ID == containerID {
-					log.Debugf("is running, %s, %s", containerID, fakeContainer.isRunning)
-					return fakeContainer.isRunning, nil
+func (c *FakeClient) IsContainerRunning(namespace, name string) (bool, error) {
+	for podNamespace, podContainers := range c.containers {
+		if podNamespace == namespace {
+			for _, containers := range podContainers {
+				for _, fakeContainer := range containers {
+					if fakeContainer.Name == name {
+						return fakeContainer.isRunning, nil
+					}
 				}
 			}
 		}
@@ -92,7 +91,7 @@ func (c *FakeClient) IsContainerRunning(containerID string) (bool, error) {
 }
 
 // GetContainerTaskStatus fake impl.
-func (c *FakeClient) GetContainerTaskStatus(containerID string) string {
+func (c *FakeClient) GetContainerTaskStatus(namespace, name string) string {
 	return "UNKNOWN"
 }
 
@@ -109,7 +108,6 @@ func (c *FakeClient) verifyExpectations(createdCount, startedCount, stoppedCount
 
 // FakeContainer is model.Container with some test related information, e.g. is it running
 type FakeContainer struct {
-	ID        string
 	Name      string
 	Image     string
 	isRunning bool
@@ -125,7 +123,6 @@ func fakeCreatedContainer(containerName, image string) FakeContainer {
 
 func newFakeContainer(containerName, image string, isRunning bool) FakeContainer {
 	return FakeContainer{
-		ID:        containerName,
 		Name:      containerName,
 		Image:     image,
 		isRunning: isRunning,
@@ -141,7 +138,6 @@ func fakeToModels(fakes []FakeContainer) (result []model.Container) {
 
 func fakeToModel(fake FakeContainer) model.Container {
 	return model.Container{
-		ID:    fake.ID,
 		Name:  fake.Name,
 		Image: fake.Image,
 	}

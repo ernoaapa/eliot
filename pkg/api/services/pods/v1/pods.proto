@@ -51,9 +51,8 @@ message PodSpec {
 }
 
 message Container {
-	string ID = 1;
-	string name = 2;
-	string image = 3;
+	string name = 1;
+	string image = 2;
 }
 
 message PodStatus {

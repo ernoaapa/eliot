@@ -21,12 +21,10 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 			Spec: model.PodSpec{
 				Containers: []model.Container{
 					model.Container{
-						ID:    "hello-world-first",
 						Name:  "hello-world-first",
 						Image: "docker.io/eaapa/hello-world:latest",
 					},
 					model.Container{
-						ID:    "hello-world-second",
 						Name:  "hello-world-second",
 						Image: "docker.io/eaapa/hello-world:latest",
 					},
@@ -64,7 +62,6 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 			Spec: model.PodSpec{
 				Containers: []model.Container{
 					model.Container{
-						ID:    "container-name",
 						Name:  "container-name",
 						Image: "docker.io/eaapa/hello-world:latest",
 					},
