@@ -7,7 +7,7 @@ option go_package = "pkg/api/services/pods/v1;pods";
 service Pods {
 	rpc Create(CreatePodRequest) returns (CreatePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
-	rpc Logs(GetLogsRequest) returns (stream GetLogsResponse);
+	rpc Logs(GetLogsRequest) returns (stream StdOutputStreamResponse);
 }
 
 message CreatePodRequest {
@@ -31,13 +31,10 @@ message GetLogsRequest {
 	string containerID = 2;
 }
 
-message GetLogsResponse {
-	enum Type {
-    STDOUT = 0;
-    STDERR = 1;
-	}
-	Type type = 1;
-	bytes line = 2;
+message StdOutputStreamResponse {
+	bytes line = 1;
+	// Is this stderr(=true) or stdout(=false)
+	bool stderr = 2;
 }
 
 message Pod {

@@ -107,13 +107,10 @@ func (c *Client) GetLogs(containerID string, stdout, stderr io.Writer) error {
 			return err
 		}
 
-		switch t := resp.Type; t {
-		case pb.GetLogsResponse_STDOUT:
-			fmt.Fprint(stdout, string(resp.Line))
-		case pb.GetLogsResponse_STDERR:
+		if resp.Stderr {
 			fmt.Fprint(stderr, string(resp.Line))
-		default:
-			return fmt.Errorf("Received unknown GetLogsResponse.Type, [%s]. Client version not matching with server?", t)
+		} else {
+			fmt.Fprint(stdout, string(resp.Line))
 		}
 	}
 }

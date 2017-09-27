@@ -56,14 +56,14 @@ func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.Lis
 }
 
 // Logs returns container logs
-func (s *Server) Logs(req *pb.GetLogsRequest, resp pb.Pods_LogsServer) error {
+func (s *Server) Logs(req *pb.GetLogsRequest, server pb.Pods_LogsServer) error {
 	log.Debugf("Get logs for container [%s] in namespace [%s]", req.GetContainerID(), req.Namespace)
 	return s.client.GetLogs(
 		req.Namespace, req.GetContainerID(),
 		runtime.AttachIO{
 			Stdin:  &stream.EmptyStdin{},
-			Stdout: stream.NewLogsWriter(resp, pb.GetLogsResponse_STDOUT),
-			Stderr: stream.NewLogsWriter(resp, pb.GetLogsResponse_STDERR),
+			Stdout: stream.NewWriter(server, false),
+			Stderr: stream.NewWriter(server, true),
 		},
 	)
 }
