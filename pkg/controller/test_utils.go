@@ -95,8 +95,8 @@ func (c *FakeClient) GetContainerTaskStatus(namespace, name string) string {
 	return "UNKNOWN"
 }
 
-// GetLogs fake impl.
-func (c *FakeClient) GetLogs(namespace, podName string, io runtime.AttachIO) error {
+// Attach fake impl.
+func (c *FakeClient) Attach(namespace, podName string, io runtime.AttachIO) error {
 	return nil
 }
 

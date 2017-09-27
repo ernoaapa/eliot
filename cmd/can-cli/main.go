@@ -41,7 +41,7 @@ func main() {
 	app.Commands = []cli.Command{
 		getCommand,
 		describeCommand,
-		logsCommand,
+		attachCommand,
 		runCommand,
 		configCommand,
 	}

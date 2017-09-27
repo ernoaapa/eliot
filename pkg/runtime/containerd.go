@@ -273,8 +273,8 @@ func (c *ContainerdClient) GetContainerTaskStatus(namespace, name string) string
 	return resp.Process.Status.String()
 }
 
-// GetLogs returns pod logs
-func (c *ContainerdClient) GetLogs(namespace, name string, io AttachIO) error {
+// Attach returns pod logs
+func (c *ContainerdClient) Attach(namespace, name string, io AttachIO) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 

@@ -55,10 +55,10 @@ func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.Lis
 	}, nil
 }
 
-// Logs returns container logs
-func (s *Server) Logs(req *pb.GetLogsRequest, server pb.Pods_LogsServer) error {
+// Attach connects to process in container and and streams stdout and stderr outputs to client
+func (s *Server) Attach(req *pb.AttachRequest, server pb.Pods_AttachServer) error {
 	log.Debugf("Get logs for container [%s] in namespace [%s]", req.GetContainerID(), req.Namespace)
-	return s.client.GetLogs(
+	return s.client.Attach(
 		req.Namespace, req.GetContainerID(),
 		runtime.AttachIO{
 			Stdin:  &stream.EmptyStdin{},

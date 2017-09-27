@@ -16,7 +16,7 @@ type Client interface {
 	GetNamespaces() ([]string, error)
 	IsContainerRunning(namespace, name string) (bool, error)
 	GetContainerTaskStatus(namespace, name string) string
-	GetLogs(namespace, podName string, attach AttachIO) error
+	Attach(namespace, podName string, attach AttachIO) error
 }
 
 // AttachIO provides way to attach stdin,stdout and stderr to container

@@ -3,11 +3,11 @@ package cand.services.pods.v1;
 
 option go_package = "pkg/api/services/pods/v1;pods";
 
-// Pods provides visibility to the pods.
+// Pods service provides visibility to the pods.
 service Pods {
 	rpc Create(CreatePodRequest) returns (CreatePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
-	rpc Logs(GetLogsRequest) returns (stream StdOutputStreamResponse);
+	rpc Attach(AttachRequest) returns (stream StdOutputStreamResponse);
 }
 
 message CreatePodRequest {
@@ -26,7 +26,7 @@ message ListPodsResponse {
 	repeated Pod pods = 1;
 }
 
-message GetLogsRequest {
+message AttachRequest {
 	string namespace = 1;
 	string containerID = 2;
 }

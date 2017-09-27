@@ -78,8 +78,8 @@ func (c *Client) CreatePod(pod *pb.Pod) (*pb.Pod, error) {
 	return resp.GetPod(), nil
 }
 
-// GetLogs calls server and fetches pod logs
-func (c *Client) GetLogs(containerID string, stdout, stderr io.Writer) error {
+// Attach calls server and fetches pod logs
+func (c *Client) Attach(containerID string, stdout, stderr io.Writer) error {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func (c *Client) GetLogs(containerID string, stdout, stderr io.Writer) error {
 
 	client := pb.NewPodsClient(conn)
 	log.Debugf("Open stream connection to server to get logs")
-	stream, err := client.Logs(context.Background(), &pb.GetLogsRequest{
+	stream, err := client.Attach(context.Background(), &pb.AttachRequest{
 		Namespace:   c.namespace,
 		ContainerID: containerID,
 	})

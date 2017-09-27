@@ -8,18 +8,18 @@ import (
 	"github.com/urfave/cli"
 )
 
-var logsCommand = cli.Command{
-	Name:        "logs",
-	HelpName:    "logs",
-	Usage:       "View container log output",
-	Description: "You can use this command to view container stdout and stderr output",
-	UsageText: `can-cli logs [options] POD_NAME
+var attachCommand = cli.Command{
+	Name:        "attach",
+	HelpName:    "attach",
+	Usage:       "Attach to container stdout and stderr output",
+	Description: "You can use this command to get connection to container process and receive stdout and stderr output",
+	UsageText: `can-cli attach [options] POD_NAME
 
-	 # View pod logs
-	 can-cli logs my-pod
+	 # View pod attach
+	 can-cli attach my-pod
 
 	 # If pod contains multiple containers, you must define container id
-	 can-cli logs --container some-id my-pod
+	 can-cli attach --container some-id my-pod
 `,
 	Flags: []cli.Flag{
 		cli.StringFlag{
@@ -53,6 +53,6 @@ var logsCommand = cli.Command{
 			return fmt.Errorf("Pod [%s] contains %d containers, you must define --container flag", podName, containerCount)
 		}
 
-		return client.GetLogs(containerName, os.Stdout, os.Stderr)
+		return client.Attach(containerName, os.Stdout, os.Stderr)
 	},
 }
