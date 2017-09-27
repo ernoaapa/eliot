@@ -30,20 +30,33 @@ var runCommand = cli.Command{
 			Name:  "image",
 			Usage: "The container image to start",
 		},
+		cli.BoolFlag{
+			Name:  "detach, d",
+			Usage: "Run container in background and print container information",
+		},
+		cli.BoolFlag{
+			Name:  "rm",
+			Usage: "Automatically remove the container when it exits",
+		},
 	},
 	Action: func(clicontext *cli.Context) error {
-		if clicontext.NArg() == 0 {
+		var (
+			name   = clicontext.Args().First()
+			image  = clicontext.String("image")
+			detach = clicontext.Bool("detach")
+			rm     = clicontext.Bool("rm")
+		)
+		if name == "" {
 			return fmt.Errorf("You must give NAME parameter")
 		}
-		name := clicontext.Args().First()
-		if name == "" {
-			return fmt.Errorf("NAME argument cannot be empty")
-		}
 
-		if !clicontext.IsSet("image") || clicontext.String("image") == "" {
+		if image == "" {
 			return fmt.Errorf("You must define --image option")
 		}
-		image := clicontext.String("image")
+
+		if detach && rm {
+			return fmt.Errorf("You cannot use --detach flag with --rm, it would remove right away after container started.")
+		}
 
 		config := cmd.GetConfig(clicontext)
 		client := cmd.GetClient(clicontext)
@@ -68,8 +81,16 @@ var runCommand = cli.Command{
 			return err
 		}
 
-		writer := printers.GetNewTabWriter(os.Stdout)
-		printer := cmd.GetPrinter(clicontext)
-		return printer.PrintPodDetails(result, writer)
+		if detach {
+			writer := printers.GetNewTabWriter(os.Stdout)
+			printer := cmd.GetPrinter(clicontext)
+			return printer.PrintPodDetails(result, writer)
+		}
+
+		if rm {
+			defer client.DeletePod(pod)
+		}
+
+		return client.Attach(result.Spec.Containers[0].Name, os.Stdout, os.Stderr)
 	},
 }
