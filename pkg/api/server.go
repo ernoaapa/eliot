@@ -44,6 +44,24 @@ func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.
 	}, nil
 }
 
+// Delete is 'pods' service Delete implementation
+func (s *Server) Delete(context context.Context, req *pb.DeletePodRequest) (*pb.DeletePodResponse, error) {
+	containers, err := s.client.GetContainers(req.Namespace, req.Name)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Cannot fetch pod containers, cannot delete pod [%s]", req.Name)
+	}
+
+	for _, container := range containers {
+		err := s.client.StopContainer(req.Namespace, container.Name)
+		if err != nil {
+			return nil, errors.Wrapf(err, "Error while stopping container [%s]", container.Name)
+		}
+	}
+	return &pb.DeletePodResponse{
+		Pod: mapping.MapPodToAPIModel(req.Namespace, req.Name, containers),
+	}, nil
+}
+
 // List is 'pods' service List implementation
 func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.ListPodsResponse, error) {
 	containersByPods, err := s.client.GetAllContainers(req.Namespace)

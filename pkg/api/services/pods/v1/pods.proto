@@ -6,6 +6,7 @@ option go_package = "pkg/api/services/pods/v1;pods";
 // Pods service provides visibility to the pods.
 service Pods {
 	rpc Create(CreatePodRequest) returns (CreatePodResponse);
+	rpc Delete(DeletePodRequest) returns (DeletePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
 	rpc Attach(AttachRequest) returns (stream StdOutputStreamResponse);
 }
@@ -15,6 +16,15 @@ message CreatePodRequest {
 }
 
 message CreatePodResponse {
+	Pod pod = 1;
+}
+
+message DeletePodRequest {
+	string namespace = 1;
+	string name = 2;
+}
+
+message DeletePodResponse {
 	Pod pod = 1;
 }
 

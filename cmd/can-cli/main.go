@@ -41,6 +41,7 @@ func main() {
 	app.Commands = []cli.Command{
 		getCommand,
 		describeCommand,
+		deleteCommand,
 		attachCommand,
 		runCommand,
 		configCommand,

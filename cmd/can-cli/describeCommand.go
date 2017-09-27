@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/ernoaapa/can/cmd"
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/printers"
 	"github.com/urfave/cli"
 )
@@ -45,7 +44,7 @@ var describeCommand = cli.Command{
 				}
 
 				if podName != "" {
-					pods = filterByPodName(pods, podName)
+					pods = cmd.FilterByPodName(pods, podName)
 				}
 
 				writer := printers.GetNewTabWriter(os.Stdout)
@@ -59,15 +58,4 @@ var describeCommand = cli.Command{
 			},
 		},
 	},
-}
-
-func filterByPodName(pods []*pb.Pod, podName string) []*pb.Pod {
-	for _, pod := range pods {
-		if pod.Metadata.Name == podName {
-			return []*pb.Pod{
-				pod,
-			}
-		}
-	}
-	return []*pb.Pod{}
 }

@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/can/pkg/api"
+	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
@@ -172,4 +173,15 @@ func expandTilde(path string) string {
 		return filepath.Join(dir, path[2:])
 	}
 	return path
+}
+
+func FilterByPodName(pods []*pb.Pod, podName string) []*pb.Pod {
+	for _, pod := range pods {
+		if pod.Metadata.Name == podName {
+			return []*pb.Pod{
+				pod,
+			}
+		}
+	}
+	return []*pb.Pod{}
 }

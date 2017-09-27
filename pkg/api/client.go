@@ -78,6 +78,23 @@ func (c *Client) CreatePod(pod *pb.Pod) (*pb.Pod, error) {
 	return resp.GetPod(), nil
 }
 
+// DeletePod creates new pod to the target server
+func (c *Client) DeletePod(pod *pb.Pod) (*pb.Pod, error) {
+	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pb.NewPodsClient(conn)
+
+	resp, err := client.Delete(context.Background(), &pb.DeletePodRequest{
+		Namespace: pod.Metadata.Namespace,
+		Name:      pod.Metadata.Name,
+	})
+	return resp.GetPod(), nil
+}
+
 // Attach calls server and fetches pod logs
 func (c *Client) Attach(containerID string, stdout, stderr io.Writer) error {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
