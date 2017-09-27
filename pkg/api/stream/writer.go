@@ -2,7 +2,6 @@ package stream
 
 import (
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	log "github.com/sirupsen/logrus"
 )
 
 // Writer is io.Writer implementation what writes stdin/stdout bytes to RPC stream
@@ -24,12 +23,10 @@ func NewWriter(stream StdOutputStreamServer, stderr bool) *Writer {
 // Write writes bytes to given RPC stream
 func (w *Writer) Write(p []byte) (n int, err error) {
 	n = len(p)
-	log.Debugf("Write %d bytes to stream", n)
 	err = w.stream.Send(&pb.StdOutputStreamResponse{
 		Line:   p,
 		Stderr: w.stderr,
 	})
-	log.Debugf("After send, received err: %v", err)
 	if err != nil {
 		return n, err
 	}

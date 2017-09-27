@@ -29,9 +29,11 @@ func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.
 		if err := s.client.CreateContainer(pod, container); err != nil {
 			return nil, errors.Wrap(err, "Failed to create container")
 		}
+		log.Debugf("Container [%s] created, will start it", container.Name)
 		if err := s.client.StartContainer(pod.Metadata.Namespace, container.Name); err != nil {
 			return nil, errors.Wrap(err, "Failed to start container")
 		}
+		log.Debugf("Container [%s] started", container.Name)
 	}
 
 	containers, err := s.client.GetContainers(pod.Metadata.Namespace, pod.Metadata.Name)
