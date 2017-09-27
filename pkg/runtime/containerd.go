@@ -11,6 +11,7 @@ import (
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/plugin"
 	"github.com/ernoaapa/can/pkg/model"
+	utils "github.com/ernoaapa/can/pkg/runtime/containerd"
 	"github.com/ernoaapa/can/pkg/runtime/containerd/mapping"
 	"github.com/pkg/errors"
 
@@ -136,7 +137,7 @@ func (c *ContainerdClient) StartContainer(namespace, name string) error {
 	}
 
 	log.Debugf("Create task in container: %s", container.ID())
-	task, err := container.NewTask(ctx, containerd.NullIO)
+	task, err := container.NewTask(ctx, utils.DetachedFifoIO)
 	if err != nil {
 		return errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())
 	}
