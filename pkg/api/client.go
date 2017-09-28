@@ -133,9 +133,9 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 			}
 
 			if resp.Stderr {
-				stderr.Write(resp.Line)
+				stderr.Write(resp.Output)
 			} else {
-				stdout.Write(resp.Line)
+				stdout.Write(resp.Output)
 			}
 		}
 		wg.Done()
@@ -145,14 +145,14 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 		wg.Add(1)
 		go func() {
 			for {
-				target := []byte{128}
+				target := []byte{1}
 				_, err := stdin.Read(target)
 				if err != nil {
 					break
 				}
 
 				err = stream.Send(&pb.StdinStreamRequest{
-					Stdin: target,
+					Input: target,
 				})
 				if err != nil {
 					break

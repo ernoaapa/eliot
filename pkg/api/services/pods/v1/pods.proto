@@ -8,7 +8,7 @@ service Pods {
 	rpc Create(CreatePodRequest) returns (CreatePodResponse);
 	rpc Delete(DeletePodRequest) returns (DeletePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
-	rpc Attach(stream StdinStreamRequest) returns (stream StdOutputStreamResponse);
+	rpc Attach(stream StdinStreamRequest) returns (stream StdoutStreamResponse);
 }
 
 message CreatePodRequest {
@@ -38,11 +38,11 @@ message ListPodsResponse {
 }
 
 message StdinStreamRequest {
-	bytes stdin = 1;
+	bytes input = 1;
 }
 
-message StdOutputStreamResponse {
-	bytes line = 1;
+message StdoutStreamResponse {
+	bytes output = 1;
 	// Is this stderr(=true) or stdout(=false)
 	bool stderr = 2;
 }

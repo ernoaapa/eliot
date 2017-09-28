@@ -31,8 +31,8 @@ func (w *Reader) Read(p []byte) (n int, err error) {
 		if err != nil {
 			return 0, err
 		}
-		log.Debugf("Received input %s", req.GetStdin())
-		w.buffer.Write(req.GetStdin())
+		log.Debugf("Received input %s", req.GetInput())
+		w.buffer.Write(req.GetInput())
 	}
 	return w.buffer.Read(p)
 }
