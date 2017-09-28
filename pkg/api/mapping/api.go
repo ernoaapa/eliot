@@ -5,9 +5,17 @@ import (
 	"github.com/ernoaapa/can/pkg/model"
 )
 
+// MapPodsToInternalModel maps API Pod model to internal model
+func MapPodsToInternalModel(pods []*pb.Pod) (result []model.Pod) {
+	for _, pod := range pods {
+		result = append(result, MapPodToInternalModel(pod))
+	}
+	return result
+}
+
 // MapPodToInternalModel maps API Pod model to internal model
 func MapPodToInternalModel(pod *pb.Pod) model.Pod {
-	return model.Default(model.Pod{
+	return model.Pod{
 		Metadata: model.Metadata{
 			Name:      pod.Metadata.Name,
 			Namespace: pod.Metadata.Namespace,
@@ -15,7 +23,7 @@ func MapPodToInternalModel(pod *pb.Pod) model.Pod {
 		Spec: model.PodSpec{
 			Containers: MapContainerToInternalModel(pod.Spec.Containers),
 		},
-	})
+	}
 }
 
 // MapContainerToInternalModel maps API Container model to internal model

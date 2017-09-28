@@ -9,6 +9,7 @@ import (
 
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,7 +73,8 @@ func TestUrlSourceHandlesUnauthorized(t *testing.T) {
 	defer source.Stop()
 
 	select {
-	case <-updates:
+	case d := <-updates:
+		log.Fatalln(d)
 		assert.FailNow(t, "Where did you got that info?!")
 	case <-time.After(200 * time.Millisecond):
 		// Ok, didn't fail...

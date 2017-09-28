@@ -14,6 +14,8 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/ernoaapa/can/pkg/api/mapping"
+	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
 )
@@ -47,11 +49,17 @@ func NewURLManifestSource(manifestURL string, interval time.Duration, resolver *
 func (s *URLManifestSource) Start() {
 	for {
 		log.Debugf("Load manifest from %s", s.manifestURL)
-		pods, err := s.getPods()
+		content, err := s.getManifest()
 		if err != nil {
 			log.Warnf("Error while fetching manifest: %s", err)
 		} else {
-			s.out <- pods
+			manifest := mapping.MapPodsToInternalModel(content)
+			validationErr := model.Validate(manifest)
+			if validationErr != nil {
+				log.Warnf("Validation error in manifest: %s", validationErr)
+			} else {
+				s.out <- manifest
+			}
 		}
 		time.Sleep(s.interval)
 	}
@@ -62,7 +70,7 @@ func (s *URLManifestSource) Stop() {
 	s.running = false
 }
 
-func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {
+func (s *URLManifestSource) getManifest() (pods []*pb.Pod, err error) {
 	body, err := json.Marshal(s.resolver.GetInfo())
 	if err != nil {
 		return pods, errors.Wrap(err, "Error wile marshalling device info to JSON")
@@ -89,9 +97,9 @@ func (s *URLManifestSource) getPods() (pods []model.Pod, err error) {
 		return pods, errors.Wrapf(err, "Received invalid content type, cannot parse media type: [%s]", contentType)
 	}
 	if strings.Contains(mediaType, yamlContentType) {
-		return unmarshalYaml(data)
+		return pb.UnmarshalYaml(data)
 	} else if strings.Contains(mediaType, jsonContentType) {
-		return unmarshalJSON(data)
+		return pb.UnmarshalJSON(data)
 	} else {
 		return pods, fmt.Errorf("Unsupported response media type: [%s]", mediaType)
 	}

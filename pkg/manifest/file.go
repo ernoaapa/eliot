@@ -9,6 +9,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/ernoaapa/can/pkg/api/mapping"
+	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/model"
 )
@@ -69,7 +71,12 @@ func (s *FileManifestSource) getPods() (pods []model.Pod, err error) {
 
 	switch extension := filepath.Ext(s.filePath); extension {
 	case ".yaml", ".yml":
-		return unmarshalYaml(data)
+		content, err := pb.UnmarshalYaml(data)
+		if err != nil {
+			return nil, err
+		}
+		manifest := mapping.MapPodsToInternalModel(content)
+		return manifest, model.Validate(manifest)
 	default:
 		return pods, fmt.Errorf("Invalid source file format: %s", extension)
 	}

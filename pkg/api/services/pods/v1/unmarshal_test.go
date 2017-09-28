@@ -1,4 +1,4 @@
-package manifest
+package pods
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestUnmarshalYaml(t *testing.T) {
-	pods, err := unmarshalYaml([]byte(`
+	pods, err := UnmarshalYaml([]byte(`
 - metadata:
     name: "foo"
     namespace: "my-namespace"
@@ -33,7 +33,7 @@ func TestUnmarshalYaml(t *testing.T) {
 }
 
 func TestUnmarshalJSON(t *testing.T) {
-	pods, err := unmarshalJSON([]byte(`
+	pods, err := UnmarshalJSON([]byte(`
 [
   {
     "metadata": {

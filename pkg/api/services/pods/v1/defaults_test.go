@@ -1,4 +1,4 @@
-package model
+package pods
 
 import (
 	"testing"
@@ -7,23 +7,23 @@ import (
 )
 
 func TestDefaults(t *testing.T) {
-	pods := []Pod{
-		Pod{
-			Metadata: Metadata{
+	pods := []*Pod{
+		&Pod{
+			Metadata: &ResourceMetadata{
 				Name: "foobar",
 			},
-			Spec: PodSpec{
-				Containers: []Container{},
+			Spec: &PodSpec{
+				Containers: []*Container{},
 			},
 		},
-		Pod{
-			Metadata: Metadata{
+		&Pod{
+			Metadata: &ResourceMetadata{
 				Name:      "foobar",
 				Namespace: "my-namespace",
 			},
-			Spec: PodSpec{
-				Containers: []Container{
-					Container{
+			Spec: &PodSpec{
+				Containers: []*Container{
+					&Container{
 						Name:  "foo",
 						Image: "docker.io/library/hello-world:latest",
 					},

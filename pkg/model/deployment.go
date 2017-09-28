@@ -3,12 +3,12 @@ package model
 // Deployment model
 type Deployment struct {
 	Metadata
-	ID   string         `json:"id"`
-	Spec DeploymentSpec `json:"spec"`
+	ID   string         `validate:"required,gt=0"`
+	Spec DeploymentSpec `validate:"required"`
 }
 
 // DeploymentSpec model
 type DeploymentSpec struct {
-	Selector map[string]string `json:"selector"`
-	Template Pod               `json:"template"`
+	Selector map[string]string
+	Template Pod `validate:"required"`
 }

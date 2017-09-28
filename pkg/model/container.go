@@ -2,13 +2,13 @@ package model
 
 // Container defines what image should be running
 type Container struct {
-	Name  string `validate:"required,gt=0,alphanumOrDash"   json:"name"      yaml:"name"`
-	Image string `validate:"required,gt=0,imageRef"         json:"image"     yaml:"image"`
+	Name  string `validate:"required,gt=0,alphanumOrDash"`
+	Image string `validate:"required,gt=0,imageRef"`
 }
 
 // ContainerStatus represents one container status
 type ContainerStatus struct {
-	ContainerID string `json:"containerId,omitempty"  yaml:"containerId,omitempty"`
-	Image       string `json:"image,omitempty"        yaml:"image,omitempty"`
-	State       string `json:"state,omitempty"        yaml:"state,omitempty"`
+	ContainerID string `validate:"required,gt=0"`
+	Image       string `validate:"required,gt=0,imageRef"`
+	State       string `validate:"required,gt=0"`
 }
