@@ -105,11 +105,21 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		return specErr
 	}
 
+	specOpts := []containerd.SpecOpts{}
+
+	if len(container.Args) > 0 {
+		specOpts = append(specOpts, containerd.WithProcessArgs(container.Args...))
+	}
+
+	if container.Tty {
+		specOpts = append(specOpts, containerd.WithTTY)
+	}
+
 	log.Debugf("Create new container from image %s...", image.Name())
 	_, err := client.NewContainer(ctx,
 		container.Name,
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
-		containerd.WithSpec(spec),
+		containerd.WithSpec(spec, specOpts...),
 		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshotView(container.Name, image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
@@ -121,7 +131,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 }
 
 // StartContainer starts the already created container
-func (c *ContainerdClient) StartContainer(namespace, name string) error {
+func (c *ContainerdClient) StartContainer(namespace, name string, tty bool) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -136,7 +146,7 @@ func (c *ContainerdClient) StartContainer(namespace, name string) error {
 	}
 
 	log.Debugf("Create task in container: %s", container.ID())
-	io, err := containerd.NewDirectIO(ctx, false)
+	io, err := containerd.NewDirectIO(ctx, tty)
 	if err != nil {
 		return errors.Wrapf(err, "Error while creating container task IO")
 	}

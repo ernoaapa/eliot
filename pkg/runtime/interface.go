@@ -11,7 +11,7 @@ type Client interface {
 	GetAllContainers(namespace string) (containersByPods map[string][]model.Container, err error)
 	GetContainers(namespace, podName string) ([]model.Container, error)
 	CreateContainer(pod model.Pod, container model.Container) error
-	StartContainer(namespace, name string) error
+	StartContainer(namespace, name string, tty bool) error
 	StopContainer(namespace, name string) error
 	GetNamespaces() ([]string, error)
 	IsContainerRunning(namespace, name string) (bool, error)

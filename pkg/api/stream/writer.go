@@ -4,7 +4,7 @@ import (
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 )
 
-// Writer is io.Writer implementation what writes stdin/stdout bytes to RPC stream
+// Writer is io.Writer implementation what writes stdout/stderr bytes to RPC stream
 type Writer struct {
 	stream StdOutputStreamServer
 	stderr bool
@@ -24,7 +24,7 @@ func NewWriter(stream StdOutputStreamServer, stderr bool) *Writer {
 func (w *Writer) Write(p []byte) (n int, err error) {
 	n = len(p)
 	err = w.stream.Send(&pb.StdOutputStreamResponse{
-		Line:   p,
+		Line:   p[:],
 		Stderr: w.stderr,
 	})
 	if err != nil {

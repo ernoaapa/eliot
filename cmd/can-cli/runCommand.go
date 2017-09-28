@@ -38,6 +38,14 @@ var runCommand = cli.Command{
 			Name:  "rm",
 			Usage: "Automatically remove the container when it exits",
 		},
+		cli.BoolFlag{
+			Name:  "tty, t",
+			Usage: "Allocate TTY for each container in the pod",
+		},
+		cli.BoolFlag{
+			Name:  "stdin, i",
+			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached.",
+		},
 	},
 	Action: func(clicontext *cli.Context) error {
 		var (
@@ -45,6 +53,9 @@ var runCommand = cli.Command{
 			image  = clicontext.String("image")
 			detach = clicontext.Bool("detach")
 			rm     = clicontext.Bool("rm")
+			tty    = clicontext.Bool("tty")
+			stdin  = clicontext.Bool("stdin")
+			args   = clicontext.Args()[1:]
 		)
 		if name == "" {
 			return fmt.Errorf("You must give NAME parameter")
@@ -55,7 +66,7 @@ var runCommand = cli.Command{
 		}
 
 		if detach && rm {
-			return fmt.Errorf("You cannot use --detach flag with --rm, it would remove right away after container started.")
+			return fmt.Errorf("You cannot use --detach flag with --rm, it would remove right away after container started")
 		}
 
 		config := cmd.GetConfig(clicontext)
@@ -71,6 +82,8 @@ var runCommand = cli.Command{
 					&pb.Container{
 						Name:  name,
 						Image: image,
+						Tty:   tty,
+						Args:  args,
 					},
 				},
 			},
@@ -91,6 +104,9 @@ var runCommand = cli.Command{
 			defer client.DeletePod(pod)
 		}
 
-		return client.Attach(result.Spec.Containers[0].Name, os.Stdout, os.Stderr)
+		if stdin {
+			return client.Attach(result.Spec.Containers[0].Name, os.Stdin, os.Stdout, os.Stderr)
+		}
+		return client.Attach(result.Spec.Containers[0].Name, nil, os.Stdout, os.Stderr)
 	},
 }

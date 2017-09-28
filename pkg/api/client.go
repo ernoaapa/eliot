@@ -3,10 +3,12 @@ package api
 import (
 	"fmt"
 	"io"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 )
@@ -96,7 +98,13 @@ func (c *Client) DeletePod(pod *pb.Pod) (*pb.Pod, error) {
 }
 
 // Attach calls server and fetches pod logs
-func (c *Client) Attach(containerID string, stdout, stderr io.Writer) error {
+func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.Writer) (err error) {
+	wg := &sync.WaitGroup{}
+	md := metadata.Pairs(
+		"namespace", c.namespace,
+		"container", containerID,
+	)
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return err
@@ -105,29 +113,55 @@ func (c *Client) Attach(containerID string, stdout, stderr io.Writer) error {
 
 	client := pb.NewPodsClient(conn)
 	log.Debugf("Open stream connection to server to get logs")
-	stream, err := client.Attach(context.Background(), &pb.AttachRequest{
-		Namespace:   c.namespace,
-		ContainerID: containerID,
-	})
+	stream, err := client.Attach(ctx)
 	if err != nil {
 		return err
 	}
 
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			log.Debugln("Received EOF for log stream")
-			err := stream.CloseSend()
-			return err
-		}
-		if err != nil {
-			return err
-		}
+	wg.Add(1)
+	go func() {
+		for {
+			resp, err := stream.Recv()
+			if err == io.EOF {
+				log.Debugln("Received EOF for log stream")
+				err = stream.CloseSend()
+				break
+			}
+			if err != nil {
+				log.Debugf("Received error: %s", err)
+				break
+			}
 
-		if resp.Stderr {
-			fmt.Fprint(stderr, string(resp.Line))
-		} else {
-			fmt.Fprint(stdout, string(resp.Line))
+			if resp.Stderr {
+				stderr.Write(resp.Line)
+			} else {
+				stdout.Write(resp.Line)
+			}
 		}
+		wg.Done()
+	}()
+
+	if stdin != nil {
+		wg.Add(1)
+		go func() {
+			for {
+				target := []byte{128}
+				_, err := stdin.Read(target)
+				if err != nil {
+					break
+				}
+
+				err = stream.Send(&pb.StdinStreamRequest{
+					Stdin: target,
+				})
+				if err != nil {
+					break
+				}
+			}
+			wg.Done()
+		}()
 	}
+
+	wg.Wait()
+	return err
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net"
 
 	"golang.org/x/net/context"
@@ -12,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 // Server implements the GRPC API for the layery-cli
@@ -30,7 +32,7 @@ func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.
 			return nil, errors.Wrap(err, "Failed to create container")
 		}
 		log.Debugf("Container [%s] created, will start it", container.Name)
-		if err := s.client.StartContainer(pod.Metadata.Namespace, container.Name); err != nil {
+		if err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, container.Tty); err != nil {
 			return nil, errors.Wrap(err, "Failed to start container")
 		}
 		log.Debugf("Container [%s] started", container.Name)
@@ -76,16 +78,41 @@ func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.Lis
 }
 
 // Attach connects to process in container and and streams stdout and stderr outputs to client
-func (s *Server) Attach(req *pb.AttachRequest, server pb.Pods_AttachServer) error {
-	log.Debugf("Get logs for container [%s] in namespace [%s]", req.GetContainerID(), req.Namespace)
+func (s *Server) Attach(server pb.Pods_AttachServer) error {
+	md, ok := metadata.FromIncomingContext(server.Context())
+	if !ok {
+		return fmt.Errorf("Incoming attach request don't have metadata. You must provide 'Namespace' and 'ContainerID' through metadata")
+	}
+	log.Debugf("Received metadata: %s", md)
+	var (
+		namespace   = getMetadataValue(md, "namespace")
+		containerID = getMetadataValue(md, "container")
+	)
+
+	if namespace == "" {
+		return fmt.Errorf("You must define 'namespace' metadata")
+	}
+
+	if containerID == "" {
+		return fmt.Errorf("You must define 'container' metadata")
+	}
+
+	log.Debugf("Get logs for container [%s] in namespace [%s]", containerID, namespace)
 	return s.client.Attach(
-		req.Namespace, req.GetContainerID(),
+		namespace, containerID,
 		runtime.AttachIO{
-			Stdin:  &stream.EmptyStdin{},
+			Stdin:  stream.NewReader(server),
 			Stdout: stream.NewWriter(server, false),
 			Stderr: stream.NewWriter(server, true),
 		},
 	)
+}
+
+func getMetadataValue(md metadata.MD, key string) string {
+	if val, ok := md[key]; ok {
+		return val[0]
+	}
+	return ""
 }
 
 // NewServer creates new API server

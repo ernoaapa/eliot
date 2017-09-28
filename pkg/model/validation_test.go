@@ -17,6 +17,10 @@ func TestValidationIsValid(t *testing.T) {
 					Container{
 						Name:  "foo-1",
 						Image: "docker.io/library/foobar",
+						Args: []string{
+							"/bin/bash",
+							"ls",
+						},
 					},
 				},
 			},

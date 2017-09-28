@@ -32,6 +32,8 @@ func MapContainerToInternalModel(containers []*pb.Container) (result []model.Con
 		result = append(result, model.Container{
 			Name:  container.Name,
 			Image: container.Image,
+			Tty:   container.Tty,
+			Args:  container.Args,
 		})
 	}
 	return result

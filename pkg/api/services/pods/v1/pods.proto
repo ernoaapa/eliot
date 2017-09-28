@@ -8,11 +8,12 @@ service Pods {
 	rpc Create(CreatePodRequest) returns (CreatePodResponse);
 	rpc Delete(DeletePodRequest) returns (DeletePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
-	rpc Attach(AttachRequest) returns (stream StdOutputStreamResponse);
+	rpc Attach(stream StdinStreamRequest) returns (stream StdOutputStreamResponse);
 }
 
 message CreatePodRequest {
 	Pod pod = 1;
+	bool tty = 2;
 }
 
 message CreatePodResponse {
@@ -36,9 +37,8 @@ message ListPodsResponse {
 	repeated Pod pods = 1;
 }
 
-message AttachRequest {
-	string namespace = 1;
-	string containerID = 2;
+message StdinStreamRequest {
+	bytes stdin = 1;
 }
 
 message StdOutputStreamResponse {
@@ -60,6 +60,8 @@ message PodSpec {
 message Container {
 	string name = 1;
 	string image = 2;
+	bool tty = 3;
+	repeated string args = 4;
 }
 
 message PodStatus {

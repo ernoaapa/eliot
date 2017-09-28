@@ -58,7 +58,7 @@ func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) e
 }
 
 // StartContainer fake impl.
-func (c *FakeClient) StartContainer(namespace, containerID string) error {
+func (c *FakeClient) StartContainer(namespace, containerID string, tty bool) error {
 	c.startedCount++
 	return nil
 }

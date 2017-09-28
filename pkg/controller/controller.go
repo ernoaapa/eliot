@@ -177,7 +177,7 @@ func (c *Controller) ensureContainerTasksRunning(pods podsManifest, state contai
 				}
 				if !running {
 					log.Warnf("Detected existing container not running, restarting container [%s]", existingContainer)
-					startErr := c.client.StartContainer(pod.Metadata.Namespace, existingContainer)
+					startErr := c.client.StartContainer(pod.Metadata.Namespace, existingContainer, container.Tty)
 					if startErr != nil {
 						return startErr
 					}
@@ -185,7 +185,7 @@ func (c *Controller) ensureContainerTasksRunning(pods podsManifest, state contai
 					log.Debugf("Container [%s] running and healthy", existingContainer)
 				}
 			} else {
-				startErr := c.client.StartContainer(pod.Metadata.Namespace, container.Name)
+				startErr := c.client.StartContainer(pod.Metadata.Namespace, container.Name, container.Tty)
 				if startErr != nil {
 					return errors.Wrapf(startErr, "Error while starting new container %s", container.Name)
 				}

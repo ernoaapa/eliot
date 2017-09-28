@@ -4,6 +4,8 @@ package model
 type Container struct {
 	Name  string `validate:"required,gt=0,alphanumOrDash"`
 	Image string `validate:"required,gt=0,imageRef"`
+	Tty   bool
+	Args  []string `validate:"dive,noSpaces"`
 }
 
 // ContainerStatus represents one container status

@@ -3,6 +3,7 @@ package model
 import (
 	"log"
 	"regexp"
+	"strings"
 	"sync"
 
 	imageref "github.com/containerd/containerd/reference"
@@ -26,6 +27,9 @@ func getValidator() *validator.Validate {
 		})
 		validate.RegisterValidation("alphanumOrDash", func(fl validator.FieldLevel) bool {
 			return isAlphanumericOrDash(fl.Field().Interface().(string))
+		})
+		validate.RegisterValidation("noSpaces", func(fl validator.FieldLevel) bool {
+			return !containsSpaces(fl.Field().Interface().(string))
 		})
 		validate.RegisterValidation("empty", func(fl validator.FieldLevel) bool {
 			return isEmpty(fl.Field().Interface())
@@ -52,6 +56,10 @@ func isAlphanumericOrDash(value string) bool {
 		log.Fatalf("Invalid regexp definition in isAlphanumericOrDash check: %s", err)
 	}
 	return match
+}
+
+func containsSpaces(value string) bool {
+	return strings.Contains(value, " ")
 }
 
 func isEmpty(value interface{}) bool {

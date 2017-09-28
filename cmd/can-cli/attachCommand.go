@@ -28,6 +28,10 @@ var attachCommand = cli.Command{
 		},
 	},
 	Action: func(clicontext *cli.Context) error {
+		var (
+			stdin = clicontext.Bool("stdin")
+		)
+
 		client := cmd.GetClient(clicontext)
 
 		if clicontext.NArg() == 0 || clicontext.Args().First() == "" {
@@ -53,6 +57,9 @@ var attachCommand = cli.Command{
 			return fmt.Errorf("Pod [%s] contains %d containers, you must define --container flag", podName, containerCount)
 		}
 
-		return client.Attach(containerName, os.Stdout, os.Stderr)
+		if stdin {
+			return client.Attach(containerName, os.Stdin, os.Stdout, os.Stderr)
+		}
+		return client.Attach(containerName, nil, os.Stdout, os.Stderr)
 	},
 }
