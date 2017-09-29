@@ -8,6 +8,7 @@ import (
 	"github.com/containerd/containerd/errdefs"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
+	prototypes "github.com/gogo/protobuf/types"
 )
 
 // FakeContainer is fake representation of model.Container
@@ -65,6 +66,11 @@ func (c *FakeContainer) Labels(context.Context) (labels map[string]string, err e
 // SetLabels fake impl.
 func (c *FakeContainer) SetLabels(context.Context, map[string]string) (labels map[string]string, err error) {
 	return labels, nil
+}
+
+// Extensions fake impl.
+func (c *FakeContainer) Extensions() map[string]prototypes.Any {
+	return map[string]prototypes.Any{}
 }
 
 func fakeRunningContainer(namespace, podName, containerName string) containerd.Container {

@@ -19,7 +19,7 @@ type config struct {
 	// respected for which is choosen. Each differ should return the same
 	// correct output, allowing any ordering to be used to prefer
 	// more optimimal implementations.
-	Order []string `toml:"default,omitempty"`
+	Order []string `toml:"default"`
 }
 
 func init() {
@@ -74,7 +74,7 @@ func (s *service) Apply(ctx context.Context, er *diffapi.ApplyRequest) (*diffapi
 
 	for _, differ := range s.differs {
 		ocidesc, err = differ.Apply(ctx, desc, mounts)
-		if !errdefs.IsNotSupported(err) {
+		if !errdefs.IsNotImplemented(err) {
 			break
 		}
 	}
@@ -99,7 +99,7 @@ func (s *service) Diff(ctx context.Context, dr *diffapi.DiffRequest) (*diffapi.D
 
 	for _, differ := range s.differs {
 		ocidesc, err = differ.DiffMounts(ctx, aMounts, bMounts, dr.MediaType, dr.Ref)
-		if !errdefs.IsNotSupported(err) {
+		if !errdefs.IsNotImplemented(err) {
 			break
 		}
 	}

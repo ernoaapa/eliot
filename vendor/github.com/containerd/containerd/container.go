@@ -11,7 +11,8 @@ import (
 	"github.com/containerd/containerd/api/types"
 	"github.com/containerd/containerd/containers"
 	"github.com/containerd/containerd/errdefs"
-	"github.com/containerd/containerd/typeurl"
+	"github.com/containerd/typeurl"
+	prototypes "github.com/gogo/protobuf/types"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 )
@@ -42,6 +43,8 @@ type Container interface {
 	Labels(context.Context) (map[string]string, error)
 	// SetLabels sets the provided labels for the container and returns the final label set
 	SetLabels(context.Context, map[string]string) (map[string]string, error)
+	// Extensions returns the extensions set on the container
+	Extensions() map[string]prototypes.Any
 }
 
 func containerFromRecord(client *Client, c containers.Container) *container {
@@ -158,6 +161,12 @@ func (c *container) Image(ctx context.Context) (Image, error) {
 	}, nil
 }
 
+func (c *container) Extensions() map[string]prototypes.Any {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.c.Extensions
+}
+
 func (c *container) NewTask(ctx context.Context, ioCreate IOCreation, opts ...NewTaskOpts) (Task, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -220,15 +229,12 @@ func (c *container) NewTask(ctx context.Context, ioCreate IOCreation, opts ...Ne
 	}
 	if info.Checkpoint != nil {
 		request.Checkpoint = info.Checkpoint
-		// we need to defer the create call to start
-		t.deferred = request
-	} else {
-		response, err := c.client.TaskService().Create(ctx, request)
-		if err != nil {
-			return nil, errdefs.FromGRPC(err)
-		}
-		t.pid = response.Pid
 	}
+	response, err := c.client.TaskService().Create(ctx, request)
+	if err != nil {
+		return nil, errdefs.FromGRPC(err)
+	}
+	t.pid = response.Pid
 	return t, nil
 }
 

@@ -9,6 +9,8 @@ containerd is an industry-standard container runtime with an emphasis on simplic
 
 containerd is designed to be embedded into a larger system, rather than being used directly by developers or end-users.
 
+![architecture](design/architecture.png)
+
 ## Getting Started
 
 If you are interested in trying out containerd please see our [Getting Started Guide](docs/getting-started.md).
@@ -79,7 +81,7 @@ You can specify options when creating a container about how to modify the specif
 redis, err := client.NewContainer(context, "redis-master", containerd.WithNewSpec(containerd.WithImageConfig(image)))
 ```
 
-## Root Filesystems
+### Root Filesystems
 
 containerd allows you to use overlay or snapshot filesystems with your containers.  It comes with builtin support for overlayfs and btrfs.
 
@@ -148,7 +150,7 @@ defer task.Delete(context)
 err := task.Start(context)
 ```
 
-### Developer Quick-Start
+## Developer Quick-Start
 
 To build the daemon and `ctr` simple test client, the following build system dependencies are required:
 
@@ -194,8 +196,7 @@ For sync communication we have a community slack with a #containerd channel that
 
 ### Reporting security issues
 
-__If you are reporting a security issue, please follow the responsible
-disclosure guidelines and reach out discreetly at containerd-security@googlegroups.com__.
+__If you are reporting a security issue, please reach out discreetly at containerd-security@googlegroups.com__.
 
 ## Copyright and license
 

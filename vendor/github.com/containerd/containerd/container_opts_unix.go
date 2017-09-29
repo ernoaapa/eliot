@@ -12,6 +12,7 @@ import (
 	"github.com/containerd/containerd/content"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
+	"github.com/containerd/containerd/platforms"
 	"github.com/gogo/protobuf/proto"
 	protobuf "github.com/gogo/protobuf/types"
 	digest "github.com/opencontainers/go-digest"
@@ -37,8 +38,8 @@ func WithCheckpoint(desc v1.Descriptor, snapshotKey string) NewContainerOpts {
 			case v1.MediaTypeImageLayer:
 				fk := m
 				rw = &fk
-			case images.MediaTypeDockerSchema2Manifest:
-				config, err := images.Config(ctx, store, m)
+			case images.MediaTypeDockerSchema2Manifest, images.MediaTypeDockerSchema2ManifestList:
+				config, err := images.Config(ctx, store, m, platforms.Default())
 				if err != nil {
 					return err
 				}

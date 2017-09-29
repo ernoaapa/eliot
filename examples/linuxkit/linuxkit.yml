@@ -2,9 +2,9 @@ kernel:
   image: linuxkit/kernel:4.9.50
   cmdline: "console=tty0 console=ttyS0 console=ttyAMA0"
 init:
-  - linuxkit/init:851e9c3ad0574d640b733b92fdb26c368d2f7f8f
+  - linuxkit/init:7804129bd06218b72c298139a25698a748d253c6
   - linuxkit/runc:a1b564248a0d0b118c11e61db9f84ecf41dd2d2a
-  - linuxkit/containerd:06876ceef325e49e9ba119659357768d5df89075
+  - linuxkit/containerd:417f83f7b8dc1fa36acf90effe44f99c7397480a
   - linuxkit/ca-certificates:e44b0a66df5a102c0e220f0066b0d904710dcb10
 onboot:
   - name: sysctl
@@ -14,15 +14,15 @@ onboot:
     command: ["/sbin/rngd", "-1"]
 services:
   - name: getty
-    image: linuxkit/getty:797cb79e0a229fcd16ebf44a0da74bcec03968ec
+    image: linuxkit/getty:bf6872ce0a9f3ab519b3e502cc41ba3958bda2a6
     env:
      - INSECURE=true
   - name: rngd
     image: linuxkit/rngd:558e86a36242bb74353bc9287b715ddb8567357e
   - name: dhcpcd
-    image: linuxkit/dhcpcd:f3f5413abb78fae9020e35bd4788fa93df4530b7
+    image: linuxkit/dhcpcd:d4408777ed6b6e6e562a5d4938fd09804324b33e
   - name: sshd
-    image: linuxkit/sshd:505a985d7bd7a90f15eca9cb4dc6ec92789d51a0
+    image: linuxkit/sshd:d313eea3d9d7fbcbc927d06a6700325725db2a82
     capabilities:
       - all
     binds:
