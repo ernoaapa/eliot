@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 
-	assert "gopkg.in/go-playground/assert.v1"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMetadataValue(t *testing.T) {
