@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"sync"
@@ -132,10 +133,14 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 				break
 			}
 
+			target := stdout
 			if resp.Stderr {
-				stderr.Write(resp.Output)
-			} else {
-				stdout.Write(resp.Output)
+				target = stderr
+			}
+
+			_, err = io.Copy(target, bytes.NewReader(resp.Output))
+			if err != nil {
+				break
 			}
 		}
 		wg.Done()

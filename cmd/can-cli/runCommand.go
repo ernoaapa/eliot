@@ -7,6 +7,7 @@ import (
 	"github.com/ernoaapa/can/cmd"
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/can/pkg/term"
 	"github.com/urfave/cli"
 )
 
@@ -54,8 +55,10 @@ var runCommand = cli.Command{
 			detach = clicontext.Bool("detach")
 			rm     = clicontext.Bool("rm")
 			tty    = clicontext.Bool("tty")
-			stdin  = clicontext.Bool("stdin")
 			args   = clicontext.Args()[1:]
+			stdin  = os.Stdin
+			stdout = os.Stdout
+			stderr = os.Stderr
 		)
 		if name == "" {
 			return fmt.Errorf("You must give NAME parameter")
@@ -104,9 +107,19 @@ var runCommand = cli.Command{
 			defer client.DeletePod(pod)
 		}
 
-		if stdin {
-			return client.Attach(result.Spec.Containers[0].Name, os.Stdin, os.Stdout, os.Stderr)
+		term := term.TTY{
+			Out: stdout,
 		}
-		return client.Attach(result.Spec.Containers[0].Name, nil, os.Stdout, os.Stderr)
+
+		if clicontext.Bool("stdin") {
+			term.In = stdin
+			term.Raw = true
+		} else {
+			stdin = nil
+		}
+
+		return term.Safe(func() error {
+			return client.Attach(result.Spec.Containers[0].Name, stdin, stdout, stderr)
+		})
 	},
 }
