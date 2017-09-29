@@ -46,7 +46,7 @@ services:
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
   - name: can-api
-    image: ernoaapa/can-api-amd64:17ce575
+    image: ernoaapa/can-api-amd64:175351b-dirty
     command: ["/can-api", "--debug", "--listen", "0.0.0.0:5000"]
     capabilities:
       - all

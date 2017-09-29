@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"sync"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -100,7 +99,7 @@ func (c *Client) DeletePod(pod *pb.Pod) (*pb.Pod, error) {
 
 // Attach calls server and fetches pod logs
 func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.Writer) (err error) {
-	wg := &sync.WaitGroup{}
+	done := make(chan struct{})
 	md := metadata.Pairs(
 		"namespace", c.namespace,
 		"container", containerID,
@@ -119,12 +118,11 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 		return err
 	}
 
-	wg.Add(1)
 	go func() {
+		defer close(done)
 		for {
 			resp, err := stream.Recv()
 			if err == io.EOF {
-				log.Debugln("Received EOF for log stream")
 				err = stream.CloseSend()
 				break
 			}
@@ -140,33 +138,39 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 
 			_, err = io.Copy(target, bytes.NewReader(resp.Output))
 			if err != nil {
+				log.Debugf("Error while copying data: %s", err)
 				break
 			}
 		}
-		wg.Done()
 	}()
 
 	if stdin != nil {
-		wg.Add(1)
 		go func() {
+			defer close(done)
+
 			for {
-				target := []byte{1}
-				_, err := stdin.Read(target)
+				buf := make([]byte, 1024)
+				n, err := stdin.Read(buf)
+				if err == io.EOF {
+					// nothing else to pipe, kill this goroutine
+					break
+				}
 				if err != nil {
+					log.Debugf("Error while reading stdin to buffer: %s", err)
 					break
 				}
 
 				err = stream.Send(&pb.StdinStreamRequest{
-					Input: target,
+					Input: buf[:n],
 				})
 				if err != nil {
+					log.Debugf("Sending to stream returned error %s", err)
 					break
 				}
 			}
-			wg.Done()
 		}()
 	}
 
-	wg.Wait()
+	<-done
 	return err
 }

@@ -98,7 +98,7 @@ func (s *Server) Attach(server pb.Pods_AttachServer) error {
 	}
 
 	log.Debugf("Get logs for container [%s] in namespace [%s]", containerID, namespace)
-	return s.client.Attach(
+	err := s.client.Attach(
 		namespace, containerID,
 		runtime.AttachIO{
 			Stdin:  stream.NewReader(server),
@@ -106,6 +106,9 @@ func (s *Server) Attach(server pb.Pods_AttachServer) error {
 			Stderr: stream.NewWriter(server, true),
 		},
 	)
+
+	log.Printf("client.Attach ended with error: %s", err)
+	return err
 }
 
 func getMetadataValue(md metadata.MD, key string) string {

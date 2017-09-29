@@ -25,12 +25,3 @@ type AttachIO struct {
 	Stdout io.Writer
 	Stderr io.Writer
 }
-
-func NoIO() AttachIO {
-	return AttachIO{}
-}
-
-// Empty returns true if the IO is missing one of io's
-func (attach AttachIO) Empty() bool {
-	return attach.Stdin == nil || attach.Stdout == nil || attach.Stderr == nil
-}
