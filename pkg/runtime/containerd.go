@@ -209,15 +209,9 @@ func (c *ContainerdClient) ensureImagePulled(namespace, ref string) (image conta
 		return image, err
 	}
 
-	image, err = client.Pull(ctx, ref)
+	image, err = client.Pull(ctx, ref, containerd.WithPullUnpack, containerd.WithSchema1Conversion)
 	if err != nil {
-		return image, errors.Wrapf(err, "Error pulling image [%s]", ref)
-	}
-
-	log.Debugf("Unpacking container image [%s]...", image.Target().Digest)
-	err = image.Unpack(ctx, snapshotter)
-	if err != nil {
-		return image, errors.Wrapf(err, "Error while unpacking image [%s]", image.Target().Digest)
+		return image, errors.Wrapf(err, "Error while pulling image [%s]", ref)
 	}
 
 	return image, nil
