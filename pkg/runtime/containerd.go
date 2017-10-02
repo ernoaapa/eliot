@@ -13,6 +13,7 @@ import (
 	"github.com/ernoaapa/can/pkg/model"
 	opts "github.com/ernoaapa/can/pkg/runtime/containerd"
 	"github.com/ernoaapa/can/pkg/runtime/containerd/mapping"
+	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
@@ -101,12 +102,9 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		return pullErr
 	}
 
-	spec, specErr := containerd.GenerateSpec(ctx, client, nil, containerd.WithImageConfig(image))
-	if specErr != nil {
-		return specErr
+	specOpts := []containerd.SpecOpts{
+		containerd.WithImageConfig(image),
 	}
-
-	specOpts := []containerd.SpecOpts{}
 
 	if len(container.Args) > 0 {
 		specOpts = append(specOpts, containerd.WithProcessArgs(container.Args...))
@@ -126,11 +124,19 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		specOpts = append(specOpts, opts.WithMounts(container.Mounts))
 	}
 
+	if pod.Spec.HostNetwork {
+		specOpts = append(specOpts,
+			containerd.WithHostNamespace(specs.NetworkNamespace),
+			containerd.WithHostHostsFile,
+			containerd.WithHostResolvconf,
+		)
+	}
+
 	log.Debugf("Create new container from image %s...", image.Name())
 	_, err := client.NewContainer(ctx,
 		container.Name,
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
-		containerd.WithSpec(spec, specOpts...),
+		containerd.WithNewSpec(specOpts...),
 		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshot(container.Name, image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),

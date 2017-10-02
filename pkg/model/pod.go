@@ -12,7 +12,8 @@ type Pod struct {
 
 // PodSpec defines what containers should be running
 type PodSpec struct {
-	Containers []Container `validate:"required,gt=0,dive"`
+	HostNetwork bool
+	Containers  []Container `validate:"required,gt=0,dive"`
 }
 
 // PodStatus represents latest known state of pod

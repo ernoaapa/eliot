@@ -102,6 +102,7 @@ var runCommand = cli.Command{
 				Namespace: config.GetCurrentContext().Namespace,
 			},
 			Spec: &pb.PodSpec{
+				HostNetwork: true,
 				Containers: []*pb.Container{
 					&pb.Container{
 						Name:   name,

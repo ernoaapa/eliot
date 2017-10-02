@@ -55,6 +55,7 @@ message Pod {
 
 message PodSpec {
 	repeated Container containers = 1;
+	bool hostNetwork = 2;
 }
 
 message Container {
