@@ -44,7 +44,7 @@ var runCommand = cli.Command{
 			Usage: "Bind a directory in host to the container. Format: /source:/target:options, E.g. /var:/var:rshared",
 		},
 		cli.StringSliceFlag{
-			Name:  "env",
+			Name:  "env, e",
 			Usage: "Set environment variables",
 		},
 		cli.BoolFlag{
@@ -70,11 +70,16 @@ var runCommand = cli.Command{
 			env    = clicontext.StringSlice("env")
 			mounts = cmd.GetMounts(clicontext)
 			binds  = cmd.GetBinds(clicontext)
-			args   = clicontext.Args()[1:]
+			args   = []string{}
 			stdin  = os.Stdin
 			stdout = os.Stdout
 			stderr = os.Stderr
 		)
+
+		if clicontext.NArg() > 1 {
+			args = clicontext.Args()[1:]
+		}
+
 		if name == "" {
 			return fmt.Errorf("You must give NAME parameter")
 		}
@@ -82,6 +87,7 @@ var runCommand = cli.Command{
 		if image == "" {
 			return fmt.Errorf("You must define --image option")
 		}
+		image = cmd.ExpandToFQIN(image)
 
 		if detach && rm {
 			return fmt.Errorf("You cannot use --detach flag with --rm, it would remove right away after container started")

@@ -268,3 +268,36 @@ func FilterByPodName(pods []*pb.Pod, podName string) []*pb.Pod {
 	}
 	return []*pb.Pod{}
 }
+
+var (
+	defaultRegistry = "docker.io"
+	defaultUsername = "library"
+	defaultTag      = "latest"
+)
+
+// ExpandToFQIN converts partial image name to "Fully Qualified Image Name"
+// E.g. eaapa/hello-world -> docker.io/eaapa/hello-world:latest
+func ExpandToFQIN(source string) string {
+	registry := defaultRegistry
+	username := defaultUsername
+	tag := defaultTag
+	image := source
+
+	parts := strings.SplitN(source, "/", 3)
+	if len(parts) == 3 {
+		registry = parts[0]
+		username = parts[1]
+		image = parts[2]
+	} else if len(parts) == 2 {
+		username = parts[0]
+		image = parts[1]
+	}
+
+	imageParts := strings.SplitN(image, ":", 2)
+	if len(imageParts) == 2 {
+		image = imageParts[0]
+		tag = imageParts[1]
+	}
+
+	return fmt.Sprintf("%s/%s/%s:%s", registry, username, image, tag)
+}
