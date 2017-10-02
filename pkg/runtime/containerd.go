@@ -11,6 +11,7 @@ import (
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/plugin"
 	"github.com/ernoaapa/can/pkg/model"
+	opts "github.com/ernoaapa/can/pkg/runtime/containerd"
 	"github.com/ernoaapa/can/pkg/runtime/containerd/mapping"
 	"github.com/pkg/errors"
 
@@ -115,13 +116,23 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		specOpts = append(specOpts, containerd.WithTTY)
 	}
 
+	if len(container.Env) > 0 {
+		log.Debugf("Adding %d environment variables", len(container.Env))
+		specOpts = append(specOpts, opts.WithEnv(container.Env))
+	}
+
+	if len(container.Mounts) > 0 {
+		log.Debugf("Adding %d mounts to container", len(container.Mounts))
+		specOpts = append(specOpts, opts.WithMounts(container.Mounts))
+	}
+
 	log.Debugf("Create new container from image %s...", image.Name())
 	_, err := client.NewContainer(ctx,
 		container.Name,
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
 		containerd.WithSpec(spec, specOpts...),
 		containerd.WithSnapshotter(snapshotter),
-		containerd.WithNewSnapshotView(container.Name, image),
+		containerd.WithNewSnapshot(container.Name, image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 	)
 	if err != nil {

@@ -62,3 +62,12 @@ func TestGetMultipleLabels(t *testing.T) {
 		"ugh": "12.3.4",
 	}, labels)
 }
+
+func TestParseMountFlag(t *testing.T) {
+	result, err := parseMountFlag("type=foo,source=/path,destination=/target,options=rbind:rw")
+	assert.NoError(t, err)
+	assert.Equal(t, "foo", result.Type)
+	assert.Equal(t, "/path", result.Source)
+	assert.Equal(t, "/target", result.Destination)
+	assert.Equal(t, []string{"rbind", "rw"}, result.Options)
+}

@@ -35,6 +35,14 @@ var runCommand = cli.Command{
 			Name:  "detach, d",
 			Usage: "Run container in background and print container information",
 		},
+		cli.StringSliceFlag{
+			Name:  "mount",
+			Usage: "Attach a filesystem mount to the container",
+		},
+		cli.StringSliceFlag{
+			Name:  "env",
+			Usage: "Set environment variables",
+		},
 		cli.BoolFlag{
 			Name:  "rm",
 			Usage: "Automatically remove the container when it exits",
@@ -55,6 +63,8 @@ var runCommand = cli.Command{
 			detach = clicontext.Bool("detach")
 			rm     = clicontext.Bool("rm")
 			tty    = clicontext.Bool("tty")
+			env    = clicontext.StringSlice("env")
+			mounts = cmd.GetMounts(clicontext)
 			args   = clicontext.Args()[1:]
 			stdin  = os.Stdin
 			stdout = os.Stdout
@@ -83,10 +93,12 @@ var runCommand = cli.Command{
 			Spec: &pb.PodSpec{
 				Containers: []*pb.Container{
 					&pb.Container{
-						Name:  name,
-						Image: image,
-						Tty:   tty,
-						Args:  args,
+						Name:   name,
+						Image:  image,
+						Tty:    tty,
+						Args:   args,
+						Env:    env,
+						Mounts: mounts,
 					},
 				},
 			},

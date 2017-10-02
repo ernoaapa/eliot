@@ -34,6 +34,9 @@ func getValidator() *validator.Validate {
 		validate.RegisterValidation("empty", func(fl validator.FieldLevel) bool {
 			return isEmpty(fl.Field().Interface())
 		})
+		validate.RegisterValidation("envKeyValuePair", func(fl validator.FieldLevel) bool {
+			return isValidEnvKeyValuePair(fl.Field().Interface().(string))
+		})
 	})
 	return validate
 }
@@ -70,6 +73,20 @@ func isEmpty(value interface{}) bool {
 		log.Fatalf("isempty validation supports only string, not %T", v)
 	}
 	return false
+}
+
+func isValidEnvKeyValuePair(value string) bool {
+	if value == "" {
+		return false
+	}
+
+	parts := strings.SplitN(value, "=", 2)
+	for _, part := range parts {
+		if !isAlphanumericOrDash(part) {
+			return false
+		}
+	}
+	return true
 }
 
 // Validate validates given pod definitions

@@ -62,6 +62,15 @@ message Container {
 	string image = 2;
 	bool tty = 3;
 	repeated string args = 4;
+	repeated string env = 5;
+	repeated Mount mounts = 6;
+}
+
+message Mount {
+	string type = 1;
+	string source = 2;
+	string destination = 3;
+	repeated string options = 4;
 }
 
 message PodStatus {

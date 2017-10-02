@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
 	"net/url"
 	"os"
@@ -158,6 +159,53 @@ func GetController(clicontext *cli.Context, in <-chan []model.Pod, out chan<- []
 // GetPrinter returns printer for formating resources output
 func GetPrinter(clicontext *cli.Context) printers.ResourcePrinter {
 	return printers.NewHumanReadablePrinter()
+}
+
+// GetMounts parses a --mount string flags
+func GetMounts(clicontext *cli.Context) (result []*pb.Mount) {
+	for _, flag := range clicontext.StringSlice("mount") {
+		mount, err := parseMountFlag(flag)
+		if err != nil {
+			log.Fatalf("Failed to parse --mount flag: %s", err)
+		}
+		result = append(result, mount)
+	}
+	return result
+}
+
+// parseMountFlag parses a mount string in the form "type=foo,source=/path,destination=/target,options=rbind:rw"
+func parseMountFlag(m string) (*pb.Mount, error) {
+	mount := &pb.Mount{}
+	r := csv.NewReader(strings.NewReader(m))
+
+	fields, err := r.Read()
+	if err != nil {
+		return mount, err
+	}
+
+	for _, field := range fields {
+		v := strings.Split(field, "=")
+		if len(v) != 2 {
+			return mount, fmt.Errorf("invalid mount specification: expected key=val")
+		}
+
+		key := v[0]
+		val := v[1]
+		switch key {
+		case "type":
+			mount.Type = val
+		case "source", "src":
+			mount.Source = val
+		case "destination", "dst":
+			mount.Destination = val
+		case "options":
+			mount.Options = strings.Split(val, ":")
+		default:
+			return mount, fmt.Errorf("mount option %q not supported", key)
+		}
+	}
+
+	return mount, nil
 }
 
 func fileExists(path string) bool {
