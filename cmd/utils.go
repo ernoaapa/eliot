@@ -208,6 +208,41 @@ func parseMountFlag(m string) (*pb.Mount, error) {
 	return mount, nil
 }
 
+// GetBinds parses a --bind string flags
+func GetBinds(clicontext *cli.Context) (result []*pb.Mount) {
+	for _, flag := range clicontext.StringSlice("bind") {
+		bind, err := parseBindFlag(flag)
+		if err != nil {
+			log.Fatalf("Failed to parse --bind flag: %s", err)
+		}
+		result = append(result, bind)
+	}
+	return result
+}
+
+// parseBindFlag parses a mount string in the form "/var:/var:rshared"
+func parseBindFlag(b string) (*pb.Mount, error) {
+	parts := strings.Split(b, ":")
+	if len(parts) < 2 {
+		return nil, fmt.Errorf("Cannot parse bind, missing ':': %s", b)
+	}
+	if len(parts) > 3 {
+		return nil, fmt.Errorf("Cannot parse bind, too many ':': %s", b)
+	}
+	src := parts[0]
+	dest := parts[1]
+	opts := []string{"rw", "rbind", "rprivate"}
+	if len(parts) == 3 {
+		opts = append(strings.Split(parts[2], ","), "rbind")
+	}
+	return &pb.Mount{
+		Type:        "bind",
+		Destination: dest,
+		Source:      src,
+		Options:     opts,
+	}, nil
+}
+
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)

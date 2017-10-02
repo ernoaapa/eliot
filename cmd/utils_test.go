@@ -71,3 +71,12 @@ func TestParseMountFlag(t *testing.T) {
 	assert.Equal(t, "/target", result.Destination)
 	assert.Equal(t, []string{"rbind", "rw"}, result.Options)
 }
+
+func TestParseBindFlag(t *testing.T) {
+	result, err := parseBindFlag("/source:/target:rshared")
+	assert.NoError(t, err)
+	assert.Equal(t, "bind", result.Type)
+	assert.Equal(t, "/source", result.Source)
+	assert.Equal(t, "/target", result.Destination)
+	assert.Equal(t, []string{"rshared", "rbind"}, result.Options)
+}

@@ -40,6 +40,10 @@ var runCommand = cli.Command{
 			Usage: "Attach a filesystem mount to the container",
 		},
 		cli.StringSliceFlag{
+			Name:  "bind",
+			Usage: "Bind a directory in host to the container. Format: /source:/target:options, E.g. /var:/var:rshared",
+		},
+		cli.StringSliceFlag{
 			Name:  "env",
 			Usage: "Set environment variables",
 		},
@@ -65,6 +69,7 @@ var runCommand = cli.Command{
 			tty    = clicontext.Bool("tty")
 			env    = clicontext.StringSlice("env")
 			mounts = cmd.GetMounts(clicontext)
+			binds  = cmd.GetBinds(clicontext)
 			args   = clicontext.Args()[1:]
 			stdin  = os.Stdin
 			stdout = os.Stdout
@@ -98,7 +103,7 @@ var runCommand = cli.Command{
 						Tty:    tty,
 						Args:   args,
 						Env:    env,
-						Mounts: mounts,
+						Mounts: append(mounts, binds...),
 					},
 				},
 			},
