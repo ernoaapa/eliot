@@ -6,6 +6,8 @@ init:
   - linuxkit/runc:a1b564248a0d0b118c11e61db9f84ecf41dd2d2a
   - linuxkit/containerd:417f83f7b8dc1fa36acf90effe44f99c7397480a
   - linuxkit/ca-certificates:e44b0a66df5a102c0e220f0066b0d904710dcb10
+  # For development, run in host as init process
+  - linuxkit/getty:bf6872ce0a9f3ab519b3e502cc41ba3958bda2a6
 onboot:
   - name: sysctl
     image: linuxkit/sysctl:154913b72c6f1f33eb408609fca9963628e8c051
@@ -13,10 +15,6 @@ onboot:
     image: linuxkit/rngd:558e86a36242bb74353bc9287b715ddb8567357e
     command: ["/sbin/rngd", "-1"]
 services:
-  - name: getty
-    image: linuxkit/getty:bf6872ce0a9f3ab519b3e502cc41ba3958bda2a6
-    env:
-     - INSECURE=true
   - name: rngd
     image: linuxkit/rngd:558e86a36242bb74353bc9287b715ddb8567357e
   - name: dhcpcd
@@ -31,6 +29,7 @@ services:
       - /usr/bin/runc:/usr/bin/runc
       - /usr/bin/ctr:/usr/bin/ctr # ctr for debugging
       - /containers:/containers # ctr requires access to be able to manage containers
+      - /var/lib/volumes:/volumes # The directory for pod volumes
       - /run/containerd:/run/containerd # need access to sockets
       - /var/log:/var/log # To be able to run 'ctr t attach' to view logs
       - /run/containerd/containerd.sock:/run/containerd/containerd.sock
@@ -46,13 +45,16 @@ services:
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
   - name: can-api
-    image: ernoaapa/can-api-amd64:b829d9d
+    image: ernoaapa/can-api-amd64:f9e96e7-dirty
     command: ["/can-api", "--debug", "--listen", "0.0.0.0:5000"]
     capabilities:
       - all
     net: host
+    runtime:
+      mkdir: ["/var/lib/volumes"]
     binds:
       - /containers:/containers
+      - /var/lib/volumes:/volumes
       - /run/containerd:/run/containerd
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
