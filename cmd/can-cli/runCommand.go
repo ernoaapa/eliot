@@ -116,6 +116,10 @@ var runCommand = cli.Command{
 			},
 		}
 
+		if rm {
+			defer client.DeletePod(pod)
+		}
+
 		result, err := client.CreatePod(pod)
 		if err != nil {
 			return err
@@ -125,10 +129,6 @@ var runCommand = cli.Command{
 			writer := printers.GetNewTabWriter(os.Stdout)
 			printer := cmd.GetPrinter(clicontext)
 			return printer.PrintPodDetails(result, writer)
-		}
-
-		if rm {
-			defer client.DeletePod(pod)
 		}
 
 		term := term.TTY{
