@@ -120,6 +120,10 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	}
 
 	if len(container.Mounts) > 0 {
+		err := ensureMountSourceDirExists(container.Mounts)
+		if err != nil {
+			return errors.Wrapf(err, "Error while ensuring mount source directories exist")
+		}
 		log.Debugf("Adding %d mounts to container", len(container.Mounts))
 		specOpts = append(specOpts, opts.WithMounts(container.Mounts))
 	}
