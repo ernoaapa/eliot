@@ -31,12 +31,13 @@ func MapPodToInternalModel(pod *pb.Pod) model.Pod {
 func MapContainerToInternalModel(containers []*pb.Container) (result []model.Container) {
 	for _, container := range containers {
 		result = append(result, model.Container{
-			Name:   container.Name,
-			Image:  container.Image,
-			Tty:    container.Tty,
-			Args:   container.Args,
-			Env:    container.Env,
-			Mounts: mapMountsToInternalModel(container.Mounts),
+			Name:       container.Name,
+			Image:      container.Image,
+			Tty:        container.Tty,
+			Args:       container.Args,
+			Env:        container.Env,
+			WorkingDir: container.WorkingDir,
+			Mounts:     mapMountsToInternalModel(container.Mounts),
 		})
 	}
 	return result

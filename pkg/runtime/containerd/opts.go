@@ -11,6 +11,14 @@ import (
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
+// WithCwd spets the container current working directory (cwd)
+func WithCwd(cwd string) containerd.SpecOpts {
+	return func(_ context.Context, _ *containerd.Client, _ *containers.Container, s *specs.Spec) error {
+		s.Process.Cwd = cwd
+		return nil
+	}
+}
+
 // WithEnv you can add or override process environment variables
 // overrides should be list of strings in format 'KEY=value'
 func WithEnv(overrides []string) containerd.SpecOpts {

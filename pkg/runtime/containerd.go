@@ -114,6 +114,10 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		specOpts = append(specOpts, containerd.WithTTY)
 	}
 
+	if container.WorkingDir != "" {
+		specOpts = append(specOpts, opts.WithCwd(container.WorkingDir))
+	}
+
 	if len(container.Env) > 0 {
 		log.Debugf("Adding %d environment variables", len(container.Env))
 		specOpts = append(specOpts, opts.WithEnv(container.Env))

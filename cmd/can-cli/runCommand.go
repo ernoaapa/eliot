@@ -59,21 +59,26 @@ var runCommand = cli.Command{
 			Name:  "stdin, i",
 			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached.",
 		},
+		cli.StringFlag{
+			Name:  "workdir, w",
+			Usage: "Working directory inside the container",
+		},
 	},
 	Action: func(clicontext *cli.Context) error {
 		var (
-			name   = clicontext.Args().First()
-			image  = clicontext.String("image")
-			detach = clicontext.Bool("detach")
-			rm     = clicontext.Bool("rm")
-			tty    = clicontext.Bool("tty")
-			env    = clicontext.StringSlice("env")
-			mounts = cmd.GetMounts(clicontext)
-			binds  = cmd.GetBinds(clicontext)
-			args   = []string{}
-			stdin  = os.Stdin
-			stdout = os.Stdout
-			stderr = os.Stderr
+			name    = clicontext.Args().First()
+			image   = clicontext.String("image")
+			detach  = clicontext.Bool("detach")
+			rm      = clicontext.Bool("rm")
+			tty     = clicontext.Bool("tty")
+			env     = clicontext.StringSlice("env")
+			workdir = clicontext.String("workdir")
+			mounts  = cmd.GetMounts(clicontext)
+			binds   = cmd.GetBinds(clicontext)
+			args    = []string{}
+			stdin   = os.Stdin
+			stdout  = os.Stdout
+			stderr  = os.Stderr
 		)
 
 		if clicontext.NArg() > 1 {
@@ -105,12 +110,13 @@ var runCommand = cli.Command{
 				HostNetwork: true,
 				Containers: []*pb.Container{
 					&pb.Container{
-						Name:   name,
-						Image:  image,
-						Tty:    tty,
-						Args:   args,
-						Env:    env,
-						Mounts: append(mounts, binds...),
+						Name:       name,
+						Image:      image,
+						Tty:        tty,
+						Args:       args,
+						Env:        env,
+						WorkingDir: workdir,
+						Mounts:     append(mounts, binds...),
 					},
 				},
 			},

@@ -62,9 +62,10 @@ message Container {
 	string name = 1;
 	string image = 2;
 	bool tty = 3;
-	repeated string args = 4;
-	repeated string env = 5;
-	repeated Mount mounts = 6;
+	string workingDir = 4;
+	repeated string args = 5;
+	repeated string env = 6;
+	repeated Mount mounts = 7;
 }
 
 message Mount {

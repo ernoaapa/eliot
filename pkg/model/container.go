@@ -2,12 +2,13 @@ package model
 
 // Container defines what image should be running
 type Container struct {
-	Name   string `validate:"required,gt=0,alphanumOrDash"`
-	Image  string `validate:"required,gt=0,imageRef"`
-	Tty    bool
-	Args   []string `validate:"dive,noSpaces"`
-	Env    []string `validate:"dive,envKeyValuePair"`
-	Mounts []Mount  `validate:"dive"`
+	Name       string `validate:"required,gt=0,alphanumOrDash"`
+	Image      string `validate:"required,gt=0,imageRef"`
+	Tty        bool
+	Args       []string `validate:"dive,noSpaces"`
+	Env        []string `validate:"dive,envKeyValuePair"`
+	WorkingDir string   `validate:"omitempty,gt=0"`
+	Mounts     []Mount  `validate:"dive"`
 }
 
 // Mount defines directory mount from host to the container
