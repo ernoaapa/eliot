@@ -98,9 +98,9 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		return connectionErr
 	}
 
-	image, pullErr := c.ensureImagePulled(pod.Metadata.Namespace, container.Image)
-	if pullErr != nil {
-		return pullErr
+	image, imageErr := client.GetImage(ctx, container.Image)
+	if imageErr != nil {
+		return imageErr
 	}
 
 	specOpts := []containerd.SpecOpts{
@@ -239,21 +239,22 @@ func (c *ContainerdClient) Signal(namespace, name string, signal syscall.Signal)
 	return task.Kill(ctx, signal, containerd.WithKillAll)
 }
 
-func (c *ContainerdClient) ensureImagePulled(namespace, ref string) (image containerd.Image, err error) {
+// PullImage ensures that given container image is pulled to the namespace
+func (c *ContainerdClient) PullImage(namespace, ref string) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
 	client, err := c.getConnection(namespace)
 	if err != nil {
-		return image, err
+		return err
 	}
 
-	image, err = client.Pull(ctx, ref, containerd.WithPullUnpack, containerd.WithSchema1Conversion)
+	_, err = client.Pull(ctx, ref, containerd.WithPullUnpack, containerd.WithSchema1Conversion)
 	if err != nil {
-		return image, errors.Wrapf(err, "Error while pulling image [%s]", ref)
+		return errors.Wrapf(err, "Error while pulling image [%s]", ref)
 	}
 
-	return image, nil
+	return nil
 }
 
 // GetNamespaces return all namespaces what cand manages

@@ -11,6 +11,7 @@ import (
 type Client interface {
 	GetAllContainers(namespace string) (containersByPods map[string][]model.Container, err error)
 	GetContainers(namespace, podName string) ([]model.Container, error)
+	PullImage(namespace, ref string) error
 	CreateContainer(pod model.Pod, container model.Container) error
 	StartContainer(namespace, name string, tty bool) error
 	StopContainer(namespace, name string) error

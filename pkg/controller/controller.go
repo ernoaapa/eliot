@@ -145,9 +145,11 @@ func (c *Controller) createMissingContainers(namespace string, pods podsManifest
 			}).Debugf("Missing containers in namespace %s", namespace)
 
 			for _, container := range create {
-				createErr := c.client.CreateContainer(pod, container)
-				if createErr != nil {
-					return errors.Wrapf(createErr, "Failed to create container %s %s", pod.Metadata.Name, container.Name)
+				if err := c.client.PullImage(pod.Metadata.Namespace, container.Image); err != nil {
+					return errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
+				}
+				if err := c.client.CreateContainer(pod, container); err != nil {
+					return errors.Wrapf(err, "Failed to create container %s %s", pod.Metadata.Name, container.Name)
 				}
 			}
 		} else {

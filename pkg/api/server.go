@@ -29,6 +29,9 @@ func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.
 	pod := mapping.MapPodToInternalModel(req.Pod)
 
 	for _, container := range pod.Spec.Containers {
+		if err := s.client.PullImage(pod.Metadata.Namespace, container.Image); err != nil {
+			return nil, errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
+		}
 		if err := s.client.CreateContainer(pod, container); err != nil {
 			return nil, errors.Wrapf(err, "Failed to create container [%s]", container.Name)
 		}

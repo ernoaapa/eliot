@@ -52,6 +52,11 @@ func (c *FakeClient) GetContainers(namespace, podName string) (result []model.Co
 	return result, err
 }
 
+// PullImage fake impl.
+func (c *FakeClient) PullImage(namespace, ref string) error {
+	return nil
+}
+
 // CreateContainer fake impl.
 func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) error {
 	c.createdCount++
