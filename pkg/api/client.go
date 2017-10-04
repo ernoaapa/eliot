@@ -144,6 +144,7 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 		}
 	}()
 
+	log.Printf("start stdin stream: %s", stdin == nil)
 	if stdin != nil {
 		go func() {
 			defer close(done)

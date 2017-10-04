@@ -211,7 +211,7 @@ func parseMountFlag(m string) (*pb.Mount, error) {
 // GetBinds parses a --bind string flags
 func GetBinds(clicontext *cli.Context) (result []*pb.Mount) {
 	for _, flag := range clicontext.StringSlice("bind") {
-		bind, err := parseBindFlag(flag)
+		bind, err := ParseBindFlag(flag)
 		if err != nil {
 			log.Fatalf("Failed to parse --bind flag: %s", err)
 		}
@@ -220,8 +220,8 @@ func GetBinds(clicontext *cli.Context) (result []*pb.Mount) {
 	return result
 }
 
-// parseBindFlag parses a mount string in the form "/var:/var:rshared"
-func parseBindFlag(b string) (*pb.Mount, error) {
+// ParseBindFlag parses a mount string in the form "/var:/var:rshared"
+func ParseBindFlag(b string) (*pb.Mount, error) {
 	parts := strings.Split(b, ":")
 	if len(parts) < 2 {
 		return nil, fmt.Errorf("Cannot parse bind, missing ':': %s", b)

@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/ernoaapa/can/cmd"
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/can/pkg/sync"
 	"github.com/ernoaapa/can/pkg/term"
 	"github.com/urfave/cli"
 )
@@ -59,6 +61,10 @@ var runCommand = cli.Command{
 			Name:  "stdin, i",
 			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached.",
 		},
+		cli.StringSliceFlag{
+			Name:  "sync",
+			Usage: "Directory to sync to the target container",
+		},
 		cli.StringFlag{
 			Name:  "workdir, w",
 			Usage: "Working directory inside the container",
@@ -66,19 +72,22 @@ var runCommand = cli.Command{
 	},
 	Action: func(clicontext *cli.Context) error {
 		var (
-			name    = clicontext.Args().First()
-			image   = clicontext.String("image")
-			detach  = clicontext.Bool("detach")
-			rm      = clicontext.Bool("rm")
-			tty     = clicontext.Bool("tty")
-			env     = clicontext.StringSlice("env")
-			workdir = clicontext.String("workdir")
-			mounts  = cmd.GetMounts(clicontext)
-			binds   = cmd.GetBinds(clicontext)
-			args    = []string{}
-			stdin   = os.Stdin
-			stdout  = os.Stdout
-			stderr  = os.Stderr
+			name     = clicontext.Args().First()
+			image    = clicontext.String("image")
+			detach   = clicontext.Bool("detach")
+			rm       = clicontext.Bool("rm")
+			tty      = clicontext.Bool("tty")
+			env      = clicontext.StringSlice("env")
+			workdir  = clicontext.String("workdir")
+			runSync  = clicontext.IsSet("sync")
+			syncDirs = clicontext.StringSlice("sync")
+			mounts   = cmd.GetMounts(clicontext)
+			binds    = cmd.GetBinds(clicontext)
+			args     = []string{}
+
+			stdin  = os.Stdin
+			stdout = os.Stdout
+			stderr = os.Stderr
 		)
 
 		if clicontext.NArg() > 1 {
@@ -101,6 +110,33 @@ var runCommand = cli.Command{
 		config := cmd.GetConfig(clicontext)
 		client := cmd.GetClient(clicontext)
 
+		containers := []*pb.Container{
+			&pb.Container{
+				Name:       name,
+				Image:      image,
+				Tty:        tty,
+				Args:       args,
+				Env:        env,
+				WorkingDir: workdir,
+				Mounts:     append(mounts, binds...),
+			},
+		}
+
+		if runSync {
+			workspaceMount, _ := cmd.ParseBindFlag("/tmp/workspace:/volume")
+
+			containers[0].Mounts = append(containers[0].Mounts, workspaceMount)
+			if containers[0].WorkingDir == "" {
+				containers[0].WorkingDir = "/volume"
+			}
+
+			containers = append(containers, &pb.Container{
+				Name:   fmt.Sprintf("rsync-%s", name),
+				Image:  cmd.ExpandToFQIN("stefda/rsync"),
+				Mounts: []*pb.Mount{workspaceMount},
+			})
+		}
+
 		pod := &pb.Pod{
 			Metadata: &pb.ResourceMetadata{
 				Name:      name,
@@ -108,17 +144,7 @@ var runCommand = cli.Command{
 			},
 			Spec: &pb.PodSpec{
 				HostNetwork: true,
-				Containers: []*pb.Container{
-					&pb.Container{
-						Name:       name,
-						Image:      image,
-						Tty:        tty,
-						Args:       args,
-						Env:        env,
-						WorkingDir: workdir,
-						Mounts:     append(mounts, binds...),
-					},
-				},
+				Containers:  containers,
 			},
 		}
 
@@ -137,6 +163,13 @@ var runCommand = cli.Command{
 			return printer.PrintPodDetails(result, writer)
 		}
 
+		if runSync {
+			done := make(chan struct{})
+			destination := fmt.Sprintf("rsync://%s:%d/volume", config.GetCurrentEndpoint().URL, 873)
+			go sync.Rsync(done, syncDirs, destination, 1*time.Second)
+			defer close(done)
+		}
+
 		term := term.TTY{
 			Out: stdout,
 		}
@@ -144,12 +177,10 @@ var runCommand = cli.Command{
 		if clicontext.Bool("stdin") {
 			term.In = stdin
 			term.Raw = true
-		} else {
-			stdin = nil
 		}
 
 		return term.Safe(func() error {
-			return client.Attach(result.Spec.Containers[0].Name, stdin, stdout, stderr)
+			return client.Attach(result.Spec.Containers[0].Name, term.In, term.Out, stderr)
 		})
 	},
 }

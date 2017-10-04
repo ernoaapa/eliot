@@ -73,7 +73,7 @@ func TestParseMountFlag(t *testing.T) {
 }
 
 func TestParseBindFlag(t *testing.T) {
-	result, err := parseBindFlag("/source:/target:rshared")
+	result, err := ParseBindFlag("/source:/target:rshared")
 	assert.NoError(t, err)
 	assert.Equal(t, "bind", result.Type)
 	assert.Equal(t, "/source", result.Source)
