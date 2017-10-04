@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"syscall"
 	"testing"
 
 	"github.com/ernoaapa/can/pkg/model"
@@ -18,7 +19,7 @@ type FakeClient struct {
 	stoppedCount int
 }
 
-// GetContainers fake impl.
+// GetAllContainers fake impl.
 func (c *FakeClient) GetAllContainers(namespace string) (map[string][]model.Container, error) {
 	for podNamespace, podContainers := range c.containers {
 		if podNamespace == namespace {
@@ -97,6 +98,11 @@ func (c *FakeClient) GetContainerTaskStatus(namespace, name string) string {
 
 // Attach fake impl.
 func (c *FakeClient) Attach(namespace, podName string, io runtime.AttachIO) error {
+	return nil
+}
+
+// Signal fake impl.
+func (c *FakeClient) Signal(namespace, name string, signal syscall.Signal) error {
 	return nil
 }
 

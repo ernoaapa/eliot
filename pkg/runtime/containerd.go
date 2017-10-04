@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"syscall"
 	"time"
 
 	"github.com/containerd/containerd"
@@ -212,6 +213,30 @@ func (c *ContainerdClient) StopContainer(namespace, name string) error {
 		return errors.Wrapf(err, "Failed to delete container [%s]", container.ID())
 	}
 	return nil
+}
+
+// Signal will send a syscall.Signal to the container task process
+func (c *ContainerdClient) Signal(namespace, name string, signal syscall.Signal) error {
+	ctx, cancel := c.getContext()
+	defer cancel()
+
+	client, connectionErr := c.getConnection(namespace)
+	if connectionErr != nil {
+		return connectionErr
+	}
+
+	container, err := client.LoadContainer(ctx, name)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to load container [%s], cannot send signal", name)
+	}
+
+	task, err := container.Task(ctx, nil)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to get task in container [%s], cannot send signal", name)
+	}
+
+	log.Debugf("Send signal [%s] to container all tasks", signal)
+	return task.Kill(ctx, signal, containerd.WithKillAll)
 }
 
 func (c *ContainerdClient) ensureImagePulled(namespace, ref string) (image containerd.Image, err error) {

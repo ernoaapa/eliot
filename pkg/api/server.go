@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net"
+	"syscall"
 
 	"golang.org/x/net/context"
 
@@ -77,7 +78,7 @@ func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.Lis
 	}, nil
 }
 
-// Attach connects to process in container and and streams stdout and stderr outputs to client
+// Attach connects to process in container and streams stdout and stderr outputs to client
 func (s *Server) Attach(server pb.Pods_AttachServer) error {
 	md, ok := metadata.FromIncomingContext(server.Context())
 	if !ok {
@@ -109,6 +110,15 @@ func (s *Server) Attach(server pb.Pods_AttachServer) error {
 
 	log.Printf("client.Attach ended with error: %s", err)
 	return err
+}
+
+// Signal connects to process in container and send signal to the process
+func (s *Server) Signal(cxt context.Context, req *pb.SignalRequest) (*pb.SignalResponse, error) {
+	err := s.client.Signal(req.Namespace, req.ContainerID, syscall.Signal(req.Signal))
+	if err != nil {
+		return nil, err
+	}
+	return &pb.SignalResponse{}, nil
 }
 
 func getMetadataValue(md metadata.MD, key string) string {

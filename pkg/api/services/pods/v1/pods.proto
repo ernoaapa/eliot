@@ -9,6 +9,7 @@ service Pods {
 	rpc Delete(DeletePodRequest) returns (DeletePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
 	rpc Attach(stream StdinStreamRequest) returns (stream StdoutStreamResponse);
+	rpc Signal(SignalRequest) returns (SignalResponse);
 }
 
 message CreatePodRequest {
@@ -46,6 +47,14 @@ message StdoutStreamResponse {
 	// Is this stderr(=true) or stdout(=false)
 	bool stderr = 2;
 }
+
+message SignalRequest {
+	string namespace = 1;
+	string containerID = 2;
+	int32 signal = 3;
+}
+
+message SignalResponse {}
 
 message Pod {
 	ResourceMetadata metadata = 1;

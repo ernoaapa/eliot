@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/ernoaapa/can/cmd"
@@ -163,6 +165,8 @@ var runCommand = cli.Command{
 			return printer.PrintPodDetails(result, writer)
 		}
 
+		attachContainerID := result.Spec.Containers[0].Name
+
 		if runSync {
 			done := make(chan struct{})
 			destination := fmt.Sprintf("rsync://%s:%d/volume", config.GetCurrentEndpoint().URL, 873)
@@ -177,10 +181,20 @@ var runCommand = cli.Command{
 		if clicontext.Bool("stdin") {
 			term.In = stdin
 			term.Raw = true
+		} else {
+			sigc := cmd.ForwardAllSignals(func(signal syscall.Signal) error {
+				return client.Signal(attachContainerID, signal)
+			})
+			defer stopCatch(sigc)
 		}
 
 		return term.Safe(func() error {
-			return client.Attach(result.Spec.Containers[0].Name, term.In, term.Out, stderr)
+			return client.Attach(attachContainerID, term.In, term.Out, stderr)
 		})
 	},
+}
+
+func stopCatch(sigc chan os.Signal) {
+	signal.Stop(sigc)
+	close(sigc)
 }

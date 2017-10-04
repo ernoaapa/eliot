@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"io"
+	"syscall"
 
 	"github.com/ernoaapa/can/pkg/model"
 )
@@ -17,6 +18,7 @@ type Client interface {
 	IsContainerRunning(namespace, name string) (bool, error)
 	GetContainerTaskStatus(namespace, name string) string
 	Attach(namespace, podName string, attach AttachIO) error
+	Signal(namespace, name string, signal syscall.Signal) error
 }
 
 // AttachIO provides way to attach stdin,stdout and stderr to container

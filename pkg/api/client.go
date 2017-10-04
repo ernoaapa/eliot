@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"syscall"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -17,6 +18,7 @@ import (
 type Client struct {
 	namespace  string
 	serverAddr string
+	ctx        context.Context
 }
 
 // NewClient creates new RPC server client
@@ -24,6 +26,7 @@ func NewClient(namespace, serverAddr string) *Client {
 	return &Client{
 		namespace,
 		serverAddr,
+		context.Background(),
 	}
 }
 
@@ -36,7 +39,7 @@ func (c *Client) GetPods() ([]*pb.Pod, error) {
 	defer conn.Close()
 
 	client := pb.NewPodsClient(conn)
-	resp, err := client.List(context.Background(), &pb.ListPodsRequest{
+	resp, err := client.List(c.ctx, &pb.ListPodsRequest{
 		Namespace: c.namespace,
 	})
 	if err != nil {
@@ -70,7 +73,7 @@ func (c *Client) CreatePod(pod *pb.Pod) (*pb.Pod, error) {
 	defer conn.Close()
 
 	client := pb.NewPodsClient(conn)
-	resp, err := client.Create(context.Background(), &pb.CreatePodRequest{
+	resp, err := client.Create(c.ctx, &pb.CreatePodRequest{
 		Pod: pod,
 	})
 	if err != nil {
@@ -90,7 +93,7 @@ func (c *Client) DeletePod(pod *pb.Pod) (*pb.Pod, error) {
 
 	client := pb.NewPodsClient(conn)
 
-	resp, err := client.Delete(context.Background(), &pb.DeletePodRequest{
+	resp, err := client.Delete(c.ctx, &pb.DeletePodRequest{
 		Namespace: pod.Metadata.Namespace,
 		Name:      pod.Metadata.Name,
 	})
@@ -104,7 +107,7 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 		"namespace", c.namespace,
 		"container", containerID,
 	)
-	ctx := metadata.NewOutgoingContext(context.Background(), md)
+	ctx := metadata.NewOutgoingContext(c.ctx, md)
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return err
@@ -144,7 +147,6 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 		}
 	}()
 
-	log.Printf("start stdin stream: %s", stdin == nil)
 	if stdin != nil {
 		go func() {
 			defer close(done)
@@ -173,5 +175,24 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 	}
 
 	<-done
+	return err
+}
+
+// Signal sends kill signal to container process
+func (c *Client) Signal(containerID string, signal syscall.Signal) (err error) {
+	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	client := pb.NewPodsClient(conn)
+
+	_, err = client.Signal(c.ctx, &pb.SignalRequest{
+		Namespace:   c.namespace,
+		ContainerID: containerID,
+		Signal:      int32(signal),
+	})
+
 	return err
 }

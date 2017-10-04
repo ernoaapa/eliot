@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"os/signal"
 	"os/user"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/ernoaapa/can/pkg/printers"
 
@@ -300,4 +302,24 @@ func ExpandToFQIN(source string) string {
 	}
 
 	return fmt.Sprintf("%s/%s/%s:%s", registry, username, image, tag)
+}
+
+// ForwardAllSignals will listen all kill signals and pass it to the handler
+func ForwardAllSignals(handler func(syscall.Signal) error) chan os.Signal {
+	sigc := make(chan os.Signal, 128)
+	signal.Notify(sigc)
+	go func() {
+		for s := range sigc {
+			signal := s.(syscall.Signal)
+			// Doesn't make sense to forward "child process terminates" because it's about this CLI child process
+			if signal == syscall.SIGCHLD {
+				continue
+			}
+
+			if err := handler(signal); err != nil {
+				log.WithError(err).Errorf("forward signal %s", s)
+			}
+		}
+	}()
+	return sigc
 }
