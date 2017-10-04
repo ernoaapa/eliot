@@ -83,6 +83,26 @@ func (c *Client) CreatePod(pod *pb.Pod) (*pb.Pod, error) {
 	return resp.GetPod(), nil
 }
 
+// StartPod creates new pod to the target server
+func (c *Client) StartPod(name string) (*pb.Pod, error) {
+	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pb.NewPodsClient(conn)
+	resp, err := client.Start(c.ctx, &pb.StartPodRequest{
+		Namespace: c.namespace,
+		Name:      name,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetPod(), nil
+}
+
 // DeletePod creates new pod to the target server
 func (c *Client) DeletePod(pod *pb.Pod) (*pb.Pod, error) {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())

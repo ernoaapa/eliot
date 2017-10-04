@@ -1,8 +1,11 @@
 package mapping
 
 import (
+	"log"
+
 	"github.com/containerd/containerd"
 	"github.com/ernoaapa/can/pkg/model"
+	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
 // MapModelByPodNamesToInternalModel builds from container label information pod data structure
@@ -35,8 +38,14 @@ func MapContainersToInternalModel(containers []containerd.Container) (result []m
 
 // MapContainerToInternalModel maps containerd model to internal model
 func MapContainerToInternalModel(container containerd.Container) model.Container {
+	spec, err := container.Spec()
+	if err != nil {
+		log.Fatalf("Cannot read container spec: %s", err)
+		spec = &specs.Spec{}
+	}
 	return model.Container{
 		Name:  container.ID(),
 		Image: container.Info().Image,
+		Tty:   spec.Process.Terminal,
 	}
 }

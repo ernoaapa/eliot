@@ -154,7 +154,11 @@ var runCommand = cli.Command{
 			defer client.DeletePod(pod)
 		}
 
-		result, err := client.CreatePod(pod)
+		if _, err := client.CreatePod(pod); err != nil {
+			return err
+		}
+
+		result, err := client.StartPod(name)
 		if err != nil {
 			return err
 		}

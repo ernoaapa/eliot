@@ -30,13 +30,9 @@ func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.
 
 	for _, container := range pod.Spec.Containers {
 		if err := s.client.CreateContainer(pod, container); err != nil {
-			return nil, errors.Wrap(err, "Failed to create container")
+			return nil, errors.Wrapf(err, "Failed to create container [%s]", container.Name)
 		}
-		log.Debugf("Container [%s] created, will start it", container.Name)
-		if err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, container.Tty); err != nil {
-			return nil, errors.Wrap(err, "Failed to start container")
-		}
-		log.Debugf("Container [%s] started", container.Name)
+		log.Debugf("Container [%s] created", container.Name)
 	}
 
 	containers, err := s.client.GetContainers(pod.Metadata.Namespace, pod.Metadata.Name)
@@ -46,6 +42,26 @@ func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.
 
 	return &pb.CreatePodResponse{
 		Pod: mapping.MapPodToAPIModel(pod.Metadata.Namespace, pod.Metadata.Name, containers),
+	}, nil
+}
+
+// Start is 'pods' service Start implementation
+func (s *Server) Start(context context.Context, req *pb.StartPodRequest) (*pb.StartPodResponse, error) {
+	containers, err := s.client.GetContainers(req.Namespace, req.Name)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to find containers to start for pod [%s] in namespace [%s]", req.Name, req.Namespace)
+	}
+
+	for _, container := range containers {
+		log.Debugf("Container [%s] created, will start it", container.Name)
+		if err := s.client.StartContainer(req.Namespace, container.Name, container.Tty); err != nil {
+			return nil, errors.Wrapf(err, "Failed to start container [%s]", container.Name)
+		}
+		log.Debugf("Container [%s] started", container.Name)
+	}
+
+	return &pb.StartPodResponse{
+		Pod: mapping.MapPodToAPIModel(req.Namespace, req.Name, containers),
 	}, nil
 }
 

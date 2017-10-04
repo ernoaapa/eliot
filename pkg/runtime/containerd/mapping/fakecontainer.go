@@ -6,9 +6,9 @@ import (
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/containers"
 	"github.com/containerd/containerd/errdefs"
+	prototypes "github.com/gogo/protobuf/types"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
-	prototypes "github.com/gogo/protobuf/types"
 )
 
 // FakeContainer is fake representation of model.Container
@@ -42,7 +42,9 @@ func (c *FakeContainer) NewTask(context.Context, containerd.IOCreation, ...conta
 
 // Spec fake impl.
 func (c *FakeContainer) Spec() (*specs.Spec, error) {
-	return nil, nil
+	return &specs.Spec{
+		Process: &specs.Process{},
+	}, nil
 }
 
 // Task fake impl.
