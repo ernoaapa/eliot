@@ -99,7 +99,7 @@ func (s *Server) Attach(server pb.Pods_AttachServer) error {
 	}
 
 	log.Debugf("Get logs for container [%s] in namespace [%s]", containerID, namespace)
-	err := s.client.Attach(
+	return s.client.Attach(
 		namespace, containerID,
 		runtime.AttachIO{
 			Stdin:  stream.NewReader(server),
@@ -107,9 +107,6 @@ func (s *Server) Attach(server pb.Pods_AttachServer) error {
 			Stderr: stream.NewWriter(server, true),
 		},
 	)
-
-	log.Printf("client.Attach ended with error: %s", err)
-	return err
 }
 
 // Signal connects to process in container and send signal to the process
