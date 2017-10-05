@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/progress"
 	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/ernoaapa/can/pkg/utils"
 	"github.com/pkg/errors"
@@ -145,7 +146,7 @@ func (c *Controller) createMissingContainers(namespace string, pods podsManifest
 			}).Debugf("Missing containers in namespace %s", namespace)
 
 			for _, container := range create {
-				if err := c.client.PullImage(pod.Metadata.Namespace, container.Image); err != nil {
+				if err := c.client.PullImage(pod.Metadata.Namespace, container.Image, &progress.ImageFetch{}); err != nil {
 					return errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
 				}
 				if err := c.client.CreateContainer(pod, container); err != nil {

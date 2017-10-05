@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net"
 	"syscall"
+	"time"
 
 	"golang.org/x/net/context"
 
 	"github.com/ernoaapa/can/pkg/api/mapping"
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/api/stream"
+	"github.com/ernoaapa/can/pkg/progress"
 	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -25,27 +27,42 @@ type Server struct {
 }
 
 // Create is 'pods' service Create implementation
-func (s *Server) Create(context context.Context, req *pb.CreatePodRequest) (*pb.CreatePodResponse, error) {
+func (s *Server) Create(req *pb.CreatePodRequest, server pb.Pods_CreateServer) error {
 	pod := mapping.MapPodToInternalModel(req.Pod)
+	var (
+		done       = make(chan struct{})
+		progresses = []*progress.ImageFetch{}
+	)
+	defer close(done)
+
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case <-time.After(100 * time.Millisecond):
+				images := mapping.MapImageFetchProgressToAPIModel(progresses)
+
+				if err := server.Send(&pb.CreatePodStreamResponse{Images: images}); err != nil {
+					log.Warnf("Error while sending create pod status back to client: %s", err)
+				}
+			}
+		}
+	}()
 
 	for _, container := range pod.Spec.Containers {
-		if err := s.client.PullImage(pod.Metadata.Namespace, container.Image); err != nil {
-			return nil, errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
+		progress := progress.NewImageFetch(container.Name, container.Image)
+		progresses = append(progresses, progress)
+		if err := s.client.PullImage(pod.Metadata.Namespace, container.Image, progress); err != nil {
+			return errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
 		}
 		if err := s.client.CreateContainer(pod, container); err != nil {
-			return nil, errors.Wrapf(err, "Failed to create container [%s]", container.Name)
+			return errors.Wrapf(err, "Failed to create container [%s]", container.Name)
 		}
 		log.Debugf("Container [%s] created", container.Name)
 	}
 
-	containers, err := s.client.GetContainers(pod.Metadata.Namespace, pod.Metadata.Name)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to fetch created containers info")
-	}
-
-	return &pb.CreatePodResponse{
-		Pod: mapping.MapPodToAPIModel(pod.Metadata.Namespace, pod.Metadata.Name, containers),
-	}, nil
+	return nil
 }
 
 // Start is 'pods' service Start implementation

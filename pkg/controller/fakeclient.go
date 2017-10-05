@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/progress"
 	"github.com/ernoaapa/can/pkg/runtime"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,7 +54,7 @@ func (c *FakeClient) GetContainers(namespace, podName string) (result []model.Co
 }
 
 // PullImage fake impl.
-func (c *FakeClient) PullImage(namespace, ref string) error {
+func (c *FakeClient) PullImage(namespace, ref string, progress *progress.ImageFetch) error {
 	return nil
 }
 

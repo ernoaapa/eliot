@@ -5,7 +5,7 @@ option go_package = "pkg/api/services/pods/v1;pods";
 
 // Pods service provides visibility to the pods.
 service Pods {
-	rpc Create(CreatePodRequest) returns (CreatePodResponse);
+	rpc Create(CreatePodRequest) returns (stream CreatePodStreamResponse);
 	rpc Start(StartPodRequest) returns (StartPodResponse);
 	rpc Delete(DeletePodRequest) returns (DeletePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
@@ -18,8 +18,23 @@ message CreatePodRequest {
 	bool tty = 2;
 }
 
-message CreatePodResponse {
-	Pod pod = 1;
+message CreatePodStreamResponse {
+	repeated ImageFetch images = 1;
+}
+
+message ImageFetch {
+	string containerID = 1;
+	string image = 2;
+	bool resolved = 3;
+	repeated ImageLayerStatus layers = 4;
+}
+
+message ImageLayerStatus {
+	string ref = 1;
+	string digest = 2;
+	string status = 3;
+	int64 offset = 4;
+	int64 total = 5;
 }
 
 message StartPodRequest {

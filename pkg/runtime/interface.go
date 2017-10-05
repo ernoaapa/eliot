@@ -5,13 +5,14 @@ import (
 	"syscall"
 
 	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/progress"
 )
 
 // Client is interface for underlying container implementation
 type Client interface {
 	GetAllContainers(namespace string) (containersByPods map[string][]model.Container, err error)
 	GetContainers(namespace, podName string) ([]model.Container, error)
-	PullImage(namespace, ref string) error
+	PullImage(namespace, ref string, status *progress.ImageFetch) error
 	CreateContainer(pod model.Pod, container model.Container) error
 	StartContainer(namespace, name string, tty bool) error
 	StopContainer(namespace, name string) error

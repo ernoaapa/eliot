@@ -11,7 +11,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
+	"github.com/ernoaapa/can/pkg/api/mapping"
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/progress"
 )
 
 // Client connects to RPC server
@@ -65,22 +67,37 @@ func (c *Client) GetPod(podName string) (*pb.Pod, error) {
 }
 
 // CreatePod creates new pod to the target server
-func (c *Client) CreatePod(pod *pb.Pod) (*pb.Pod, error) {
+func (c *Client) CreatePod(pod *pb.Pod) error {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer conn.Close()
 
 	client := pb.NewPodsClient(conn)
-	resp, err := client.Create(c.ctx, &pb.CreatePodRequest{
+	stream, err := client.Create(c.ctx, &pb.CreatePodRequest{
 		Pod: pod,
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return resp.GetPod(), nil
+	progress := progress.NewRenderer()
+	defer progress.Stop()
+
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			err = stream.CloseSend()
+			progress.Done()
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		progress.Update(mapping.MapAPIModelToImageFetchProgress(resp.Images))
+	}
 }
 
 // StartPod creates new pod to the target server

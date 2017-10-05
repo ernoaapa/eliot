@@ -10,10 +10,14 @@ import (
 	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
 	tasks "github.com/containerd/containerd/api/services/tasks/v1"
 	"github.com/containerd/containerd/errdefs"
+	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/plugin"
+	"github.com/containerd/containerd/remotes"
 	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/progress"
 	opts "github.com/ernoaapa/can/pkg/runtime/containerd"
 	"github.com/ernoaapa/can/pkg/runtime/containerd/mapping"
+	imagespecs "github.com/opencontainers/image-spec/specs-go/v1"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 
@@ -240,7 +244,7 @@ func (c *ContainerdClient) Signal(namespace, name string, signal syscall.Signal)
 }
 
 // PullImage ensures that given container image is pulled to the namespace
-func (c *ContainerdClient) PullImage(namespace, ref string) error {
+func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.ImageFetch) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -249,9 +253,26 @@ func (c *ContainerdClient) PullImage(namespace, ref string) error {
 		return err
 	}
 
-	_, err = client.Pull(ctx, ref, containerd.WithPullUnpack, containerd.WithSchema1Conversion)
+	done := make(chan struct{})
+	defer close(done)
+	go opts.UpdateFetchProgress(done, client, progress)
+
+	handler := func(ctx context.Context, desc imagespecs.Descriptor) ([]imagespecs.Descriptor, error) {
+		if desc.MediaType != images.MediaTypeDockerSchema1Manifest {
+			progress.Add(remotes.MakeRefKey(ctx, desc), desc.Digest.String())
+		}
+		return nil, nil
+	}
+
+	_, err = client.Pull(
+		ctx,
+		ref,
+		containerd.WithPullUnpack,
+		containerd.WithSchema1Conversion,
+		containerd.WithImageHandler(images.HandlerFunc(handler)),
+	)
 	if err != nil {
-		return errors.Wrapf(err, "Error while pulling image [%s]", ref)
+		return errors.Wrapf(err, "Error while pulling image [%s] to namespace [%s]", ref, namespace)
 	}
 
 	return nil
