@@ -1,9 +1,23 @@
 package model
 
+import (
+	"fmt"
+	"net"
+)
+
 // DeviceInfo contains information about current device
 type DeviceInfo struct {
 	// Labels for the device, provided through cli
 	Labels map[string]string
+
+	// Device hostname
+	Hostname string `validate:"required,gt=0"`
+
+	// IPs
+	Addresses []net.IP
+
+	// Port
+	GrpcPort int
 
 	// The machine id is an ID identifying a specific Linux/Unix installation.
 	// It does not change if hardware is replaced.
@@ -31,9 +45,6 @@ type DeviceInfo struct {
 	// Device platform e.g. x86_64
 	Platform string
 
-	// Device hostname
-	Hostname string `validate:"required,gt=0"`
-
 	// Number of CPUs
 	CPUs int
 }
@@ -46,4 +57,12 @@ type DeviceState struct {
 // PodState represents information about pod current state
 type PodState struct {
 	ID string `validate:"required,gt=0"`
+}
+
+// GetPrimaryEndpoint return primary GRPC endpoint address
+func (d DeviceInfo) GetPrimaryEndpoint() string {
+	if len(d.Addresses) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%s:%d", d.Addresses[0], d.GrpcPort)
 }

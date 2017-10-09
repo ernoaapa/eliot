@@ -33,20 +33,7 @@ func main() {
 			Value: "localhost:5000",
 		},
 	}, cmd.GlobalFlags...)
-
-	app.Before = func(context *cli.Context) error {
-		if context.GlobalBool("debug") {
-			log.SetLevel(log.DebugLevel)
-		}
-		return nil
-	}
-
-	app.Before = func(context *cli.Context) error {
-		if context.GlobalBool("debug") {
-			log.SetLevel(log.DebugLevel)
-		}
-		return nil
-	}
+	app.Before = cmd.GlobalBefore
 
 	app.Action = func(clicontext *cli.Context) error {
 		client := cmd.GetRuntimeClient(clicontext)

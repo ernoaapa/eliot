@@ -8,6 +8,7 @@ import (
 
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
+	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers/humanreadable"
 )
 
@@ -38,6 +39,19 @@ func (p *HumanReadablePrinter) PrintPodsTable(pods []*pb.Pod, writer io.Writer) 
 	// TODO: For some reason, don't output without printing something to the writer
 	// Find out how to flush the writer
 	fmt.Fprintln(writer, "\n")
+	return nil
+}
+
+// PrintDevicesTable writes stream of Devices in human readable table format to the writer
+func (p *HumanReadablePrinter) PrintDevicesTable(devices <-chan model.DeviceInfo, writer io.Writer) error {
+	fmt.Fprintln(writer, "HOSTNAME\tENDPOINT")
+
+	go func(devices <-chan model.DeviceInfo) {
+		for device := range devices {
+			fmt.Fprintf(writer, "%s\t%s", device.Hostname, device.GetPrimaryEndpoint())
+			fmt.Fprintln(writer, "\n")
+		}
+	}(devices)
 	return nil
 }
 
