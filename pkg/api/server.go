@@ -39,7 +39,13 @@ func (s *Server) Create(req *pb.CreatePodRequest, server pb.Pods_CreateServer) e
 		for {
 			select {
 			case <-done:
-				return
+				// Send last update
+				images := mapping.MapImageFetchProgressToAPIModel(progresses)
+
+				if err := server.Send(&pb.CreatePodStreamResponse{Images: images}); err != nil {
+					log.Warnf("Error while sending create pod status back to client: %s", err)
+				}
+				return // End update loop
 			case <-time.After(100 * time.Millisecond):
 				images := mapping.MapImageFetchProgressToAPIModel(progresses)
 

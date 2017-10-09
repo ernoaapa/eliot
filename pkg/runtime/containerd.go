@@ -275,6 +275,8 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 		return errors.Wrapf(err, "Error while pulling image [%s] to namespace [%s]", ref, namespace)
 	}
 
+	progress.AllDone()
+
 	return nil
 }
 

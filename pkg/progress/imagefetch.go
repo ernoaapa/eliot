@@ -20,6 +20,33 @@ type Status struct {
 	Total  int64
 }
 
+// NewStatus creates new status in waiting state
+func NewStatus(ref, digest string) *Status {
+	return &Status{
+		Ref:    ref,
+		Digest: digest,
+		Status: "waiting",
+	}
+}
+
+// Waiting marks status to be in waiting state
+func (s *Status) Waiting() {
+	s.Status = "waiting"
+}
+
+// Downloading updates Status to downloading
+func (s *Status) Downloading(offset, total int64) {
+	s.Status = "downloading"
+	s.Offset = offset
+	s.Total = total
+}
+
+// Done marks Status to done state
+func (s *Status) Done() {
+	s.Offset = s.Total
+	s.Status = "done"
+}
+
 // NewImageFetch creates new ImageFetch for given name
 func NewImageFetch(containerID, image string) *ImageFetch {
 	return CreateImageFetch(containerID, image, false, map[string]*Status{})
@@ -46,11 +73,7 @@ func (s *ImageFetch) Add(ref, digest string) {
 		return // Already added
 	}
 
-	s.layers[ref] = &Status{
-		Ref:    ref,
-		Digest: digest,
-		Status: "waiting",
-	}
+	s.layers[ref] = NewStatus(ref, digest)
 }
 
 // SetToWaiting updates layer ref to the waiting state
@@ -62,7 +85,7 @@ func (s *ImageFetch) SetToWaiting(ref string) {
 		return // not added yet
 	}
 
-	s.layers[ref].Status = "waiting"
+	s.layers[ref].Waiting()
 }
 
 // SetToDownloading updates layer ref to the waiting state
@@ -74,9 +97,7 @@ func (s *ImageFetch) SetToDownloading(ref string, offset, total int64) {
 		return // not added yet
 	}
 
-	s.layers[ref].Status = "downloading"
-	s.layers[ref].Offset = offset
-	s.layers[ref].Total = total
+	s.layers[ref].Downloading(offset, total)
 }
 
 // SetToDone updates layer ref to the done state
@@ -88,7 +109,17 @@ func (s *ImageFetch) SetToDone(ref string) {
 		return // not added yet
 	}
 
-	s.layers[ref].Status = "done"
+	s.layers[ref].Done()
+}
+
+// AllDone marks all layers downloaded
+func (s *ImageFetch) AllDone() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for _, layer := range s.layers {
+		layer.Done()
+	}
 }
 
 // GetLayers return list of layers
