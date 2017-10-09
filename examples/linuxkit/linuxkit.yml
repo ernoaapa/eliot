@@ -34,6 +34,13 @@ services:
       - /var/log:/var/log # To be able to run 'ctr t attach' to view logs
       - /run/containerd/containerd.sock:/run/containerd/containerd.sock
       - /tmp:/tmp
+
+  - name: discovery
+    image: ernoaapa/discovery-amd64:a1857d2
+    command: ["/discovery", "--debug", "--expose", "5000"]
+    net: host
+    binds:
+      - /etc/machine-id:/etc/machine-id
   - name: cand
     image: ernoaapa/cand-amd64:b829d9d
     command: ["/cand", "--debug", "--labels", "camera=true,name=first", "--manifest", "http://can.ngrok.io/api/devices/first/manifest", "--report", "http://can.ngrok.io/api/devices/first/pods"]
@@ -45,11 +52,12 @@ services:
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
   - name: can-api
-    image: ernoaapa/can-api-amd64:f9e96e7-dirty
+    image: ernoaapa/can-api-amd64:a1857d2
     command: ["/can-api", "--debug", "--listen", "0.0.0.0:5000"]
     capabilities:
       - all
     net: host
+    pid: host
     runtime:
       mkdir: ["/var/lib/volumes"]
     binds:
