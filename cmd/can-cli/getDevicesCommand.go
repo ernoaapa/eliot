@@ -26,6 +26,6 @@ var getDevicesCommand = cli.Command{
 		printer := cmd.GetPrinter(clicontext)
 		printer.PrintDevicesTable(devices, writer)
 
-		return discovery.Devices(devices, 4*time.Second)
+		return discovery.DevicesAsync(devices, 5*time.Second)
 	},
 }

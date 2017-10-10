@@ -9,8 +9,27 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Devices search for devices in network for given timeout
-func Devices(results chan<- model.DeviceInfo, timeout time.Duration) error {
+// Devices return list of DeviceInfos synchronously with given timeout
+func Devices(timeout time.Duration) (devices []model.DeviceInfo, err error) {
+	results := make(chan model.DeviceInfo)
+	defer close(results)
+
+	go func() {
+		for device := range results {
+			devices = append(devices, device)
+		}
+	}()
+
+	err = DevicesAsync(results, timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	return devices, nil
+}
+
+// DevicesAsync search for devices in network asynchronously for given timeout
+func DevicesAsync(results chan<- model.DeviceInfo, timeout time.Duration) error {
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to initialize new zeroconf resolver")
@@ -19,11 +38,7 @@ func Devices(results chan<- model.DeviceInfo, timeout time.Duration) error {
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(entries <-chan *zeroconf.ServiceEntry) {
 		for entry := range entries {
-			results <- model.DeviceInfo{
-				Hostname:  entry.HostName,
-				Addresses: append(entry.AddrIPv4, entry.AddrIPv6...),
-				GrpcPort:  entry.Port,
-			}
+			results <- MapToInternalModel(entry)
 		}
 	}(entries)
 
