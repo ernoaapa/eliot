@@ -35,7 +35,8 @@ var describeCommand = cli.Command{
 	can-cli describe pods
 `,
 			Action: func(clicontext *cli.Context) error {
-				client := cmd.GetClient(clicontext)
+				config := cmd.GetConfigProvider(clicontext)
+				client := cmd.GetClient(config)
 				podName := clicontext.Args().First()
 
 				pods, err := client.GetPods()

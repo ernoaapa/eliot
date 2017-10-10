@@ -39,10 +39,6 @@ var (
 			Name:  "debug",
 			Usage: "enable debug output in logs",
 		},
-		cli.StringFlag{
-			Name:  "endpoint",
-			Usage: "Use specific device endpoint. E.g. '192.168.1.101:5000'",
-		},
 	}
 )
 
@@ -55,56 +51,56 @@ func GlobalBefore(context *cli.Context) error {
 }
 
 // GetClient creates new cloud API client
-func GetClient(clicontext *cli.Context) *api.Client {
-	config := GetConfig(clicontext)
-	namespace := config.GetCurrentContext().Namespace
-	if clicontext.GlobalIsSet("namespace") {
-		namespace = clicontext.GlobalString("namespace")
-	}
+func GetClient(config *config.Provider) *api.Client {
 	return api.NewClient(
-		namespace,
-		resolveTargetEndpoint(clicontext),
+		config.GetNamespace(),
+		config.GetEndpoint(),
 	)
 }
 
-func resolveTargetEndpoint(clicontext *cli.Context) string {
-	if clicontext.GlobalIsSet("endpoint") && clicontext.GlobalString("endpoint") != "" {
-		return clicontext.GlobalString("endpoint")
-	}
-
-	config := GetConfig(clicontext)
-	endpoint := config.GetCurrentEndpoint()
-	if endpoint.URL != "" {
-		return endpoint.URL
-	}
-
-	log.Infoln("No endpoint url defined in configuration, try to discover from network automatically...")
-
-	devices, err := discovery.Devices(2 * time.Second)
-	if err != nil {
-		log.Fatalf("Failed to auto-discover devices in network: %s", err)
-	}
-
-	if len(devices) == 1 {
-		device := devices[0]
-		log.Infof("Discovered device [%s] Will use endpoint [%s]", device.Hostname, device.GetPrimaryEndpoint())
-		return devices[0].GetPrimaryEndpoint()
-	} else if len(devices) > 1 {
-		log.Fatalf("Discovered %d devices from network, get list of devices with command 'get devices'", len(devices))
-	}
-
-	log.Fatalf("Unable to discover device Automatically. You must give device endpoint. E.g. --endpoint=192.168.1.2")
-	return ""
-}
-
-// GetConfig parse yaml config and return Config
+// GetConfig parse yaml config and return the file representation
+// In normal cases, you should use GetConfigProvider
 func GetConfig(clicontext *cli.Context) *config.Config {
 	configPath := clicontext.GlobalString("config")
-	config, err := config.GetConfig(expandTilde(configPath))
+	conf, err := config.GetConfig(expandTilde(configPath))
 	if err != nil {
 		log.Fatalf("Error while reading configuration file [%s]: %s", configPath, err)
 	}
-	return config
+	return conf
+}
+
+// GetConfigProvider return config.Provider to access the current configuration
+func GetConfigProvider(clicontext *cli.Context) *config.Provider {
+	provider := config.NewProvider(GetConfig(clicontext))
+
+	if clicontext.GlobalIsSet("namespace") && clicontext.GlobalString("namespace") != "" {
+		provider.OverrideNamespace(clicontext.GlobalString("namespace"))
+	}
+
+	if clicontext.GlobalIsSet("endpoint") && clicontext.GlobalString("endpoint") != "" {
+		provider.OverrideEndpoint(clicontext.GlobalString("endpoint"))
+	}
+
+	if provider.GetEndpoint() == "" {
+		log.Infoln("No endpoint url defined in configuration, try to discover from network automatically...")
+
+		devices, err := discovery.Devices(2 * time.Second)
+		if err != nil {
+			log.Fatalf("Failed to auto-discover devices in network: %s", err)
+		}
+
+		if len(devices) == 1 {
+			device := devices[0]
+			log.Infof("Discovered device [%s] Will use endpoint [%s]", device.Hostname, device.GetPrimaryEndpoint())
+			provider.OverrideEndpoint(devices[0].GetPrimaryEndpoint())
+		} else if len(devices) > 1 {
+			log.Fatalf("Discovered %d devices from network, get list of devices with command 'get devices'", len(devices))
+		} else {
+			log.Fatalf("Unable to discover device Automatically. You must give device endpoint. E.g. --endpoint=192.168.1.2")
+		}
+	}
+
+	return provider
 }
 
 // UpdateConfig writes config to the config file in yaml format

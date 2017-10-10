@@ -36,6 +36,11 @@ func main() {
 			Usage:  "Namespace to use with commands. By default reads from config.",
 			EnvVar: "CAN_NAMESPACE",
 		},
+		cli.StringFlag{
+			Name:   "endpoint",
+			Usage:  "Use specific device endpoint. E.g. '192.168.1.101:5000'",
+			EnvVar: "CAN_ENDPOINT",
+		},
 	}, cmd.GlobalFlags...)
 
 	app.Commands = []cli.Command{

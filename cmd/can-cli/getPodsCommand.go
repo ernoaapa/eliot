@@ -17,7 +17,8 @@ var getPodsCommand = cli.Command{
 	 # Get table of running pods
 	 can-cli get pods`,
 	Action: func(clicontext *cli.Context) error {
-		client := cmd.GetClient(clicontext)
+		config := cmd.GetConfigProvider(clicontext)
+		client := cmd.GetClient(config)
 
 		pods, err := client.GetPods()
 		if err != nil {

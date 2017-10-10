@@ -32,7 +32,8 @@ var deleteCommand = cli.Command{
 	 # Delete all 'my-pod' pod
 	 can-cli delete pod my-pod`,
 			Action: func(clicontext *cli.Context) error {
-				client := cmd.GetClient(clicontext)
+				config := cmd.GetConfigProvider(clicontext)
+				client := cmd.GetClient(config)
 				podName := clicontext.Args().First()
 
 				pods, err := client.GetPods()

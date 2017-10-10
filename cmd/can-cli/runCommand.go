@@ -135,8 +135,8 @@ var runCommand = cli.Command{
 			}
 		}
 
-		config := cmd.GetConfig(clicontext)
-		client := cmd.GetClient(clicontext)
+		config := cmd.GetConfigProvider(clicontext)
+		client := cmd.GetClient(config)
 
 		containers := []*pb.Container{
 			&pb.Container{
@@ -168,7 +168,7 @@ var runCommand = cli.Command{
 		pod := &pb.Pod{
 			Metadata: &pb.ResourceMetadata{
 				Name:      name,
-				Namespace: config.GetCurrentContext().Namespace,
+				Namespace: config.GetNamespace(),
 			},
 			Spec: &pb.PodSpec{
 				HostNetwork: true,
@@ -199,7 +199,7 @@ var runCommand = cli.Command{
 
 		if !noSync {
 			done := make(chan struct{})
-			destination := fmt.Sprintf("rsync://%s:%d/volume", config.GetCurrentEndpoint().URL, 873)
+			destination := fmt.Sprintf("rsync://%s:%d/volume", config.GetEndpointHost(), 873)
 			go sync.Rsync(done, syncDirs, destination, 1*time.Second)
 			defer close(done)
 		}
