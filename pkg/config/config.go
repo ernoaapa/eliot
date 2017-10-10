@@ -2,10 +2,10 @@ package config
 
 import (
 	"io/ioutil"
-	"os"
 	"reflect"
 
 	"github.com/ernoaapa/can/pkg/converter"
+	"github.com/ernoaapa/can/pkg/fs"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -48,7 +48,7 @@ func DefaultConfig() *Config {
 
 // GetConfig reads current config from user home directory
 func GetConfig(path string) (*Config, error) {
-	if !fileExist(path) {
+	if !fs.FileExist(path) {
 		return DefaultConfig(), nil
 	}
 
@@ -64,11 +64,6 @@ func GetConfig(path string) (*Config, error) {
 	}
 
 	return config, nil
-}
-
-func fileExist(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
 }
 
 // WriteConfig writes configuration to given path

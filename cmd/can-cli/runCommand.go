@@ -4,40 +4,52 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/ernoaapa/can/cmd"
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/can/pkg/resolve"
 	"github.com/ernoaapa/can/pkg/sync"
 	"github.com/ernoaapa/can/pkg/term"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
-
-var runCommandHelp = `
-	# Start new container
-	can-cli run my-pod docker.io/ernoaapa/hello-world:latest
-`
 
 var runCommand = cli.Command{
 	Name:        "run",
 	HelpName:    "run",
 	Usage:       "Start container in the device",
 	Description: "With run command, you can start new containers in the device",
-	UsageText: `can-cli run [options] NAME
+	UsageText: `can-cli run [options] -- <command>
 
-	 # Start new container
-	 can-cli run --image docker.io/eaapa/hello-world:latest my-pod
+	 # Run code in current directory in the device
+	 can-cli run
+
+	 # Run 'build.sh' command in device with files in current directory
+	 can-cli run -- ./build.sh
+	 
+	 # Run container image in the container
+	 can-cli run --image docker.io/eaapa/hello-world:latest
+
+	 # Run container with name in the device
+	 can-cli run --image docker.io/eaapa/hello-world:latest --name my-pod
 `,
 	Flags: []cli.Flag{
 		cli.StringFlag{
+			Name:  "name",
+			Usage: "Name for the pod (default: current directory name)",
+		},
+		cli.StringFlag{
 			Name:  "image",
-			Usage: "The container image to start",
+			Usage: "The container image to start (default: resolve image based on project structure)",
 		},
 		cli.BoolFlag{
 			Name:  "detach, d",
-			Usage: "Run container in background and print container information",
+			Usage: "Run container in background and print container information (default: false)",
 		},
 		cli.StringSliceFlag{
 			Name:  "mount",
@@ -49,64 +61,78 @@ var runCommand = cli.Command{
 		},
 		cli.StringSliceFlag{
 			Name:  "env, e",
-			Usage: "Set environment variables",
+			Usage: "Set environment variable into the container. E.g. --env FOO=bar",
 		},
-		cli.BoolFlag{
+		cli.BoolTFlag{
 			Name:  "rm",
-			Usage: "Automatically remove the container when it exits",
+			Usage: "Automatically remove the container when it exits (default: true)",
 		},
-		cli.BoolFlag{
+		cli.BoolTFlag{
 			Name:  "tty, t",
-			Usage: "Allocate TTY for each container in the pod",
+			Usage: "Allocate TTY for each container in the pod (default: true)",
+		},
+		cli.BoolTFlag{
+			Name:  "stdin, i",
+			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached (default: true)",
 		},
 		cli.BoolFlag{
-			Name:  "stdin, i",
-			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached.",
+			Name:  "no-sync",
+			Usage: "Do not sync any directory to the container (default: false)",
 		},
 		cli.StringSliceFlag{
 			Name:  "sync",
-			Usage: "Directory to sync to the target container",
+			Usage: "Directory to sync to the target container (default: current directory)",
+			Value: &cli.StringSlice{"."},
 		},
 		cli.StringFlag{
 			Name:  "workdir, w",
 			Usage: "Working directory inside the container",
 		},
 	},
-	Action: func(clicontext *cli.Context) error {
+	Action: func(clicontext *cli.Context) (err error) {
 		var (
-			name     = clicontext.Args().First()
+			name     = clicontext.String("name")
 			image    = clicontext.String("image")
 			detach   = clicontext.Bool("detach")
 			rm       = clicontext.Bool("rm")
 			tty      = clicontext.Bool("tty")
 			env      = clicontext.StringSlice("env")
 			workdir  = clicontext.String("workdir")
-			runSync  = clicontext.IsSet("sync")
+			noSync   = clicontext.Bool("no-sync")
 			syncDirs = clicontext.StringSlice("sync")
 			mounts   = cmd.GetMounts(clicontext)
 			binds    = cmd.GetBinds(clicontext)
-			args     = []string{}
+			args     = clicontext.Args()
 
 			stdin  = os.Stdin
 			stdout = os.Stdout
 			stderr = os.Stderr
 		)
 
-		if clicontext.NArg() > 1 {
-			args = clicontext.Args()[1:]
-		}
-
-		if name == "" {
-			return fmt.Errorf("You must give NAME parameter")
-		}
-
 		if image == "" {
-			return fmt.Errorf("You must define --image option")
+			log.Println("No image defined, try to detect image for project...")
+			image, err = resolve.Image(cmd.GetCurrentDirectory())
+			if err != nil {
+				log.Debugf("Unable to resolve automatically container image for project in directory [%s]. Error: %s", cmd.GetCurrentDirectory(), err)
+				return fmt.Errorf("Unable to detect image for project. You must define target container image with --image option")
+			}
+			log.Printf("Auto-resolved image for project. Will use image: %s", image)
 		}
 		image = cmd.ExpandToFQIN(image)
 
+		if name == "" {
+			// Default to current directory name
+			name = filepath.Base(cmd.GetCurrentDirectory())
+		}
+
 		if detach && rm {
 			return fmt.Errorf("You cannot use --detach flag with --rm, it would remove right away after container started")
+		}
+
+		for _, variable := range env {
+			if !model.IsValidEnvKeyValuePair(variable) {
+				return fmt.Errorf("Invalid --env value [%s], must be in format KEY=value. E.g. --env FOO=bar", variable)
+			}
 		}
 
 		config := cmd.GetConfig(clicontext)
@@ -124,7 +150,7 @@ var runCommand = cli.Command{
 			},
 		}
 
-		if runSync {
+		if !noSync {
 			workspaceMount, _ := cmd.ParseBindFlag("/tmp/workspace:/volume")
 
 			containers[0].Mounts = append(containers[0].Mounts, workspaceMount)
@@ -171,7 +197,7 @@ var runCommand = cli.Command{
 
 		attachContainerID := result.Spec.Containers[0].Name
 
-		if runSync {
+		if !noSync {
 			done := make(chan struct{})
 			destination := fmt.Sprintf("rsync://%s:%d/volume", config.GetCurrentEndpoint().URL, 873)
 			go sync.Rsync(done, syncDirs, destination, 1*time.Second)

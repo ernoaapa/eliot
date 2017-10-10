@@ -35,7 +35,7 @@ func getValidator() *validator.Validate {
 			return isEmpty(fl.Field().Interface())
 		})
 		validate.RegisterValidation("envKeyValuePair", func(fl validator.FieldLevel) bool {
-			return isValidEnvKeyValuePair(fl.Field().Interface().(string))
+			return IsValidEnvKeyValuePair(fl.Field().Interface().(string))
 		})
 	})
 	return validate
@@ -75,7 +75,7 @@ func isEmpty(value interface{}) bool {
 	return false
 }
 
-func isValidEnvKeyValuePair(value string) bool {
+func IsValidEnvKeyValuePair(value string) bool {
 	if value == "" {
 		return false
 	}

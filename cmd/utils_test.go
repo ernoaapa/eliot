@@ -88,3 +88,7 @@ func TestExpandToFQIN(t *testing.T) {
 	assert.Equal(t, "docker.io/library/nginx:tag1", ExpandToFQIN("nginx:tag1"))
 	assert.Equal(t, "docker.io/library/nginx:latest", ExpandToFQIN("nginx"))
 }
+
+func TestGetCurrentDirectory(t *testing.T) {
+	assert.NotEmpty(t, GetCurrentDirectory())
+}

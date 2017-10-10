@@ -23,6 +23,7 @@ import (
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
+	"github.com/ernoaapa/can/pkg/fs"
 	"github.com/ernoaapa/can/pkg/manifest"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/runtime"
@@ -366,4 +367,18 @@ func ForwardAllSignals(handler func(syscall.Signal) error) chan os.Signal {
 		}
 	}()
 	return sigc
+}
+
+// GetCurrentDirectory resolves current directory where the command were executed
+// Tries different options until find one or fails
+func GetCurrentDirectory() string {
+	for _, path := range []string{".", os.Args[0], os.Getenv("PWD")} {
+		dir, err := filepath.Abs(filepath.Dir(path))
+		if err == nil && fs.DirExist(path) {
+			return dir
+		}
+	}
+
+	log.Fatal("Failed to resolve current directory")
+	return ""
 }
