@@ -2,7 +2,10 @@ package config
 
 import (
 	"io/ioutil"
+	"os"
+	"reflect"
 
+	"github.com/ernoaapa/can/pkg/converter"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -34,8 +37,21 @@ type Context struct {
 	Namespace string `yaml:"namespace"`
 }
 
+// DefaultConfig returns new Config instance with default values
+func DefaultConfig() *Config {
+	return &Config{
+		Contexts: []Context{
+			{Namespace: "cand"},
+		},
+	}
+}
+
 // GetConfig reads current config from user home directory
 func GetConfig(path string) (*Config, error) {
+	if !fileExist(path) {
+		return DefaultConfig(), nil
+	}
+
 	data, readErr := ioutil.ReadFile(path)
 	if readErr != nil {
 		return nil, errors.Wrapf(readErr, "Failed to read configuration file: %s", path)
@@ -48,6 +64,24 @@ func GetConfig(path string) (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func fileExist(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
+// WriteConfig writes configuration to given path
+func WriteConfig(path string, config *Config) error {
+	data, err := yaml.Marshal(config)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to marshal config to yaml format")
+	}
+	if err := ioutil.WriteFile(path, data, 0600); err != nil {
+		return errors.Wrapf(err, "Failed to write config to path [%s]", path)
+	}
+
+	return nil
 }
 
 // GetCurrentUser return current user
@@ -63,6 +97,14 @@ func (c Config) GetCurrentContext() Context {
 // GetCurrentEndpoint return current context
 func (c Config) GetCurrentEndpoint() Endpoint {
 	return c.GetEndpoint(c.GetCurrentContext().Endpoint)
+}
+
+// Set mutates the Config by updating single field with value
+func (c *Config) Set(field, value string) {
+	v := reflect.ValueOf(c).Elem().FieldByName(converter.KebabCaseToCamelCase(field))
+	if v.IsValid() {
+		v.SetString(value)
+	}
 }
 
 // GetContext return context by name

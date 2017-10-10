@@ -106,6 +106,13 @@ func GetConfig(clicontext *cli.Context) *config.Config {
 	return config
 }
 
+// UpdateConfig writes config to the config file in yaml format
+func UpdateConfig(clicontext *cli.Context, updated *config.Config) error {
+	configPath := expandTilde(clicontext.GlobalString("config"))
+
+	return config.WriteConfig(configPath, updated)
+}
+
 // GetLabels return --labels CLI parameter value as string map
 func GetLabels(clicontext *cli.Context) map[string]string {
 	if !clicontext.IsSet("labels") {
@@ -296,6 +303,7 @@ func expandTilde(path string) string {
 	return path
 }
 
+// FilterByPodName return new list of Pods which name matches with given podName
 func FilterByPodName(pods []*pb.Pod, podName string) []*pb.Pod {
 	for _, pod := range pods {
 		if pod.Metadata.Name == podName {

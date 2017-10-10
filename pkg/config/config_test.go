@@ -37,3 +37,11 @@ current-context: local-dev/erno
 	assert.Equal(t, "localhost:5000", config.GetCurrentEndpoint().URL, "Should return current user")
 	assert.Equal(t, "foobar", config.GetCurrentContext().Namespace, "Should return current context namespace")
 }
+
+func TestSetValue(t *testing.T) {
+	config := Config{}
+
+	config.Set("CurrentContext", "foobar")
+
+	assert.Equal(t, "foobar", config.CurrentContext)
+}
