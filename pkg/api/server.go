@@ -59,9 +59,12 @@ func (s *Server) Create(req *pb.CreatePodRequest, server pb.Pods_CreateServer) e
 	for _, container := range pod.Spec.Containers {
 		progress := progress.NewImageFetch(container.Name, container.Image)
 		progresses = append(progresses, progress)
+
 		if err := s.client.PullImage(pod.Metadata.Namespace, container.Image, progress); err != nil {
 			return errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
 		}
+		progress.AllDone()
+
 		if err := s.client.CreateContainer(pod, container); err != nil {
 			return errors.Wrapf(err, "Failed to create container [%s]", container.Name)
 		}
