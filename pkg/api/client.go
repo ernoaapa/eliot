@@ -134,6 +134,9 @@ func (c *Client) DeletePod(pod *pb.Pod) (*pb.Pod, error) {
 		Namespace: pod.Metadata.Namespace,
 		Name:      pod.Metadata.Name,
 	})
+	if err != nil {
+		return nil, err
+	}
 	return resp.GetPod(), nil
 }
 

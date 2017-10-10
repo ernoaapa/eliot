@@ -210,11 +210,24 @@ func (c *ContainerdClient) StopContainer(namespace, name string) error {
 	}
 
 	task, err := container.Task(ctx, nil)
-	if err == nil {
-		task.Delete(ctx, containerd.WithProcessKill)
+	if err != nil {
+		if !errdefs.IsNotFound(err) {
+			return errors.Wrap(err, "Fetching container task returned unexpected error")
+		}
 	}
+
+	if task != nil {
+		_, taskDeleteErr := task.Delete(ctx, containerd.WithProcessKill)
+		if err != nil {
+			return errors.Wrapf(taskDeleteErr, "Container task deletion returned error")
+		}
+	}
+
 	if err := container.Delete(ctx, containerd.WithSnapshotCleanup); err != nil {
-		return errors.Wrapf(err, "Failed to delete container [%s]", container.ID())
+		// Someone might already deleted it...
+		if !errdefs.IsNotFound(err) {
+			return errors.Wrapf(err, "Failed to delete container [%s]", container.ID())
+		}
 	}
 	return nil
 }
