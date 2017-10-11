@@ -151,7 +151,7 @@ var runCommand = cli.Command{
 		}
 
 		if !noSync {
-			workspaceMount, _ := cmd.ParseBindFlag("/tmp/workspace:/volume")
+			workspaceMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:/volume:rw,rshared", name))
 
 			containers[0].Mounts = append(containers[0].Mounts, workspaceMount)
 			if containers[0].WorkingDir == "" {

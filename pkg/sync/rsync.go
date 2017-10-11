@@ -20,7 +20,7 @@ func Rsync(done <-chan struct{}, sourceDirs []string, destination string, interv
 }
 
 func executeRsync(sourceDir, destination string) {
-	cmd := exec.Command("/usr/bin/rsync", "-rtp", sourceDir, destination)
+	cmd := exec.Command("/usr/bin/rsync", "--recursive", "--perms", "--times", "--links", "--devices", "--specials", "--compress", sourceDir, destination)
 	// TODO: How to display sync completed /failed? Cannot print terminal because messing out terminal attachment
 	cmd.Run()
 }

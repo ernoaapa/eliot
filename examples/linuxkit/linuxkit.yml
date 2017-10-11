@@ -14,6 +14,11 @@ onboot:
   - name: rngd1
     image: linuxkit/rngd:558e86a36242bb74353bc9287b715ddb8567357e
     command: ["/sbin/rngd", "-1"]
+  - name: format
+    image: linuxkit/format:158d992b7bf7ab984100c697d7e72161ea7d7382
+  - name: mount
+    image: linuxkit/mount:4fe245efb01384e42622c36302e13e386bbaeb08
+    command: ["/usr/bin/mountie", "/var/lib"]
 services:
   - name: rngd
     image: linuxkit/rngd:558e86a36242bb74353bc9287b715ddb8567357e
@@ -52,7 +57,7 @@ services:
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
   - name: can-api
-    image: ernoaapa/can-api-amd64:a1857d2
+    image: ernoaapa/can-api-amd64:0b761ad-dirty
     command: ["/can-api", "--debug", "--listen", "0.0.0.0:5000"]
     capabilities:
       - all
@@ -62,7 +67,7 @@ services:
       mkdir: ["/var/lib/volumes"]
     binds:
       - /containers:/containers
-      - /var/lib/volumes:/volumes
+      - /var/lib/volumes:/var/lib/volumes
       - /run/containerd:/run/containerd
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
