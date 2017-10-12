@@ -10,6 +10,7 @@ import (
 
 	"github.com/ernoaapa/can/cmd"
 	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers"
 	"github.com/ernoaapa/can/pkg/resolve"
@@ -90,19 +91,21 @@ var runCommand = cli.Command{
 		},
 	},
 	Action: func(clicontext *cli.Context) (err error) {
+
 		var (
-			name     = clicontext.String("name")
-			image    = clicontext.String("image")
-			detach   = clicontext.Bool("detach")
-			rm       = clicontext.Bool("rm")
-			tty      = clicontext.Bool("tty")
-			env      = clicontext.StringSlice("env")
-			workdir  = clicontext.String("workdir")
-			noSync   = clicontext.Bool("no-sync")
-			syncDirs = clicontext.StringSlice("sync")
-			mounts   = cmd.GetMounts(clicontext)
-			binds    = cmd.GetBinds(clicontext)
-			args     = clicontext.Args()
+			projectConfig = config.ReadProjectConfig("./.can.yml")
+			name          = projectConfig.String("name", clicontext.String("name"))
+			image         = projectConfig.String("image", clicontext.String("image"))
+			detach        = clicontext.Bool("detach")
+			rm            = clicontext.Bool("rm")
+			tty           = clicontext.Bool("tty")
+			env           = projectConfig.StringSlice("env", clicontext.StringSlice("env"))
+			workdir       = clicontext.String("workdir")
+			noSync        = clicontext.Bool("no-sync")
+			syncDirs      = clicontext.StringSlice("sync")
+			mounts        = cmd.GetMounts(clicontext)
+			binds         = cmd.GetBinds(clicontext)
+			args          = clicontext.Args()
 
 			stdin  = os.Stdin
 			stdout = os.Stdout

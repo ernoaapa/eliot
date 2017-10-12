@@ -1,0 +1,4 @@
+name: foobar
+image: node:6
+env:
+  - FOO=bar
