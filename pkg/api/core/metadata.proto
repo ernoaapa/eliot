@@ -1,0 +1,16 @@
+syntax = "proto3";
+package cand.core;
+
+option go_package = "github.com/ernoaapa/can/pkg/api/core;core";
+
+// ResourceMetadata is metadata that all resources must have
+message ResourceMetadata {
+	// Name must be unique within a namespace.
+	// Cannot be updated.
+	string name = 1;
+
+	// Namespace defines space within each name must be unique.
+	// An empty namespace is equivalent to the default namespace.
+	// Cannot be updated.
+	string namespace = 2;
+}

@@ -9,7 +9,8 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/ernoaapa/can/pkg/api/mapping"
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/api/stream"
 	"github.com/ernoaapa/can/pkg/progress"
 	"github.com/ernoaapa/can/pkg/runtime"
@@ -19,7 +20,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// Server implements the GRPC API for the layery-cli
+// Server implements the GRPC API for the can-cli
 type Server struct {
 	client runtime.Client
 	grpc   *grpc.Server
@@ -27,7 +28,7 @@ type Server struct {
 }
 
 // Create is 'pods' service Create implementation
-func (s *Server) Create(req *pb.CreatePodRequest, server pb.Pods_CreateServer) error {
+func (s *Server) Create(req *pods.CreatePodRequest, server pods.Pods_CreateServer) error {
 	pod := mapping.MapPodToInternalModel(req.Pod)
 	var (
 		done       = make(chan struct{})
@@ -42,14 +43,14 @@ func (s *Server) Create(req *pb.CreatePodRequest, server pb.Pods_CreateServer) e
 				// Send last update
 				images := mapping.MapImageFetchProgressToAPIModel(progresses)
 
-				if err := server.Send(&pb.CreatePodStreamResponse{Images: images}); err != nil {
+				if err := server.Send(&pods.CreatePodStreamResponse{Images: images}); err != nil {
 					log.Warnf("Error while sending create pod status back to client: %s", err)
 				}
 				return // End update loop
 			case <-time.After(100 * time.Millisecond):
 				images := mapping.MapImageFetchProgressToAPIModel(progresses)
 
-				if err := server.Send(&pb.CreatePodStreamResponse{Images: images}); err != nil {
+				if err := server.Send(&pods.CreatePodStreamResponse{Images: images}); err != nil {
 					log.Warnf("Error while sending create pod status back to client: %s", err)
 				}
 			}
@@ -75,7 +76,7 @@ func (s *Server) Create(req *pb.CreatePodRequest, server pb.Pods_CreateServer) e
 }
 
 // Start is 'pods' service Start implementation
-func (s *Server) Start(context context.Context, req *pb.StartPodRequest) (*pb.StartPodResponse, error) {
+func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pods.StartPodResponse, error) {
 	containers, err := s.client.GetContainers(req.Namespace, req.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to find containers to start for pod [%s] in namespace [%s]", req.Name, req.Namespace)
@@ -89,13 +90,13 @@ func (s *Server) Start(context context.Context, req *pb.StartPodRequest) (*pb.St
 		log.Debugf("Container [%s] started", container.Name)
 	}
 
-	return &pb.StartPodResponse{
+	return &pods.StartPodResponse{
 		Pod: mapping.MapPodToAPIModel(req.Namespace, req.Name, containers),
 	}, nil
 }
 
 // Delete is 'pods' service Delete implementation
-func (s *Server) Delete(context context.Context, req *pb.DeletePodRequest) (*pb.DeletePodResponse, error) {
+func (s *Server) Delete(context context.Context, req *pods.DeletePodRequest) (*pods.DeletePodResponse, error) {
 	containers, err := s.client.GetContainers(req.Namespace, req.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Cannot fetch pod containers, cannot delete pod [%s]", req.Name)
@@ -107,24 +108,24 @@ func (s *Server) Delete(context context.Context, req *pb.DeletePodRequest) (*pb.
 			return nil, errors.Wrapf(err, "Error while stopping container [%s]", container.Name)
 		}
 	}
-	return &pb.DeletePodResponse{
+	return &pods.DeletePodResponse{
 		Pod: mapping.MapPodToAPIModel(req.Namespace, req.Name, containers),
 	}, nil
 }
 
 // List is 'pods' service List implementation
-func (s *Server) List(context context.Context, req *pb.ListPodsRequest) (*pb.ListPodsResponse, error) {
+func (s *Server) List(context context.Context, req *pods.ListPodsRequest) (*pods.ListPodsResponse, error) {
 	containersByPods, err := s.client.GetAllContainers(req.Namespace)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.ListPodsResponse{
+	return &pods.ListPodsResponse{
 		Pods: mapping.MapPodsToAPIModel(req.Namespace, containersByPods),
 	}, nil
 }
 
 // Attach connects to process in container and streams stdout and stderr outputs to client
-func (s *Server) Attach(server pb.Pods_AttachServer) error {
+func (s *Server) Attach(server containers.Containers_AttachServer) error {
 	md, ok := metadata.FromIncomingContext(server.Context())
 	if !ok {
 		return fmt.Errorf("Incoming attach request don't have metadata. You must provide 'Namespace' and 'ContainerID' through metadata")
@@ -155,12 +156,12 @@ func (s *Server) Attach(server pb.Pods_AttachServer) error {
 }
 
 // Signal connects to process in container and send signal to the process
-func (s *Server) Signal(cxt context.Context, req *pb.SignalRequest) (*pb.SignalResponse, error) {
+func (s *Server) Signal(cxt context.Context, req *containers.SignalRequest) (*containers.SignalResponse, error) {
 	err := s.client.Signal(req.Namespace, req.ContainerID, syscall.Signal(req.Signal))
 	if err != nil {
 		return nil, err
 	}
-	return &pb.SignalResponse{}, nil
+	return &containers.SignalResponse{}, nil
 }
 
 func getMetadataValue(md metadata.MD, key string) string {
@@ -178,7 +179,8 @@ func NewServer(listen string, client runtime.Client) *Server {
 	}
 
 	apiserver.grpc = grpc.NewServer()
-	pb.RegisterPodsServer(apiserver.grpc, apiserver)
+	pods.RegisterPodsServer(apiserver.grpc, apiserver)
+	containers.RegisterContainersServer(apiserver.grpc, apiserver)
 
 	return apiserver
 }

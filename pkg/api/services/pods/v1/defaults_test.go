@@ -3,27 +3,29 @@ package pods
 import (
 	"testing"
 
+	"github.com/ernoaapa/can/pkg/api/core"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDefaults(t *testing.T) {
 	pods := []*Pod{
 		&Pod{
-			Metadata: &ResourceMetadata{
+			Metadata: &core.ResourceMetadata{
 				Name: "foobar",
 			},
 			Spec: &PodSpec{
-				Containers: []*Container{},
+				Containers: []*containers.Container{},
 			},
 		},
 		&Pod{
-			Metadata: &ResourceMetadata{
+			Metadata: &core.ResourceMetadata{
 				Name:      "foobar",
 				Namespace: "my-namespace",
 			},
 			Spec: &PodSpec{
-				Containers: []*Container{
-					&Container{
+				Containers: []*containers.Container{
+					&containers.Container{
 						Name:  "foo",
 						Image: "docker.io/library/hello-world:latest",
 					},

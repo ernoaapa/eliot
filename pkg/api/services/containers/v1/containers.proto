@@ -1,0 +1,51 @@
+syntax = "proto3";
+package cand.services.containers.v1;
+
+option go_package = "github.com/ernoaapa/can/pkg/api/services/containers/v1;containers";
+
+// Containers service provides access to containers in pods
+service Containers {
+	rpc Attach(stream StdinStreamRequest) returns (stream StdoutStreamResponse);
+	rpc Signal(SignalRequest) returns (SignalResponse);
+}
+
+message StdinStreamRequest {
+	bytes input = 1;
+}
+
+message StdoutStreamResponse {
+	bytes output = 1;
+	// Is this stderr(=true) or stdout(=false)
+	bool stderr = 2;
+}
+
+message SignalRequest {
+	string namespace = 1;
+	string containerID = 2;
+	int32 signal = 3;
+}
+
+message SignalResponse {}
+
+message Container {
+	string name = 1;
+	string image = 2;
+	bool tty = 3;
+	string workingDir = 4;
+	repeated string args = 5;
+	repeated string env = 6;
+	repeated Mount mounts = 7;
+}
+
+message Mount {
+	string type = 1;
+	string source = 2;
+	string destination = 3;
+	repeated string options = 4;
+}
+
+message ContainerStatus {
+	string containerID = 1;
+	string image = 2;
+	string state = 3;
+}

@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/ernoaapa/can/cmd"
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/api/core"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers"
@@ -141,8 +143,8 @@ var runCommand = cli.Command{
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)
 
-		containers := []*pb.Container{
-			&pb.Container{
+		cont := []*containers.Container{
+			&containers.Container{
 				Name:       name,
 				Image:      image,
 				Tty:        tty,
@@ -156,26 +158,26 @@ var runCommand = cli.Command{
 		if !noSync {
 			workspaceMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:/volume:rw,rshared", name))
 
-			containers[0].Mounts = append(containers[0].Mounts, workspaceMount)
-			if containers[0].WorkingDir == "" {
-				containers[0].WorkingDir = "/volume"
+			cont[0].Mounts = append(cont[0].Mounts, workspaceMount)
+			if cont[0].WorkingDir == "" {
+				cont[0].WorkingDir = "/volume"
 			}
 
-			containers = append(containers, &pb.Container{
+			cont = append(cont, &containers.Container{
 				Name:   fmt.Sprintf("rsync-%s", name),
 				Image:  cmd.ExpandToFQIN("stefda/rsync"),
-				Mounts: []*pb.Mount{workspaceMount},
+				Mounts: []*containers.Mount{workspaceMount},
 			})
 		}
 
-		pod := &pb.Pod{
-			Metadata: &pb.ResourceMetadata{
+		pod := &pods.Pod{
+			Metadata: &core.ResourceMetadata{
 				Name:      name,
 				Namespace: config.GetNamespace(),
 			},
-			Spec: &pb.PodSpec{
+			Spec: &pods.PodSpec{
 				HostNetwork: true,
-				Containers:  containers,
+				Containers:  cont,
 			},
 		}
 

@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/api/core"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -15,16 +17,16 @@ func TestPrintTable(t *testing.T) {
 	var buffer bytes.Buffer
 	printer := NewHumanReadablePrinter()
 
-	data := []*pb.Pod{
-		&pb.Pod{
-			Metadata: &pb.ResourceMetadata{
+	data := []*pods.Pod{
+		&pods.Pod{
+			Metadata: &core.ResourceMetadata{
 				Name:      "foo",
 				Namespace: "cand",
 			},
-			Spec: &pb.PodSpec{
-				Containers: []*pb.Container{
-					&pb.Container{},
-					&pb.Container{},
+			Spec: &pods.PodSpec{
+				Containers: []*containers.Container{
+					&containers.Container{},
+					&containers.Container{},
 				},
 			},
 		},
@@ -43,15 +45,15 @@ func TestPrintDetails(t *testing.T) {
 	var buffer bytes.Buffer
 	printer := NewHumanReadablePrinter()
 
-	data := &pb.Pod{
-		Metadata: &pb.ResourceMetadata{
+	data := &pods.Pod{
+		Metadata: &core.ResourceMetadata{
 			Name:      "foo",
 			Namespace: "cand",
 		},
-		Spec: &pb.PodSpec{
-			Containers: []*pb.Container{
-				&pb.Container{},
-				&pb.Container{},
+		Spec: &pods.PodSpec{
+			Containers: []*containers.Container{
+				&containers.Container{},
+				&containers.Container{},
 			},
 		},
 	}

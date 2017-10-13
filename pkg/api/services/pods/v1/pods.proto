@@ -1,7 +1,9 @@
 syntax = "proto3";
 package cand.services.pods.v1;
+import "core/metadata.proto";
+import "services/containers/v1/containers.proto";
 
-option go_package = "pkg/api/services/pods/v1;pods";
+option go_package = "github.com/ernoaapa/can/pkg/api/services/pods/v1;pods";
 
 // Pods service provides visibility to the pods.
 service Pods {
@@ -9,8 +11,6 @@ service Pods {
 	rpc Start(StartPodRequest) returns (StartPodResponse);
 	rpc Delete(DeletePodRequest) returns (DeletePodResponse);
 	rpc List(ListPodsRequest) returns (ListPodsResponse);
-	rpc Attach(stream StdinStreamRequest) returns (stream StdoutStreamResponse);
-	rpc Signal(SignalRequest) returns (SignalResponse);
 }
 
 message CreatePodRequest {
@@ -63,70 +63,17 @@ message ListPodsResponse {
 	repeated Pod pods = 1;
 }
 
-message StdinStreamRequest {
-	bytes input = 1;
-}
-
-message StdoutStreamResponse {
-	bytes output = 1;
-	// Is this stderr(=true) or stdout(=false)
-	bool stderr = 2;
-}
-
-message SignalRequest {
-	string namespace = 1;
-	string containerID = 2;
-	int32 signal = 3;
-}
-
-message SignalResponse {}
-
 message Pod {
-	ResourceMetadata metadata = 1;
+	cand.core.ResourceMetadata metadata = 1;
 	PodSpec spec = 2;
 	PodStatus status = 3;
 }
 
 message PodSpec {
-	repeated Container containers = 1;
+	repeated cand.services.containers.v1.Container containers = 1;
 	bool hostNetwork = 2;
 }
 
-message Container {
-	string name = 1;
-	string image = 2;
-	bool tty = 3;
-	string workingDir = 4;
-	repeated string args = 5;
-	repeated string env = 6;
-	repeated Mount mounts = 7;
-}
-
-message Mount {
-	string type = 1;
-	string source = 2;
-	string destination = 3;
-	repeated string options = 4;
-}
-
 message PodStatus {
-	repeated ContainerStatus containerStatuses = 1;
-}
-
-message ContainerStatus {
-	string containerID = 1;
-	string image = 2;
-	string state = 3;
-}
-
-// ResourceMetadata is metadata that all resources must have
-message ResourceMetadata {
-	// Name must be unique within a namespace.
-	// Cannot be updated.
-	string name = 1;
-
-	// Namespace defines space within each name must be unique.
-	// An empty namespace is equivalent to the default namespace.
-	// Cannot be updated.
-	string namespace = 2;
+	repeated cand.services.containers.v1.ContainerStatus containerStatuses = 1;
 }

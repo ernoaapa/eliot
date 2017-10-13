@@ -19,7 +19,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/can/pkg/api"
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
@@ -204,7 +205,7 @@ func GetPrinter(clicontext *cli.Context) printers.ResourcePrinter {
 }
 
 // GetMounts parses a --mount string flags
-func GetMounts(clicontext *cli.Context) (result []*pb.Mount) {
+func GetMounts(clicontext *cli.Context) (result []*containers.Mount) {
 	for _, flag := range clicontext.StringSlice("mount") {
 		mount, err := parseMountFlag(flag)
 		if err != nil {
@@ -216,8 +217,8 @@ func GetMounts(clicontext *cli.Context) (result []*pb.Mount) {
 }
 
 // parseMountFlag parses a mount string in the form "type=foo,source=/path,destination=/target,options=rbind:rw"
-func parseMountFlag(m string) (*pb.Mount, error) {
-	mount := &pb.Mount{}
+func parseMountFlag(m string) (*containers.Mount, error) {
+	mount := &containers.Mount{}
 	r := csv.NewReader(strings.NewReader(m))
 
 	fields, err := r.Read()
@@ -251,7 +252,7 @@ func parseMountFlag(m string) (*pb.Mount, error) {
 }
 
 // GetBinds parses a --bind string flags
-func GetBinds(clicontext *cli.Context) (result []*pb.Mount) {
+func GetBinds(clicontext *cli.Context) (result []*containers.Mount) {
 	for _, flag := range clicontext.StringSlice("bind") {
 		bind, err := ParseBindFlag(flag)
 		if err != nil {
@@ -263,7 +264,7 @@ func GetBinds(clicontext *cli.Context) (result []*pb.Mount) {
 }
 
 // ParseBindFlag parses a mount string in the form "/var:/var:rshared"
-func ParseBindFlag(b string) (*pb.Mount, error) {
+func ParseBindFlag(b string) (*containers.Mount, error) {
 	parts := strings.Split(b, ":")
 	if len(parts) < 2 {
 		return nil, fmt.Errorf("Cannot parse bind, missing ':': %s", b)
@@ -277,7 +278,7 @@ func ParseBindFlag(b string) (*pb.Mount, error) {
 	if len(parts) == 3 {
 		opts = append(strings.Split(parts[2], ","), "rbind")
 	}
-	return &pb.Mount{
+	return &containers.Mount{
 		Type:        "bind",
 		Destination: dest,
 		Source:      src,
@@ -301,15 +302,15 @@ func expandTilde(path string) string {
 }
 
 // FilterByPodName return new list of Pods which name matches with given podName
-func FilterByPodName(pods []*pb.Pod, podName string) []*pb.Pod {
-	for _, pod := range pods {
+func FilterByPodName(source []*pods.Pod, podName string) []*pods.Pod {
+	for _, pod := range source {
 		if pod.Metadata.Name == podName {
-			return []*pb.Pod{
+			return []*pods.Pod{
 				pod,
 			}
 		}
 	}
-	return []*pb.Pod{}
+	return []*pods.Pod{}
 }
 
 var (

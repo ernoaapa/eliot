@@ -1,7 +1,7 @@
 package stream
 
 import (
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 )
 
 // Writer is io.Writer implementation what writes stdout/stderr bytes to RPC stream
@@ -12,7 +12,7 @@ type Writer struct {
 
 // StdoutStreamServer interface for the endpoint what returns stream of log lines
 type StdoutStreamServer interface {
-	Send(*pb.StdoutStreamResponse) error
+	Send(*containers.StdoutStreamResponse) error
 }
 
 // NewWriter creates new Writer instance
@@ -23,7 +23,7 @@ func NewWriter(stream StdoutStreamServer, stderr bool) *Writer {
 // Write writes bytes to given RPC stream
 func (w *Writer) Write(p []byte) (n int, err error) {
 	n = len(p)
-	err = w.stream.Send(&pb.StdoutStreamResponse{
+	err = w.stream.Send(&containers.StdoutStreamResponse{
 		Output: p[:],
 		Stderr: w.stderr,
 	})

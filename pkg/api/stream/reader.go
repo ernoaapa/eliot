@@ -3,7 +3,7 @@ package stream
 import (
 	"bytes"
 
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 )
 
 // Reader is io.Reader implementation what reads bytes from RPC stream
@@ -14,7 +14,7 @@ type Reader struct {
 
 // StdinStreamServer interface for the endpoint what takes stdin stream in
 type StdinStreamServer interface {
-	Recv() (*pb.StdinStreamRequest, error)
+	Recv() (*containers.StdinStreamRequest, error)
 }
 
 // NewReader creates new Reader instance

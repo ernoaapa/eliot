@@ -12,7 +12,8 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/ernoaapa/can/pkg/api/mapping"
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/progress"
 )
 
@@ -33,15 +34,15 @@ func NewClient(namespace, serverAddr string) *Client {
 }
 
 // GetPods calls server and fetches all pods information
-func (c *Client) GetPods() ([]*pb.Pod, error) {
+func (c *Client) GetPods() ([]*pods.Pod, error) {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	client := pb.NewPodsClient(conn)
-	resp, err := client.List(c.ctx, &pb.ListPodsRequest{
+	client := pods.NewPodsClient(conn)
+	resp, err := client.List(c.ctx, &pods.ListPodsRequest{
 		Namespace: c.namespace,
 	})
 	if err != nil {
@@ -52,7 +53,7 @@ func (c *Client) GetPods() ([]*pb.Pod, error) {
 }
 
 // GetPod return Pod by name
-func (c *Client) GetPod(podName string) (*pb.Pod, error) {
+func (c *Client) GetPod(podName string) (*pods.Pod, error) {
 	pods, err := c.GetPods()
 	if err != nil {
 		return nil, err
@@ -67,15 +68,15 @@ func (c *Client) GetPod(podName string) (*pb.Pod, error) {
 }
 
 // CreatePod creates new pod to the target server
-func (c *Client) CreatePod(pod *pb.Pod) error {
+func (c *Client) CreatePod(pod *pods.Pod) error {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 
-	client := pb.NewPodsClient(conn)
-	stream, err := client.Create(c.ctx, &pb.CreatePodRequest{
+	client := pods.NewPodsClient(conn)
+	stream, err := client.Create(c.ctx, &pods.CreatePodRequest{
 		Pod: pod,
 	})
 	if err != nil {
@@ -101,15 +102,15 @@ func (c *Client) CreatePod(pod *pb.Pod) error {
 }
 
 // StartPod creates new pod to the target server
-func (c *Client) StartPod(name string) (*pb.Pod, error) {
+func (c *Client) StartPod(name string) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	client := pb.NewPodsClient(conn)
-	resp, err := client.Start(c.ctx, &pb.StartPodRequest{
+	client := pods.NewPodsClient(conn)
+	resp, err := client.Start(c.ctx, &pods.StartPodRequest{
 		Namespace: c.namespace,
 		Name:      name,
 	})
@@ -121,16 +122,16 @@ func (c *Client) StartPod(name string) (*pb.Pod, error) {
 }
 
 // DeletePod creates new pod to the target server
-func (c *Client) DeletePod(pod *pb.Pod) (*pb.Pod, error) {
+func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	client := pb.NewPodsClient(conn)
+	client := pods.NewPodsClient(conn)
 
-	resp, err := client.Delete(c.ctx, &pb.DeletePodRequest{
+	resp, err := client.Delete(c.ctx, &pods.DeletePodRequest{
 		Namespace: pod.Metadata.Namespace,
 		Name:      pod.Metadata.Name,
 	})
@@ -154,7 +155,7 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 	}
 	defer conn.Close()
 
-	client := pb.NewPodsClient(conn)
+	client := containers.NewContainersClient(conn)
 	log.Debugf("Open stream connection to server to get logs")
 	stream, err := client.Attach(ctx)
 	if err != nil {
@@ -203,7 +204,7 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 					break
 				}
 
-				err = stream.Send(&pb.StdinStreamRequest{
+				err = stream.Send(&containers.StdinStreamRequest{
 					Input: buf[:n],
 				})
 				if err != nil {
@@ -226,9 +227,9 @@ func (c *Client) Signal(containerID string, signal syscall.Signal) (err error) {
 	}
 	defer conn.Close()
 
-	client := pb.NewPodsClient(conn)
+	client := containers.NewContainersClient(conn)
 
-	_, err = client.Signal(c.ctx, &pb.SignalRequest{
+	_, err = client.Signal(c.ctx, &containers.SignalRequest{
 		Namespace:   c.namespace,
 		ContainerID: containerID,
 		Signal:      int32(signal),
