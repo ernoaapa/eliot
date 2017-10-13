@@ -9,7 +9,19 @@ import (
 )
 
 // UnmarshalYaml reads v1 Pods data in YAML format and unmarshals it to v1 api model
-func UnmarshalYaml(data []byte) ([]*Pod, error) {
+func UnmarshalYaml(data []byte) (*Pod, error) {
+	target := &Pod{}
+
+	unmarshalErr := yaml.Unmarshal(data, target)
+	if unmarshalErr != nil {
+		return target, errors.Wrapf(unmarshalErr, "Unable to parse Yaml data")
+	}
+
+	return Default(target), nil
+}
+
+// UnmarshalListYaml reads list of v1 Pods data in YAML format and unmarshals it to v1 api model
+func UnmarshalListYaml(data []byte) ([]*Pod, error) {
 	target := &[]*Pod{}
 
 	unmarshalErr := yaml.Unmarshal(data, target)
@@ -20,8 +32,8 @@ func UnmarshalYaml(data []byte) ([]*Pod, error) {
 	return Defaults(*target), nil
 }
 
-// UnmarshalJSON reads v1 Pods data in JSON format and unmarshals it to v1 api model
-func UnmarshalJSON(data []byte) ([]*Pod, error) {
+// UnmarshalListJSON reads v1 Pods data in JSON format and unmarshals it to v1 api model
+func UnmarshalListJSON(data []byte) ([]*Pod, error) {
 	target := &[]*Pod{}
 
 	unmarshalErr := json.Unmarshal(data, target)

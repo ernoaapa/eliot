@@ -71,7 +71,7 @@ func (s *FileManifestSource) getPods() (pods []model.Pod, err error) {
 
 	switch extension := filepath.Ext(s.filePath); extension {
 	case ".yaml", ".yml":
-		content, err := pb.UnmarshalYaml(data)
+		content, err := pb.UnmarshalListYaml(data)
 		if err != nil {
 			return nil, err
 		}

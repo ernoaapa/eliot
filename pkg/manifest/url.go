@@ -97,9 +97,9 @@ func (s *URLManifestSource) getManifest() (pods []*pb.Pod, err error) {
 		return pods, errors.Wrapf(err, "Received invalid content type, cannot parse media type: [%s]", contentType)
 	}
 	if strings.Contains(mediaType, yamlContentType) {
-		return pb.UnmarshalYaml(data)
+		return pb.UnmarshalListYaml(data)
 	} else if strings.Contains(mediaType, jsonContentType) {
-		return pb.UnmarshalJSON(data)
+		return pb.UnmarshalListJSON(data)
 	} else {
 		return pods, fmt.Errorf("Unsupported response media type: [%s]", mediaType)
 	}
