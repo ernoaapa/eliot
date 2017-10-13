@@ -49,6 +49,7 @@ func main() {
 		deleteCommand,
 		attachCommand,
 		runCommand,
+		createCommand,
 		configCommand,
 	}
 
