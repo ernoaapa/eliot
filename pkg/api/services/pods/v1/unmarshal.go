@@ -1,23 +1,32 @@
 package pods
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 
+	utils "github.com/ernoaapa/can/pkg/utils/yaml"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
 
 // UnmarshalYaml reads v1 Pods data in YAML format and unmarshals it to v1 api model
-func UnmarshalYaml(data []byte) (*Pod, error) {
-	target := &Pod{}
+func UnmarshalYaml(data []byte) ([]*Pod, error) {
+	result := []*Pod{}
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	scanner.Split(utils.SplitYAMLDocument)
 
-	unmarshalErr := yaml.Unmarshal(data, target)
-	if unmarshalErr != nil {
-		return target, errors.Wrapf(unmarshalErr, "Unable to parse Yaml data")
+	for scanner.Scan() {
+		target := &Pod{}
+		unmarshalErr := yaml.Unmarshal(scanner.Bytes(), target)
+		if unmarshalErr != nil {
+			return result, errors.Wrapf(unmarshalErr, "Unable to parse Yaml data")
+		}
+		result = append(result, target)
 	}
 
-	return Default(target), nil
+	return Defaults(result), nil
 }
 
 // UnmarshalListYaml reads list of v1 Pods data in YAML format and unmarshals it to v1 api model

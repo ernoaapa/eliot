@@ -20,11 +20,11 @@ import (
 func Pods(sources []string) (result []*pods.Pod, err error) {
 	for _, source := range sources {
 		if fs.FileExist(source) {
-			resource, err := readFileSource(source)
+			resources, err := readFileSource(source)
 			if err != nil {
 				return result, errors.Wrapf(err, "Failed to read pod spec file %s", source)
 			}
-			result = append(result, resource)
+			result = append(result, resources...)
 		} else if fs.DirExist(source) {
 			files, err := ioutil.ReadDir(source)
 			if err != nil {
@@ -32,11 +32,11 @@ func Pods(sources []string) (result []*pods.Pod, err error) {
 			}
 			for _, file := range files {
 				if !file.IsDir() {
-					resource, err := readFileSource(filepath.Join(source, file.Name()))
+					resources, err := readFileSource(filepath.Join(source, file.Name()))
 					if err != nil {
 						return result, errors.Wrapf(err, "Failed to read pod spec file %s", source)
 					}
-					result = append(result, resource)
+					result = append(result, resources...)
 				}
 			}
 		} else if validURL(source) {
@@ -50,12 +50,12 @@ func Pods(sources []string) (result []*pods.Pod, err error) {
 			if err != nil {
 				return result, errors.Wrapf(err, "Failed to get spec response from url: %s", source)
 			}
-			resource, err := pods.UnmarshalYaml(data)
+			resources, err := pods.UnmarshalYaml(data)
 			if err != nil {
 				return result, errors.Wrapf(err, "Failed to read pod spec response from url: %s", source)
 			}
 
-			result = append(result, resource)
+			result = append(result, resources...)
 		} else {
 			return result, fmt.Errorf("Unknown source %s. Must be file, directory or url", source)
 		}
@@ -63,10 +63,10 @@ func Pods(sources []string) (result []*pods.Pod, err error) {
 	return result, nil
 }
 
-func readFileSource(path string) (*pods.Pod, error) {
+func readFileSource(path string) ([]*pods.Pod, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return &pods.Pod{}, errors.Wrapf(err, "Failed to read pod spec file %s", path)
+		return []*pods.Pod{}, errors.Wrapf(err, "Failed to read pod spec file %s", path)
 	}
 
 	return pods.UnmarshalYaml(data)
