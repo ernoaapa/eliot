@@ -205,7 +205,7 @@ var runCommand = cli.Command{
 		if !noSync {
 			done := make(chan struct{})
 			destination := fmt.Sprintf("rsync://%s:%d/volume", config.GetEndpointHost(), 873)
-			go sync.Rsync(done, syncDirs, destination, 1*time.Second)
+			sync.StartRsync(done, syncDirs, destination, 1*time.Second)
 			defer close(done)
 		}
 
