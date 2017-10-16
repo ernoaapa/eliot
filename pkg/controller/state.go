@@ -57,11 +57,3 @@ func resolveContainerStatus(client runtime.Client, namespace string, container m
 		State: client.GetContainerTaskStatus(namespace, container.Name),
 	}
 }
-
-func getValues(podsByName map[string]model.Pod) []model.Pod {
-	values := []model.Pod{}
-	for _, pod := range podsByName {
-		values = append(values, pod)
-	}
-	return values
-}

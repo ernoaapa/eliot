@@ -12,12 +12,7 @@ import (
 func MapModelByPodNamesToInternalModel(containers []containerd.Container) map[string][]model.Container {
 	result := make(map[string][]model.Container)
 	for _, container := range containers {
-		labels := ContainerLabels(container.Info().Labels)
-		podName := labels.getPodName()
-		if podName == "" {
-			// container is not cand managed container so add it under 'system' pod in namespace 'default'
-			podName = "system"
-		}
+		podName := GetPodName(container)
 
 		if _, ok := result[podName]; !ok {
 			result[podName] = []model.Container{}
@@ -26,6 +21,17 @@ func MapModelByPodNamesToInternalModel(containers []containerd.Container) map[st
 		result[podName] = append(result[podName], MapContainerToInternalModel(container))
 	}
 	return result
+}
+
+// GetPodName resolves pod name where the container belongs
+func GetPodName(container containerd.Container) string {
+	labels := ContainerLabels(container.Info().Labels)
+	podName := labels.getPodName()
+	if podName == "" {
+		// container is not cand managed container so add it under 'system' pod in namespace 'default'
+		podName = "system"
+	}
+	return podName
 }
 
 // MapContainersToInternalModel maps containerd models to internal model
@@ -48,4 +54,20 @@ func MapContainerToInternalModel(container containerd.Container) model.Container
 		Image: container.Info().Image,
 		Tty:   spec.Process.Terminal,
 	}
+}
+
+// MapContainerStatusToInternalModel maps containerd model to internal container status model
+func MapContainerStatusToInternalModel(container containerd.Container, status containerd.Status) model.ContainerStatus {
+	return model.ContainerStatus{
+		ContainerID: container.ID(),
+		Image:       container.Info().Image,
+		State:       mapContainerStatus(status),
+	}
+}
+
+func mapContainerStatus(status containerd.Status) string {
+	if status.Status == "" {
+		return string(containerd.Unknown)
+	}
+	return string(status.Status)
 }

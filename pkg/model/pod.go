@@ -20,3 +20,22 @@ type PodSpec struct {
 type PodStatus struct {
 	ContainerStatuses []ContainerStatus `validate:"dive"`
 }
+
+// NewPod creates new Pod struct with name and namespace metadata
+func NewPod(name, namespace string) Pod {
+	return Pod{
+		Metadata: NewMetadata(name, namespace),
+		Spec: PodSpec{
+			Containers: []Container{},
+		},
+		Status: PodStatus{
+			ContainerStatuses: []ContainerStatus{},
+		},
+	}
+}
+
+// AppendContainer adds container to the pod information
+func (p *Pod) AppendContainer(container Container, status ContainerStatus) {
+	p.Spec.Containers = append(p.Spec.Containers, container)
+	p.Status.ContainerStatuses = append(p.Status.ContainerStatuses, status)
+}

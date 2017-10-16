@@ -20,6 +20,18 @@ type FakeClient struct {
 	stoppedCount int
 }
 
+// GetPods fake impl.
+func (c *FakeClient) GetPods(namespace string) (result []model.Pod, err error) {
+	for podNamespace, podContainers := range c.containers {
+		if podNamespace == namespace {
+			for podName := range podContainers {
+				result = append(result, model.NewPod(podName, podNamespace))
+			}
+		}
+	}
+	return result, nil
+}
+
 // GetAllContainers fake impl.
 func (c *FakeClient) GetAllContainers(namespace string) (map[string][]model.Container, error) {
 	for podNamespace, podContainers := range c.containers {

@@ -91,7 +91,7 @@ func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pod
 	}
 
 	return &pods.StartPodResponse{
-		Pod: mapping.MapPodToAPIModel(req.Namespace, req.Name, containers),
+		Pod: mapping.CreatePodAPIModel(req.Namespace, req.Name, containers),
 	}, nil
 }
 
@@ -109,18 +109,18 @@ func (s *Server) Delete(context context.Context, req *pods.DeletePodRequest) (*p
 		}
 	}
 	return &pods.DeletePodResponse{
-		Pod: mapping.MapPodToAPIModel(req.Namespace, req.Name, containers),
+		Pod: mapping.CreatePodAPIModel(req.Namespace, req.Name, containers),
 	}, nil
 }
 
 // List is 'pods' service List implementation
 func (s *Server) List(context context.Context, req *pods.ListPodsRequest) (*pods.ListPodsResponse, error) {
-	containersByPods, err := s.client.GetAllContainers(req.Namespace)
+	p, err := s.client.GetPods(req.Namespace)
 	if err != nil {
 		return nil, err
 	}
 	return &pods.ListPodsResponse{
-		Pods: mapping.MapPodsToAPIModel(req.Namespace, containersByPods),
+		Pods: mapping.MapPodsToAPIModel(p),
 	}, nil
 }
 

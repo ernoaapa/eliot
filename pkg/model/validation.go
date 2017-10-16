@@ -75,6 +75,7 @@ func isEmpty(value interface{}) bool {
 	return false
 }
 
+// IsValidEnvKeyValuePair return true if value is valid formated environment variable (e.g. KEY=value)
 func IsValidEnvKeyValuePair(value string) bool {
 	if value == "" {
 		return false

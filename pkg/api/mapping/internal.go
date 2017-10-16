@@ -7,27 +7,42 @@ import (
 	"github.com/ernoaapa/can/pkg/model"
 )
 
-// MapPodsToAPIModel maps list of internal Pod models to API model
-func MapPodsToAPIModel(namespace string, containersByPods map[string][]model.Container) (result []*pods.Pod) {
-	for podName, containers := range containersByPods {
-		result = append(result, MapPodToAPIModel(namespace, podName, containers))
+// MapPodsToAPIModel maps list of internal pod models to API model
+func MapPodsToAPIModel(pods []model.Pod) (result []*pods.Pod) {
+	for _, pod := range pods {
+		result = append(result, MapPodToAPIModel(pod))
 	}
 	return result
 }
 
+// MapContainersByPodsToAPIModel maps list of internal Pod models to API model
+func MapContainersByPodsToAPIModel(namespace string, containersByPods map[string][]model.Container) (result []*pods.Pod) {
+	for podName, containers := range containersByPods {
+		result = append(result, CreatePodAPIModel(podName, namespace, containers))
+	}
+	return result
+}
+
+// CreatePodAPIModel maps internal Pod model to API model
+func CreatePodAPIModel(namespace, podName string, containers []model.Container) *pods.Pod {
+	pod := model.NewPod(podName, namespace)
+	pod.Spec.Containers = containers
+	return MapPodToAPIModel(pod)
+}
+
 // MapPodToAPIModel maps internal Pod model to API model
-func MapPodToAPIModel(namespace, podName string, containers []model.Container) *pods.Pod {
+func MapPodToAPIModel(pod model.Pod) *pods.Pod {
 	return &pods.Pod{
 		Metadata: &core.ResourceMetadata{
-			Name:      podName,
-			Namespace: namespace,
+			Name:      pod.Metadata.Name,
+			Namespace: pod.Metadata.Namespace,
 		},
 		Spec: &pods.PodSpec{
-			Containers: MapContainersToAPIModel(containers),
+			Containers: MapContainersToAPIModel(pod.Spec.Containers),
 		},
-		// Status: &pods.PodStatus{
-		// 	ContainerStatuses: mapContainerStatusesToAPIModel(pod.Status.ContainerStatuses),
-		// },
+		Status: &pods.PodStatus{
+			ContainerStatuses: MapContainerStatusesToAPIModel(pod.Status.ContainerStatuses),
+		},
 	}
 }
 

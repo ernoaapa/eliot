@@ -83,6 +83,56 @@ func (c *ContainerdClient) GetAllContainers(namespace string) (map[string][]mode
 	return mapping.MapModelByPodNamesToInternalModel(containers), nil
 }
 
+// GetPods return all containers active in containerd grouped by pods
+func (c *ContainerdClient) GetPods(namespace string) ([]model.Pod, error) {
+	pods := map[string]*model.Pod{}
+	ctx, cancel := c.getContext()
+	defer cancel()
+
+	client, err := c.getConnection(namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	containers, err := client.Containers(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error while getting list of containers")
+	}
+
+	for _, container := range containers {
+		podName := mapping.GetPodName(container)
+		if _, ok := pods[podName]; !ok {
+			pod := model.NewPod(podName, namespace)
+			pods[podName] = &pod
+		}
+
+		status := containerd.Status{}
+		task, err := container.Task(ctx, nil)
+		if err != nil {
+			log.Warnf("Cannot resolve container status, failed to fetch task, will mark as unknown. Error: %s", err)
+		} else {
+			status, err = task.Status(ctx)
+			if err != nil {
+				log.Warnf("Cannot resolve container status, failed to fetch status, will mark as unknown. Error: %s", err)
+			}
+		}
+
+		pods[podName].AppendContainer(
+			mapping.MapContainerToInternalModel(container),
+			mapping.MapContainerStatusToInternalModel(container, status),
+		)
+	}
+
+	return getValues(pods), nil
+}
+
+func getValues(podsByName map[string]*model.Pod) (result []model.Pod) {
+	for _, pod := range podsByName {
+		result = append(result, *pod)
+	}
+	return result
+}
+
 // GetContainers return pod active containers in containerd
 func (c *ContainerdClient) GetContainers(namespace, podName string) ([]model.Container, error) {
 	containersByPod, err := c.GetAllContainers(namespace)

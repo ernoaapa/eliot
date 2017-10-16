@@ -1,12 +1,14 @@
 package humanreadable
 
 // PodDetailsTemplate is go template for printing pod details
-const PodDetailsTemplate = `Name: {{.Metadata.Name}}
-Namespace:	{{.Metadata.Namespace}}
-Containers:{{range .Spec.Containers}}
-  {{.Name}}:
+const PodDetailsTemplate = `Name: {{.Pod.Metadata.Name}}
+Namespace:	{{.Pod.Metadata.Namespace}}
+State: {{.PodStatus}}
+Containers:{{range .Pod.Status.ContainerStatuses}}
+  {{.ContainerID}}:
     Image: {{.Image}}
+    State: {{.State}}
 {{else}}
-  (No containers)
+  (No container statuses available)
 {{end}}
 `
