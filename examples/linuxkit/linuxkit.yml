@@ -41,13 +41,13 @@ services:
       - /tmp:/tmp
 
   - name: discovery
-    image: ernoaapa/discovery-amd64:a1857d2
+    image: ernoaapa/discovery-amd64:4a0ce80
     command: ["/discovery", "--debug", "--expose", "5000"]
     net: host
     binds:
       - /etc/machine-id:/etc/machine-id
   - name: cand
-    image: ernoaapa/cand-amd64:b829d9d
+    image: ernoaapa/cand-amd64:4a0ce80
     command: ["/cand", "--debug", "--labels", "camera=true,name=first", "--manifest", "http://can.ngrok.io/api/devices/first/manifest", "--report", "http://can.ngrok.io/api/devices/first/pods"]
     capabilities:
       - all
@@ -57,7 +57,7 @@ services:
       - /etc/resolv.conf:/etc/resolv.conf
       - /etc/machine-id:/etc/machine-id
   - name: can-api
-    image: ernoaapa/can-api-amd64:7ff0dec
+    image: ernoaapa/can-api-amd64:4a0ce80
     command: ["/can-api", "--debug", "--listen", "0.0.0.0:5000"]
     capabilities:
       - all
