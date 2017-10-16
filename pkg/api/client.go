@@ -6,6 +6,7 @@ import (
 	"io"
 	"syscall"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -91,7 +92,7 @@ func (c *Client) CreatePod(pod *pods.Pod) error {
 		if err == io.EOF {
 			err = stream.CloseSend()
 			progress.Done()
-			return nil
+			return err
 		}
 		if err != nil {
 			return err
@@ -144,6 +145,8 @@ func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 // Attach calls server and fetches pod logs
 func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.Writer) (err error) {
 	done := make(chan struct{})
+	errc := make(chan error)
+
 	md := metadata.Pairs(
 		"namespace", c.namespace,
 		"container", containerID,
@@ -168,10 +171,13 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 			resp, err := stream.Recv()
 			if err == io.EOF {
 				err = stream.CloseSend()
+				if err != nil {
+					errc <- err
+				}
 				break
 			}
 			if err != nil {
-				log.Debugf("Received error: %s", err)
+				errc <- errors.Wrapf(err, "Received error while reading attach stream")
 				break
 			}
 
@@ -182,7 +188,7 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 
 			_, err = io.Copy(target, bytes.NewReader(resp.Output))
 			if err != nil {
-				log.Debugf("Error while copying data: %s", err)
+				errc <- errors.Wrapf(err, "Error while copying data")
 				break
 			}
 		}
@@ -200,7 +206,7 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 					break
 				}
 				if err != nil {
-					log.Debugf("Error while reading stdin to buffer: %s", err)
+					errc <- errors.Wrapf(err, "Error while reading stdin to buffer")
 					break
 				}
 
@@ -208,15 +214,20 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 					Input: buf[:n],
 				})
 				if err != nil {
-					log.Debugf("Sending to stream returned error %s", err)
+					errc <- errors.Wrapf(err, "Sending to stream returned error")
 					break
 				}
 			}
 		}()
 	}
 
-	<-done
-	return err
+	for {
+		select {
+		case <-done:
+			return err
+		case err = <-errc:
+		}
+	}
 }
 
 // Signal sends kill signal to container process

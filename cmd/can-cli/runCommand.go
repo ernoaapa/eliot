@@ -18,6 +18,7 @@ import (
 	"github.com/ernoaapa/can/pkg/resolve"
 	"github.com/ernoaapa/can/pkg/sync"
 	"github.com/ernoaapa/can/pkg/term"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -96,12 +97,12 @@ var runCommand = cli.Command{
 
 		var (
 			projectConfig = config.ReadProjectConfig("./.can.yml")
-			name          = projectConfig.String("name", clicontext.String("name"))
-			image         = projectConfig.String("image", clicontext.String("image"))
+			name          = projectConfig.NameOrElse(clicontext.String("name"))
+			image         = projectConfig.ImageOrElse(clicontext.String("image"))
 			detach        = clicontext.Bool("detach")
 			rm            = clicontext.Bool("rm")
 			tty           = clicontext.Bool("tty")
-			env           = projectConfig.StringSlice("env", clicontext.StringSlice("env"))
+			env           = projectConfig.EnvWith(clicontext.StringSlice("env"))
 			workdir       = clicontext.String("workdir")
 			noSync        = clicontext.Bool("no-sync")
 			syncDirs      = clicontext.StringSlice("sync")
@@ -156,16 +157,16 @@ var runCommand = cli.Command{
 		}
 
 		if !noSync {
-			workspaceMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:/volume:rw,rshared", name))
+			workspaceMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:%s:rw,rshared", name, projectConfig.Sync.Target))
 
 			cont[0].Mounts = append(cont[0].Mounts, workspaceMount)
 			if cont[0].WorkingDir == "" {
-				cont[0].WorkingDir = "/volume"
+				cont[0].WorkingDir = projectConfig.Sync.Target
 			}
 
 			cont = append(cont, &containers.Container{
 				Name:   fmt.Sprintf("rsync-%s", name),
-				Image:  cmd.ExpandToFQIN("stefda/rsync"),
+				Image:  cmd.ExpandToFQIN(projectConfig.Sync.Image),
 				Mounts: []*containers.Mount{workspaceMount},
 			})
 		}
@@ -181,17 +182,24 @@ var runCommand = cli.Command{
 			},
 		}
 
-		if rm {
-			defer client.DeletePod(pod)
-		}
-
 		if err := client.CreatePod(pod); err != nil {
-			return err
+			return errors.Wrapf(err, "Error in creating pod")
 		}
 
 		result, err := client.StartPod(name)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "Error in starting pod")
+		}
+
+		if rm {
+			defer func() {
+				pod, err := client.DeletePod(pod)
+				if err != nil {
+					log.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
+				} else {
+					log.Infof("Deleted pod [%s]", pod.Metadata.Name)
+				}
+			}()
 		}
 
 		if detach {
@@ -200,7 +208,8 @@ var runCommand = cli.Command{
 			return printer.PrintPodDetails(result, writer)
 		}
 
-		attachContainerID := result.Spec.Containers[0].Name
+		// TODO: Switch to created ContainerID when API exposes it
+		attachContainerID := name
 
 		if !noSync {
 			done := make(chan struct{})
@@ -224,6 +233,7 @@ var runCommand = cli.Command{
 		}
 
 		return term.Safe(func() error {
+			log.Debugln("Attach to container [%s]", attachContainerID)
 			return client.Attach(attachContainerID, term.In, term.Out, stderr)
 		})
 	},

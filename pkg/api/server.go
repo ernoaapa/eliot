@@ -44,7 +44,7 @@ func (s *Server) Create(req *pods.CreatePodRequest, server pods.Pods_CreateServe
 				images := mapping.MapImageFetchProgressToAPIModel(progresses)
 
 				if err := server.Send(&pods.CreatePodStreamResponse{Images: images}); err != nil {
-					log.Warnf("Error while sending create pod status back to client: %s", err)
+					log.Warnf("Error while sending last create pod status back to client: %s", err)
 				}
 				return // End update loop
 			case <-time.After(100 * time.Millisecond):
@@ -83,7 +83,6 @@ func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pod
 	}
 
 	for _, container := range containers {
-		log.Debugf("Container [%s] created, will start it", container.Name)
 		if err := s.client.StartContainer(req.Namespace, container.Name, container.Tty); err != nil {
 			return nil, errors.Wrapf(err, "Failed to start container [%s]", container.Name)
 		}

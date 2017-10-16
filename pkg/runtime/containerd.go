@@ -238,7 +238,7 @@ func (c *ContainerdClient) StartContainer(namespace, name string, tty bool) erro
 	log.Debugln("Starting task...")
 	err = task.Start(ctx)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to start task in container", container.ID())
+		return errors.Wrapf(err, "Failed to start task in container [%s]", container.ID())
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
 	return nil
