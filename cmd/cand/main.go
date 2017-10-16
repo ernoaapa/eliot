@@ -92,8 +92,8 @@ func main() {
 		if err != nil {
 			return err
 		}
+		wg.Add(1)
 		go func() {
-			wg.Add(1)
 			defer wg.Done()
 			source.Start()
 		}()
@@ -102,22 +102,22 @@ func main() {
 		if err != nil {
 			return err
 		}
+		wg.Add(1)
 		go func() {
-			wg.Add(1)
 			defer wg.Done()
 			reporter.Start()
 		}()
 
 		controller := cmd.GetController(clicontext, sourceUpdates, stateUpdates)
-
+		wg.Add(1)
 		go func() {
-			wg.Add(1)
 			defer wg.Done()
 			controller.Start()
 		}()
 
 		log.Infoln("Started!")
 		wg.Wait()
+		log.Infoln("Source, reporter and controller died. Shutting down")
 		return nil
 	}
 
