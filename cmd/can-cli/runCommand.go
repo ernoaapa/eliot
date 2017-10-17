@@ -157,17 +157,18 @@ var runCommand = cli.Command{
 		}
 
 		if !noSync {
-			workspaceMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:%s:rw,rshared", name, projectConfig.Sync.Target))
+			workdirMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:%s:rw,rshared", name, projectConfig.Sync.Target))
 
-			cont[0].Mounts = append(cont[0].Mounts, workspaceMount)
+			cont[0].Mounts = append(cont[0].Mounts, workdirMount)
 			if cont[0].WorkingDir == "" {
 				cont[0].WorkingDir = projectConfig.Sync.Target
 			}
 
+			syncMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:/volume:rw,rshared", name))
 			cont = append(cont, &containers.Container{
 				Name:   fmt.Sprintf("rsync-%s", name),
 				Image:  cmd.ExpandToFQIN(projectConfig.Sync.Image),
-				Mounts: []*containers.Mount{workspaceMount},
+				Mounts: []*containers.Mount{syncMount},
 			})
 		}
 
