@@ -8,12 +8,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestImageResolve(t *testing.T) {
+func TestImageResolveNode(t *testing.T) {
 	projectDir := getExampleDirectory("node")
 	image, err := Image(projectDir)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "docker.io/library/node:latest", image)
+}
+
+func TestImageResolveGolang(t *testing.T) {
+	projectDir := getExampleDirectory("golang")
+	image, err := Image(projectDir)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "docker.io/library/golang:latest", image)
 }
 
 func getExampleDirectory(name string) string {
