@@ -10,6 +10,10 @@ import (
 
 func ensureMountSourceDirExists(mounts []model.Mount) error {
 	for _, mount := range mounts {
+		if fs.FileExist(mount.Source) {
+			// it's a file...
+			continue
+		}
 		if !fs.DirExist(mount.Source) {
 			err := os.MkdirAll(mount.Source, os.ModePerm)
 			if err != nil {

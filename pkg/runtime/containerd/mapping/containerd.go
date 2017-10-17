@@ -1,7 +1,7 @@
 package mapping
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/containerd/containerd"
 	"github.com/ernoaapa/can/pkg/model"
