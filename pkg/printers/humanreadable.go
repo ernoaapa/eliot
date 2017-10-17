@@ -8,7 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers/humanreadable"
@@ -25,7 +26,7 @@ func NewHumanReadablePrinter() *HumanReadablePrinter {
 }
 
 // PrintPodsTable writes list of Pods in human readable table format to the writer
-func (p *HumanReadablePrinter) PrintPodsTable(pods []*pb.Pod, writer io.Writer) error {
+func (p *HumanReadablePrinter) PrintPodsTable(pods []*pods.Pod, writer io.Writer) error {
 	fmt.Fprintln(writer, "NAMESPACE\tNAME\tCONTAINERS\tSTATUS")
 
 	for _, pod := range pods {
@@ -37,9 +38,14 @@ func (p *HumanReadablePrinter) PrintPodsTable(pods []*pb.Pod, writer io.Writer) 
 }
 
 // getStatus constructs a string representation of all containers statuses
-func getStatus(pod *pb.Pod) string {
+func getStatus(pod *pods.Pod) string {
 	counts := map[string]int{}
-	for _, status := range pod.Status.ContainerStatuses {
+
+	statuses := []*containers.ContainerStatus{}
+	if pod.Status != nil {
+		statuses = pod.Status.ContainerStatuses
+	}
+	for _, status := range statuses {
 		if _, ok := counts[status.State]; !ok {
 			counts[status.State] = 0
 		}
@@ -77,7 +83,7 @@ func (p *HumanReadablePrinter) PrintDevicesTable(devices <-chan model.DeviceInfo
 }
 
 // PrintPodDetails writes list of pods in human readable detailed format to the writer
-func (p *HumanReadablePrinter) PrintPodDetails(pod *pb.Pod, writer io.Writer) error {
+func (p *HumanReadablePrinter) PrintPodDetails(pod *pods.Pod, writer io.Writer) error {
 	t := template.New("pod-details")
 	t, err := t.Parse(humanreadable.PodDetailsTemplate)
 	if err != nil {
