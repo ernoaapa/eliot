@@ -107,7 +107,7 @@ var runCommand = cli.Command{
 			noSync        = clicontext.Bool("no-sync")
 			syncDirs      = clicontext.StringSlice("sync")
 			mounts        = cmd.GetMounts(clicontext)
-			binds         = cmd.GetBinds(clicontext)
+			binds         = cmd.GetBinds(clicontext, projectConfig.Binds...)
 			args          = clicontext.Args()
 
 			stdin  = os.Stdin

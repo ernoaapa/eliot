@@ -252,8 +252,10 @@ func parseMountFlag(m string) (*containers.Mount, error) {
 }
 
 // GetBinds parses a --bind string flags
-func GetBinds(clicontext *cli.Context) (result []*containers.Mount) {
-	for _, flag := range clicontext.StringSlice("bind") {
+func GetBinds(clicontext *cli.Context, extra ...string) (result []*containers.Mount) {
+	binds := clicontext.StringSlice("bind")
+	binds = append(binds, extra...)
+	for _, flag := range binds {
 		bind, err := ParseBindFlag(flag)
 		if err != nil {
 			log.Fatalf("Failed to parse --bind flag: %s", err)

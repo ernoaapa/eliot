@@ -11,9 +11,10 @@ import (
 // ProjectConfig represents configuration in project directory
 type ProjectConfig struct {
 	path  string
-	Name  string `yaml:"name"`
-	Image string `yaml:"image"`
-	Env   []string
+	Name  string     `yaml:"name"`
+	Image string     `yaml:"image"`
+	Env   []string   `yaml:"env"`
+	Binds []string   `yaml:"binds"`
 	Sync  SyncConfig `yaml:"sync"`
 }
 

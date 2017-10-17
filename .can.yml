@@ -1,0 +1,10 @@
+sync:
+  target: /go/src/github.com/ernoaapa/can
+binds:
+  - /containers:/containers
+  - /var/lib/volumes:/var/lib/volumes
+  - /run/containerd:/run/containerd
+  - /etc/resolv.conf:/etc/resolv.conf
+  - /etc/machine-id:/etc/machine-id
+  - /var/log:/var/log # To be able to serve default containers logs through api
+  # - /tmp:/tmp # To be able to read temporary fifo log files
