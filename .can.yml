@@ -7,4 +7,6 @@ binds:
   - /etc/resolv.conf:/etc/resolv.conf
   - /etc/machine-id:/etc/machine-id
   - /var/log:/var/log # To be able to serve default containers logs through api
-  # - /tmp:/tmp # To be able to read temporary fifo log files
+  # Warning: if running inside linuxkit, you need to remount with 'exec' otherwise you get "permission denied"
+  # mount -i -o remount,exec /tmp/
+  - /tmp:/tmp # To be able to read temporary fifo log files

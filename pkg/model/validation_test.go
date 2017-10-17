@@ -41,6 +41,7 @@ func TestEnvKeyValuePairs(t *testing.T) {
 	assert.True(t, IsValidEnvKeyValuePair("VERSION=12345"), "Should be valid env key/value pair")
 	assert.True(t, IsValidEnvKeyValuePair("DEBUG=true"), "Should be valid env key/value pair")
 	assert.True(t, IsValidEnvKeyValuePair("BAZ"), "Should be valid env key/value pair")
+	assert.True(t, IsValidEnvKeyValuePair("TMPDIR=~/tmp"), "Should be valid env key/value pair")
 
 	assert.False(t, IsValidEnvKeyValuePair("%&%,foo"), "Should be invalid env key/value pair")
 }

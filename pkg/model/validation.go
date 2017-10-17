@@ -82,10 +82,8 @@ func IsValidEnvKeyValuePair(value string) bool {
 	}
 
 	parts := strings.SplitN(value, "=", 2)
-	for _, part := range parts {
-		if !isAlphanumericOrDash(part) {
-			return false
-		}
+	if !isAlphanumericOrDash(parts[0]) {
+		return false
 	}
 	return true
 }
