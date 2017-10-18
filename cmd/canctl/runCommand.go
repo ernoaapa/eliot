@@ -194,7 +194,7 @@ var runCommand = cli.Command{
 
 		if rm {
 			defer func() {
-				pod, err := client.DeletePod(pod)
+				_, err := client.DeletePod(pod)
 				if err != nil {
 					log.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
 				} else {
