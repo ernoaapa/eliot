@@ -67,22 +67,6 @@ func (c *ContainerdClient) getConnection(namespace string) (*containerd.Client, 
 	return client, nil
 }
 
-// GetAllContainers return all containers active in containerd grouped by pod name
-func (c *ContainerdClient) GetAllContainers(namespace string) (map[string][]model.Container, error) {
-	ctx, cancel := c.getContext()
-	defer cancel()
-
-	client, err := c.getConnection(namespace)
-	if err != nil {
-		return nil, err
-	}
-	containers, err := client.Containers(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "Error while getting list of containers")
-	}
-	return mapping.MapModelByPodNamesToInternalModel(containers), nil
-}
-
 // GetPods return all containers active in containerd grouped by pods
 func (c *ContainerdClient) GetPods(namespace string) ([]model.Pod, error) {
 	pods := map[string]*model.Pod{}
@@ -135,11 +119,16 @@ func getValues(podsByName map[string]*model.Pod) (result []model.Pod) {
 
 // GetContainers return pod active containers in containerd
 func (c *ContainerdClient) GetContainers(namespace, podName string) ([]model.Container, error) {
-	containersByPod, err := c.GetAllContainers(namespace)
+	pods, err := c.GetPods(namespace)
 	if err != nil {
 		return nil, err
 	}
-	return containersByPod[podName], nil
+	for _, pod := range pods {
+		if pod.Metadata.Name == podName {
+			return pod.Spec.Containers, nil
+		}
+	}
+	return []model.Container{}, nil
 }
 
 // CreateContainer creates given container

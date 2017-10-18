@@ -62,7 +62,10 @@ func (c *Controller) Sync(manifest podsManifest) (err error) {
 	log.Debugf("Syncing namespaces: %s", namespaces)
 	for _, namespace := range namespaces {
 		manifest := manifest.filterPodsByNamespace(namespace)
-		state, err := c.client.GetAllContainers(namespace)
+		state, err := c.client.GetPods(namespace)
+		for _, pod := range state {
+			log.Debugf("Found %d containers in %s", len(pod.Spec.Containers), pod.Metadata.Name)
+		}
 		if err != nil {
 			return err
 		}
@@ -96,7 +99,7 @@ func (c *Controller) Sync(manifest podsManifest) (err error) {
 	}
 }
 
-func (c *Controller) cleanupRemovedContainers(namespace string, pods podsManifest, state containersState) error {
+func (c *Controller) cleanupRemovedContainers(namespace string, pods podsManifest, state podsState) error {
 	remove := getRemovedContainers(pods, state)
 
 	if len(remove) > 0 {
@@ -117,10 +120,12 @@ func (c *Controller) cleanupRemovedContainers(namespace string, pods podsManifes
 	return nil
 }
 
-func getRemovedContainers(pods podsManifest, state containersState) (remove []model.Container) {
-	for podName, containers := range state {
+func getRemovedContainers(pods podsManifest, state podsState) (remove []model.Container) {
+	for _, pod := range state {
+		podName := pod.Metadata.Name
+		containers := state.getPodContainers(podName)
 		if !pods.containsPod(podName) {
-			log.Debugf("Found active pod [%s], but it does not exist in manifest, will remove it", podName)
+			log.Debugf("Found active pod [%s], but it does not exist in manifest, will remove it's %d containers", podName, len(containers))
 			remove = append(remove, containers...)
 		} else {
 			for _, activeContainer := range containers {
@@ -135,7 +140,7 @@ func getRemovedContainers(pods podsManifest, state containersState) (remove []mo
 	return remove
 }
 
-func (c *Controller) createMissingContainers(namespace string, pods podsManifest, state containersState) error {
+func (c *Controller) createMissingContainers(namespace string, pods podsManifest, state podsState) error {
 	for _, pod := range pods {
 		create := getMissingContainers(pod, state)
 
@@ -160,7 +165,7 @@ func (c *Controller) createMissingContainers(namespace string, pods podsManifest
 	return nil
 }
 
-func getMissingContainers(pod model.Pod, state containersState) (create []model.Container) {
+func getMissingContainers(pod model.Pod, state podsState) (create []model.Container) {
 	for _, desiredContainer := range pod.Spec.Containers {
 		if !state.containsContainer(pod.Metadata.Name, desiredContainer) {
 			create = append(create, desiredContainer)
@@ -169,7 +174,7 @@ func getMissingContainers(pod model.Pod, state containersState) (create []model.
 	return create
 }
 
-func (c *Controller) ensureContainerTasksRunning(pods podsManifest, state containersState) error {
+func (c *Controller) ensureContainerTasksRunning(pods podsManifest, state podsState) error {
 	for _, pod := range pods {
 		for _, container := range pod.Spec.Containers {
 			if state.containsContainer(pod.Metadata.Name, container) {

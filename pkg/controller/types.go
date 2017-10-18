@@ -50,14 +50,19 @@ func (list podsManifest) getNamespaces() []string {
 	return result
 }
 
-type containersState map[string][]model.Container
+type podsState []model.Pod
 
-func (c containersState) getPodContainers(podName string) []model.Container {
-	return c[podName]
+func (p podsState) getPodContainers(podName string) []model.Container {
+	for _, pod := range p {
+		if pod.Metadata.Name == podName {
+			return pod.Spec.Containers
+		}
+	}
+	return []model.Container{}
 }
 
-func (c containersState) containsContainer(podName string, target model.Container) bool {
-	for _, container := range c.getPodContainers(podName) {
+func (p podsState) containsContainer(podName string, target model.Container) bool {
+	for _, container := range p.getPodContainers(podName) {
 		if containersMatch(container, target) {
 			return true
 		}
@@ -65,8 +70,8 @@ func (c containersState) containsContainer(podName string, target model.Containe
 	return false
 }
 
-func (c containersState) findContainer(podName string, target model.Container) string {
-	for _, container := range c.getPodContainers(podName) {
+func (p podsState) findContainer(podName string, target model.Container) string {
+	for _, container := range p.getPodContainers(podName) {
 		if containersMatch(container, target) {
 			return container.Name
 		}

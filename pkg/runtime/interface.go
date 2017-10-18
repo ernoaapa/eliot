@@ -11,7 +11,6 @@ import (
 // Client is interface for underlying container implementation
 type Client interface {
 	GetPods(namespace string) ([]model.Pod, error)
-	GetAllContainers(namespace string) (containersByPods map[string][]model.Container, err error)
 	GetContainers(namespace, podName string) ([]model.Container, error)
 	PullImage(namespace, ref string, status *progress.ImageFetch) error
 	CreateContainer(pod model.Pod, container model.Container) error

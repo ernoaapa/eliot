@@ -11,7 +11,7 @@ import (
 func TestSyncStartsMultiContainerPod(t *testing.T) {
 	in := make(chan []model.Pod)
 	out := make(chan []model.Pod)
-	clientMock := &FakeClient{t, []string{"default"}, map[string]map[string][]FakeContainer{}, 0, 0, 0}
+	clientMock := &FakeClient{t, []string{"default"}, map[string][]model.Pod{}, 0, 0, 0}
 	pods := []model.Pod{
 		model.Pod{
 			Metadata: model.Metadata{
@@ -43,14 +43,14 @@ func TestSyncStartsMultiContainerPod(t *testing.T) {
 func TestSyncStopRemovedPodContainers(t *testing.T) {
 	in := make(chan []model.Pod)
 	out := make(chan []model.Pod)
-	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
-		"cand": map[string][]FakeContainer{
-			"my-pod": []FakeContainer{
-				fakeRunningContainer("container-name", "docker.io/eaapa/hello-world:latest"),
-			},
-			"other-pod": []FakeContainer{
-				fakeRunningContainer("will-be-removed", "docker.io/eaapa/hello-world:latest"),
-			},
+	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string][]model.Pod{
+		"cand": []model.Pod{
+			newPod("cand", "my-pod",
+				withRunningContainer("container-name", "docker.io/eaapa/hello-world:latest"),
+			),
+			newPod("cand", "other-pod",
+				withRunningContainer("will-be-removed", "docker.io/eaapa/hello-world:latest"),
+			),
 		},
 	}, 0, 0, 0}
 	pods := []model.Pod{
@@ -80,11 +80,11 @@ func TestSyncStopRemovedPodContainers(t *testing.T) {
 func TestSyncStartsMissingContainerTask(t *testing.T) {
 	in := make(chan []model.Pod)
 	out := make(chan []model.Pod)
-	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string]map[string][]FakeContainer{
-		"cand": map[string][]FakeContainer{
-			"my-pod": []FakeContainer{
-				fakeCreatedContainer("container-name", "docker.io/eaapa/hello-world:latest"),
-			},
+	clientMock := &FakeClient{t, []string{"default", "cand"}, map[string][]model.Pod{
+		"cand": []model.Pod{
+			newPod("cand", "my-pod",
+				withCreatedContainer("container-name", "docker.io/eaapa/hello-world:latest"),
+			),
 		},
 	}, 0, 0, 0}
 	pods := []model.Pod{

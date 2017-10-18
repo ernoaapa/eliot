@@ -14,7 +14,7 @@ import (
 type FakeClient struct {
 	t            *testing.T
 	namespaces   []string
-	containers   map[string]map[string][]FakeContainer
+	pods         map[string][]model.Pod
 	createdCount int
 	startedCount int
 	stoppedCount int
@@ -22,42 +22,16 @@ type FakeClient struct {
 
 // GetPods fake impl.
 func (c *FakeClient) GetPods(namespace string) (result []model.Pod, err error) {
-	for podNamespace, podContainers := range c.containers {
-		if podNamespace == namespace {
-			for podName := range podContainers {
-				result = append(result, model.NewPod(podName, podNamespace))
-			}
-		}
-	}
-	return result, nil
-}
-
-// GetAllContainers fake impl.
-func (c *FakeClient) GetAllContainers(namespace string) (map[string][]model.Container, error) {
-	for podNamespace, podContainers := range c.containers {
-		if podNamespace == namespace {
-			result := map[string][]model.Container{}
-			for podName, containers := range podContainers {
-				result[podName] = []model.Container{}
-				for _, fakeContainer := range containers {
-					result[podName] = append(result[podName], fakeToModel(fakeContainer))
-				}
-			}
-			return result, nil
-		}
-	}
-	return make(map[string][]model.Container), nil
+	return c.pods[namespace], nil
 }
 
 // GetContainers fake impl.
 func (c *FakeClient) GetContainers(namespace, podName string) (result []model.Container, err error) {
-	for podNamespace, podContainers := range c.containers {
+	for podNamespace, pods := range c.pods {
 		if podNamespace == namespace {
-			for name, containers := range podContainers {
-				if name == podName {
-					for _, fakeContainer := range containers {
-						result = append(result, fakeToModel(fakeContainer))
-					}
+			for _, pod := range pods {
+				if pod.Metadata.Name == podName {
+					return pod.Spec.Containers, nil
 				}
 			}
 		}
@@ -95,12 +69,12 @@ func (c *FakeClient) GetNamespaces() ([]string, error) {
 
 // IsContainerRunning fake impl.
 func (c *FakeClient) IsContainerRunning(namespace, name string) (bool, error) {
-	for podNamespace, podContainers := range c.containers {
-		if podNamespace == namespace {
-			for _, containers := range podContainers {
-				for _, fakeContainer := range containers {
-					if fakeContainer.Name == name {
-						return fakeContainer.isRunning, nil
+	for podNamespace, pods := range c.pods {
+		for _, pod := range pods {
+			if podNamespace == namespace {
+				for _, containerStatus := range pod.Status.ContainerStatuses {
+					if containerStatus.ContainerID == name {
+						return containerStatus.State == "running", nil
 					}
 				}
 			}
@@ -130,39 +104,42 @@ func (c *FakeClient) verifyExpectations(createdCount, startedCount, stoppedCount
 	assert.Equal(c.t, stoppedCount, c.stoppedCount, "Container stop count should match")
 }
 
-// FakeContainer is model.Container with some test related information, e.g. is it running
-type FakeContainer struct {
-	Name      string
-	Image     string
-	isRunning bool
+type createOpts func(*model.Pod)
+
+func newPod(namespace, name string, opts ...createOpts) model.Pod {
+	pod := model.NewPod(name, namespace)
+	for _, opt := range opts {
+		opt(&pod)
+	}
+	return pod
 }
 
-func fakeRunningContainer(containerName, image string) FakeContainer {
-	return newFakeContainer(containerName, image, true)
-}
+func withRunningContainer(containerName, image string) createOpts {
+	return func(pod *model.Pod) {
+		pod.Spec.Containers = append(pod.Spec.Containers, model.Container{
+			Name:  containerName,
+			Image: image,
+		})
 
-func fakeCreatedContainer(containerName, image string) FakeContainer {
-	return newFakeContainer(containerName, image, false)
-}
-
-func newFakeContainer(containerName, image string, isRunning bool) FakeContainer {
-	return FakeContainer{
-		Name:      containerName,
-		Image:     image,
-		isRunning: isRunning,
+		pod.Status.ContainerStatuses = append(pod.Status.ContainerStatuses, model.ContainerStatus{
+			ContainerID: containerName,
+			Image:       image,
+			State:       "running",
+		})
 	}
 }
 
-func fakeToModels(fakes []FakeContainer) (result []model.Container) {
-	for _, fake := range fakes {
-		result = append(result, fakeToModel(fake))
-	}
-	return result
-}
+func withCreatedContainer(containerName, image string) createOpts {
+	return func(pod *model.Pod) {
+		pod.Spec.Containers = append(pod.Spec.Containers, model.Container{
+			Name:  containerName,
+			Image: image,
+		})
 
-func fakeToModel(fake FakeContainer) model.Container {
-	return model.Container{
-		Name:  fake.Name,
-		Image: fake.Image,
+		pod.Status.ContainerStatuses = append(pod.Status.ContainerStatuses, model.ContainerStatus{
+			ContainerID: containerName,
+			Image:       image,
+			State:       "created",
+		})
 	}
 }
