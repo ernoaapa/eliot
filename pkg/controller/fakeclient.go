@@ -113,7 +113,7 @@ func (c *FakeClient) verifyExpectations(createdCount, startedCount, stoppedCount
 type createOpts func(*model.Pod)
 
 func newPod(namespace, name string, opts ...createOpts) model.Pod {
-	pod := model.NewPod(name, namespace)
+	pod := model.NewPod(namespace, name)
 	for _, opt := range opts {
 		opt(&pod)
 	}

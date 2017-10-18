@@ -23,9 +23,9 @@ type PodStatus struct {
 }
 
 // NewPod creates new Pod struct with name and namespace metadata
-func NewPod(name, namespace string) Pod {
+func NewPod(namespace, name string) Pod {
 	return Pod{
-		Metadata: NewMetadata(name, namespace),
+		Metadata: NewMetadata(namespace, name),
 		Spec: PodSpec{
 			Containers: []Container{},
 		},

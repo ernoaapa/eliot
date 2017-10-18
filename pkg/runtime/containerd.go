@@ -86,7 +86,7 @@ func (c *ContainerdClient) GetPods(namespace string) ([]model.Pod, error) {
 	for _, container := range containers {
 		podName := mapping.GetPodName(container)
 		if _, ok := pods[podName]; !ok {
-			pod := model.NewPod(podName, namespace)
+			pod := model.NewPod(namespace, podName)
 			pods[podName] = &pod
 		}
 

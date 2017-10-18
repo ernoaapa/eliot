@@ -12,7 +12,7 @@ type Metadata struct {
 }
 
 // NewMetadata creates new metadata with name and metadata fields
-func NewMetadata(name, namespace string) Metadata {
+func NewMetadata(namespace, name string) Metadata {
 	return Metadata{
 		Name:      name,
 		Namespace: namespace,
