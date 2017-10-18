@@ -90,24 +90,28 @@ func (c *ContainerdClient) GetPods(namespace string) ([]model.Pod, error) {
 			pods[podName] = &pod
 		}
 
-		status := containerd.Status{}
-		task, err := container.Task(ctx, nil)
-		if err != nil {
-			log.Warnf("Cannot resolve container status, failed to fetch task, will mark as unknown. Error: %s", err)
-		} else {
-			status, err = task.Status(ctx)
-			if err != nil {
-				log.Warnf("Cannot resolve container status, failed to fetch status, will mark as unknown. Error: %s", err)
-			}
-		}
-
 		pods[podName].AppendContainer(
 			mapping.MapContainerToInternalModel(container),
-			mapping.MapContainerStatusToInternalModel(container, status),
+			mapping.MapContainerStatusToInternalModel(container, resolveContainerStatus(ctx, container)),
 		)
 	}
 
 	return getValues(pods), nil
+}
+
+func resolveContainerStatus(ctx context.Context, container containerd.Container) containerd.Status {
+	status := containerd.Status{}
+	task, err := container.Task(ctx, nil)
+	if err != nil {
+		log.Warnf("Cannot resolve container status, failed to fetch task, will mark as unknown. Error: %s", err)
+	} else {
+		status, err = task.Status(ctx)
+		if err != nil {
+			log.Warnf("Cannot resolve container status, failed to fetch status, will mark as unknown. Error: %s", err)
+		}
+	}
+
+	return status
 }
 
 func getValues(podsByName map[string]*model.Pod) (result []model.Pod) {
@@ -117,18 +121,18 @@ func getValues(podsByName map[string]*model.Pod) (result []model.Pod) {
 	return result
 }
 
-// GetContainers return pod active containers in containerd
-func (c *ContainerdClient) GetContainers(namespace, podName string) ([]model.Container, error) {
+// GetPod return pod by name
+func (c *ContainerdClient) GetPod(namespace, podName string) (model.Pod, error) {
 	pods, err := c.GetPods(namespace)
 	if err != nil {
-		return nil, err
+		return model.Pod{}, err
 	}
 	for _, pod := range pods {
 		if pod.Metadata.Name == podName {
-			return pod.Spec.Containers, nil
+			return pod, nil
 		}
 	}
-	return []model.Container{}, nil
+	return model.Pod{}, fmt.Errorf("Pod in namespace [%s] with name [%s] not found", namespace, podName)
 }
 
 // CreateContainer creates given container
@@ -204,75 +208,81 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 }
 
 // StartContainer starts the already created container
-func (c *ContainerdClient) StartContainer(namespace, name string, tty bool) error {
+func (c *ContainerdClient) StartContainer(namespace, name string, tty bool) (result model.ContainerStatus, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
 	client, connectionErr := c.getConnection(namespace)
 	if connectionErr != nil {
-		return connectionErr
+		return result, connectionErr
 	}
 
 	container, err := client.LoadContainer(ctx, name)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to load container [%s], cannot start it", name)
+		return result, errors.Wrapf(err, "Failed to load container [%s], cannot start it", name)
 	}
 
 	log.Debugf("Create task in container: %s", container.ID())
 	io, err := containerd.NewDirectIO(ctx, tty)
 	if err != nil {
-		return errors.Wrapf(err, "Error while creating container task IO")
+		return result, errors.Wrapf(err, "Error while creating container task IO")
 	}
 	task, err := container.NewTask(ctx, io.IOCreate)
 	if err != nil {
-		return errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())
+		return result, errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())
 	}
 
 	log.Debugln("Starting task...")
 	err = task.Start(ctx)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to start task in container [%s]", container.ID())
+		return result, errors.Wrapf(err, "Failed to start task in container [%s]", container.ID())
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
-	return nil
+
+	return mapping.MapContainerStatusToInternalModel(container, resolveContainerStatus(ctx, container)), nil
 }
 
 // StopContainer stops given container
-func (c *ContainerdClient) StopContainer(namespace, name string) error {
+func (c *ContainerdClient) StopContainer(namespace, name string) (result model.ContainerStatus, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
 	client, connectionErr := c.getConnection(namespace)
 	if connectionErr != nil {
-		return connectionErr
+		return result, connectionErr
 	}
 
 	container, err := client.LoadContainer(ctx, name)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to load container [%s], cannot stop it", name)
+		return result, errors.Wrapf(err, "Failed to load container [%s], cannot stop it", name)
 	}
 
 	task, err := container.Task(ctx, nil)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
-			return errors.Wrap(err, "Fetching container task returned unexpected error")
+			return result, errors.Wrap(err, "Fetching container task returned unexpected error")
 		}
 	}
 
 	if task != nil {
 		_, taskDeleteErr := task.Delete(ctx, containerd.WithProcessKill)
 		if err != nil {
-			return errors.Wrapf(taskDeleteErr, "Container task deletion returned error")
+			return result, errors.Wrapf(taskDeleteErr, "Container task deletion returned error")
 		}
 	}
 
 	if err := container.Delete(ctx, containerd.WithSnapshotCleanup); err != nil {
 		// Someone might already deleted it...
 		if !errdefs.IsNotFound(err) {
-			return errors.Wrapf(err, "Failed to delete container [%s]", container.ID())
+			return result, errors.Wrapf(err, "Failed to delete container [%s]", container.ID())
 		}
 	}
-	return nil
+
+	return model.ContainerStatus{
+		ContainerID: container.ID(),
+		Image:       container.Info().Image,
+		State:       "stopped",
+	}, nil
 }
 
 // Signal will send a syscall.Signal to the container task process

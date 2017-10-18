@@ -6,6 +6,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ernoaapa/can/pkg/model"
+
 	"golang.org/x/net/context"
 
 	"github.com/ernoaapa/can/pkg/api/mapping"
@@ -77,38 +79,48 @@ func (s *Server) Create(req *pods.CreatePodRequest, server pods.Pods_CreateServe
 
 // Start is 'pods' service Start implementation
 func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pods.StartPodResponse, error) {
-	containers, err := s.client.GetContainers(req.Namespace, req.Name)
+	pod, err := s.client.GetPod(req.Namespace, req.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to find containers to start for pod [%s] in namespace [%s]", req.Name, req.Namespace)
 	}
 
-	for _, container := range containers {
-		if err := s.client.StartContainer(req.Namespace, container.Name, container.Tty); err != nil {
+	statuses := []model.ContainerStatus{}
+	for _, container := range pod.Spec.Containers {
+		status, err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, container.Tty)
+		if err != nil {
 			return nil, errors.Wrapf(err, "Failed to start container [%s]", container.Name)
 		}
 		log.Debugf("Container [%s] started", container.Name)
+		statuses = append(statuses, status)
 	}
 
+	pod.Status.ContainerStatuses = statuses
+
 	return &pods.StartPodResponse{
-		Pod: mapping.CreatePodAPIModel(req.Namespace, req.Name, containers),
+		Pod: mapping.MapPodToAPIModel(pod),
 	}, nil
 }
 
 // Delete is 'pods' service Delete implementation
 func (s *Server) Delete(context context.Context, req *pods.DeletePodRequest) (*pods.DeletePodResponse, error) {
-	containers, err := s.client.GetContainers(req.Namespace, req.Name)
+	pod, err := s.client.GetPod(req.Namespace, req.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Cannot fetch pod containers, cannot delete pod [%s]", req.Name)
 	}
 
-	for _, container := range containers {
-		err := s.client.StopContainer(req.Namespace, container.Name)
+	statuses := []model.ContainerStatus{}
+	for _, containerStatus := range pod.Status.ContainerStatuses {
+		status, err := s.client.StopContainer(req.Namespace, containerStatus.ContainerID)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Error while stopping container [%s]", container.Name)
+			return nil, errors.Wrapf(err, "Error while stopping container [%s]", containerStatus.ContainerID)
 		}
+		statuses = append(statuses, status)
 	}
+
+	pod.Status.ContainerStatuses = statuses
+
 	return &pods.DeletePodResponse{
-		Pod: mapping.CreatePodAPIModel(req.Namespace, req.Name, containers),
+		Pod: mapping.MapPodToAPIModel(pod),
 	}, nil
 }
 

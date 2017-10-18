@@ -11,11 +11,11 @@ import (
 // Client is interface for underlying container implementation
 type Client interface {
 	GetPods(namespace string) ([]model.Pod, error)
-	GetContainers(namespace, podName string) ([]model.Container, error)
+	GetPod(namespace, podName string) (model.Pod, error)
 	PullImage(namespace, ref string, status *progress.ImageFetch) error
 	CreateContainer(pod model.Pod, container model.Container) error
-	StartContainer(namespace, name string, tty bool) error
-	StopContainer(namespace, name string) error
+	StartContainer(namespace, name string, tty bool) (model.ContainerStatus, error)
+	StopContainer(namespace, name string) (model.ContainerStatus, error)
 	GetNamespaces() ([]string, error)
 	IsContainerRunning(namespace, name string) (bool, error)
 	GetContainerTaskStatus(namespace, name string) string

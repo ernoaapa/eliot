@@ -15,21 +15,6 @@ func MapPodsToAPIModel(pods []model.Pod) (result []*pods.Pod) {
 	return result
 }
 
-// MapContainersByPodsToAPIModel maps list of internal Pod models to API model
-func MapContainersByPodsToAPIModel(namespace string, containersByPods map[string][]model.Container) (result []*pods.Pod) {
-	for podName, containers := range containersByPods {
-		result = append(result, CreatePodAPIModel(podName, namespace, containers))
-	}
-	return result
-}
-
-// CreatePodAPIModel maps internal Pod model to API model
-func CreatePodAPIModel(namespace, podName string, containers []model.Container) *pods.Pod {
-	pod := model.NewPod(podName, namespace)
-	pod.Spec.Containers = containers
-	return MapPodToAPIModel(pod)
-}
-
 // MapPodToAPIModel maps internal Pod model to API model
 func MapPodToAPIModel(pod model.Pod) *pods.Pod {
 	return &pods.Pod{

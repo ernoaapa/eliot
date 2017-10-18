@@ -25,13 +25,13 @@ func (c *FakeClient) GetPods(namespace string) (result []model.Pod, err error) {
 	return c.pods[namespace], nil
 }
 
-// GetContainers fake impl.
-func (c *FakeClient) GetContainers(namespace, podName string) (result []model.Container, err error) {
+// GetPod fake impl.
+func (c *FakeClient) GetPod(namespace, podName string) (result model.Pod, err error) {
 	for podNamespace, pods := range c.pods {
 		if podNamespace == namespace {
 			for _, pod := range pods {
 				if pod.Metadata.Name == podName {
-					return pod.Spec.Containers, nil
+					return pod, nil
 				}
 			}
 		}
@@ -51,15 +51,21 @@ func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) e
 }
 
 // StartContainer fake impl.
-func (c *FakeClient) StartContainer(namespace, containerID string, tty bool) error {
+func (c *FakeClient) StartContainer(namespace, containerID string, tty bool) (model.ContainerStatus, error) {
 	c.startedCount++
-	return nil
+	return model.ContainerStatus{
+		ContainerID: containerID,
+		State:       "running",
+	}, nil
 }
 
 // StopContainer fake impl.
-func (c *FakeClient) StopContainer(namespace, containerID string) error {
+func (c *FakeClient) StopContainer(namespace, containerID string) (model.ContainerStatus, error) {
 	c.stoppedCount++
-	return nil
+	return model.ContainerStatus{
+		ContainerID: containerID,
+		State:       "stopped",
+	}, nil
 }
 
 // GetNamespaces fake impl.
