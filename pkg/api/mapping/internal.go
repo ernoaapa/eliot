@@ -38,7 +38,9 @@ func MapPodToAPIModel(pod model.Pod) *pods.Pod {
 			Namespace: pod.Metadata.Namespace,
 		},
 		Spec: &pods.PodSpec{
-			Containers: MapContainersToAPIModel(pod.Spec.Containers),
+			Containers:  MapContainersToAPIModel(pod.Spec.Containers),
+			HostNetwork: pod.Spec.HostNetwork,
+			HostPID:     pod.Spec.HostPID,
 		},
 		Status: &pods.PodStatus{
 			ContainerStatuses: MapContainerStatusesToAPIModel(pod.Status.ContainerStatuses),

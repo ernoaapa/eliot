@@ -72,6 +72,7 @@ message Pod {
 message PodSpec {
 	repeated cand.services.containers.v1.Container containers = 1;
 	bool hostNetwork = 2;
+	bool hostPID = 3;
 }
 
 message PodStatus {

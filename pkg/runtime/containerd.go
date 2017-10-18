@@ -195,6 +195,10 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		)
 	}
 
+	if pod.Spec.HostPID {
+		specOpts = append(specOpts, containerd.WithHostNamespace(specs.PIDNamespace))
+	}
+
 	log.Debugf("Create new container from image %s...", image.Name())
 	_, err := client.NewContainer(ctx,
 		container.Name,

@@ -13,6 +13,7 @@ type Pod struct {
 // PodSpec defines what containers should be running
 type PodSpec struct {
 	HostNetwork bool
+	HostPID     bool
 	Containers  []Container `validate:"required,gt=0,dive"`
 }
 

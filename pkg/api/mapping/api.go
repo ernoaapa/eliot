@@ -24,6 +24,7 @@ func MapPodToInternalModel(pod *pods.Pod) model.Pod {
 		Spec: model.PodSpec{
 			Containers:  MapContainerToInternalModel(pod.Spec.Containers),
 			HostNetwork: pod.Spec.HostNetwork,
+			HostPID:     pod.Spec.HostPID,
 		},
 	}
 }
