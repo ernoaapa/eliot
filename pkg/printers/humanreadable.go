@@ -30,7 +30,7 @@ func (p *HumanReadablePrinter) PrintPodsTable(pods []*pods.Pod, writer io.Writer
 	fmt.Fprintln(writer, "NAMESPACE\tNAME\tCONTAINERS\tSTATUS")
 
 	for _, pod := range pods {
-		fmt.Fprintf(writer, "%s\t%s\t%d\t%s", pod.Metadata.Name, pod.Metadata.Namespace, len(pod.Spec.Containers), getStatus(pod))
+		fmt.Fprintf(writer, "%s\t%s\t%d\t%s", pod.Metadata.Namespace, pod.Metadata.Name, len(pod.Spec.Containers), getStatus(pod))
 		fmt.Fprint(writer, "\n")
 	}
 	fmt.Fprint(writer, "\n")
