@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/ernoaapa/can/pkg/fs"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -57,6 +58,10 @@ func ReadProjectConfig(path string) (result *ProjectConfig) {
 			Image:  "docker.io/stefda/rsync:latest",
 			Target: "/volume",
 		},
+	}
+
+	if !fs.FileExist(path) {
+		return config
 	}
 
 	data, err := ioutil.ReadFile(path)
