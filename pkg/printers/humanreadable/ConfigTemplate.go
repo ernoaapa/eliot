@@ -4,7 +4,6 @@ package humanreadable
 var ConfigTemplate = `
 Current context:
 	Name: {{.GetCurrentContext.Name }}
-	User: {{.GetCurrentContext.User }}
 	Namespace: {{.GetCurrentContext.Namespace }}
 	Endpoint:
 		Name: {{.GetCurrentEndpoint.Name }}

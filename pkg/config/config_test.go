@@ -16,12 +16,9 @@ func TestGetConfig(t *testing.T) {
 endpoints:
   - name: local-dev
     url: localhost:5000
-users:
-  - name: erno
 contexts:
   - name: local-dev/erno
     endpoint: local-dev
-    user: erno
     namespace: foobar
 current-context: local-dev/erno
 `), 0644)
@@ -30,7 +27,6 @@ current-context: local-dev/erno
 	config, err := GetConfig(file.Name())
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(config.Endpoints), "Should have one endpoint")
-	assert.Equal(t, 1, len(config.Users), "Should have one user")
 	assert.Equal(t, 1, len(config.Contexts), "Should have one context")
 	assert.Equal(t, "local-dev/erno", config.CurrentContext, "Should parse active context")
 

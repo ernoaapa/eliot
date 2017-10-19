@@ -74,11 +74,8 @@ func TestPrintConfig(t *testing.T) {
 		Endpoints: []config.Endpoint{
 			config.Endpoint{Name: "localhost", URL: "localhost:5000"},
 		},
-		Users: []config.User{
-			config.User{Name: "tester"},
-		},
 		Contexts: []config.Context{
-			config.Context{Name: "local-dev", Endpoint: "localhost", User: "tester", Namespace: "default"},
+			config.Context{Name: "local-dev", Endpoint: "localhost", Namespace: "default"},
 		},
 		CurrentContext: "local-dev",
 	}

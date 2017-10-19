@@ -13,7 +13,6 @@ import (
 // Config is struct for configuration for CLI client
 type Config struct {
 	Endpoints      []Endpoint `yaml:"endpoints"`
-	Users          []User     `yaml:"users"`
 	Contexts       []Context  `yaml:"contexts"`
 	CurrentContext string     `yaml:"current-context"`
 }
@@ -24,15 +23,9 @@ type Endpoint struct {
 	URL  string `yaml:"url"`
 }
 
-// User is authenticated user
-type User struct {
-	Name string `yaml:"name"`
-}
-
 // Context represents single user in single endpoint
 type Context struct {
 	Name      string `yaml:"name"`
-	User      string `yaml:"user"`
 	Endpoint  string `yaml:"endpoint"`
 	Namespace string `yaml:"namespace"`
 }
@@ -41,8 +34,9 @@ type Context struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Contexts: []Context{
-			{Namespace: "cand"},
+			{Name: "cand", Namespace: "cand"},
 		},
+		CurrentContext: "cand",
 	}
 }
 
@@ -79,11 +73,6 @@ func WriteConfig(path string, config *Config) error {
 	return nil
 }
 
-// GetCurrentUser return current user
-func (c Config) GetCurrentUser() User {
-	return c.GetUser(c.GetCurrentContext().User)
-}
-
 // GetCurrentContext return current context
 func (c Config) GetCurrentContext() Context {
 	return c.GetContext(c.CurrentContext)
@@ -111,17 +100,6 @@ func (c Config) GetContext(name string) Context {
 	}
 
 	return Context{}
-}
-
-// GetUser return user by name
-func (c *Config) GetUser(name string) User {
-	for _, user := range c.Users {
-		if user.Name == name {
-			return user
-		}
-	}
-
-	return User{}
 }
 
 // GetEndpoint return endpoint by name
