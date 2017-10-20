@@ -5,6 +5,7 @@ import (
 	"syscall"
 
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/config"
 )
 
 // Client interface for all API clients
@@ -22,7 +23,7 @@ type Client interface {
 type PodOpts func(pod *pods.Pod) error
 
 // AttachHooks is additional process what runs when is attached to container
-type AttachHooks func(endpoint string, done <-chan struct{})
+type AttachHooks func(endpoint config.Endpoint, done <-chan struct{})
 
 // AttachIO wraps stdin/stdout for attach
 type AttachIO struct {

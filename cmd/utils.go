@@ -57,12 +57,9 @@ func GetClient(config *config.Provider) api.Client {
 	if len(endpoints) == 0 {
 		log.Fatalf("Unable to discover devices automatically. You must give device endpoint. E.g. --endpoint=192.168.1.2")
 	} else if len(endpoints) == 1 {
-		return api.NewDirectClient(
-			config.GetNamespace(),
-			endpoints[0].URL,
-		)
+		return api.NewDirectClient(config.GetNamespace(), endpoints[0])
 	} else {
-		log.Fatalf("Discovered %d devices from network, get list of devices with command 'get devices'", len(endpoints))
+		return api.NewMultiDirectClient(config.GetNamespace(), endpoints)
 	}
 	return nil
 }
@@ -109,6 +106,15 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 			})
 		}
 		provider.OverrideEndpoints(endpoints)
+	}
+
+	if clicontext.GlobalIsSet("device") && clicontext.GlobalString("device") != "" {
+		deviceName := clicontext.GlobalString("device")
+		endpoint, found := provider.GetEndpointByName(deviceName)
+		if !found {
+			log.Fatalf("Failed to find device with name %s", deviceName)
+		}
+		provider.OverrideEndpoints([]config.Endpoint{endpoint})
 	}
 
 	return provider

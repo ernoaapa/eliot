@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strings"
 	"syscall"
 	"time"
 
@@ -143,8 +142,8 @@ var runCommand = cli.Command{
 			}
 		}
 
-		config := cmd.GetConfigProvider(clicontext)
-		client := cmd.GetClient(config)
+		conf := cmd.GetConfigProvider(clicontext)
+		client := cmd.GetClient(conf)
 
 		opts := []api.PodOpts{}
 
@@ -171,7 +170,7 @@ var runCommand = cli.Command{
 		pod := &pods.Pod{
 			Metadata: &core.ResourceMetadata{
 				Name:      name,
-				Namespace: config.GetNamespace(),
+				Namespace: conf.GetNamespace(),
 			},
 			Spec: &pods.PodSpec{
 				HostNetwork: true,
@@ -221,9 +220,8 @@ var runCommand = cli.Command{
 
 		hooks := []api.AttachHooks{}
 		if !noSync {
-			hooks = append(hooks, func(endpoint string, done <-chan struct{}) {
-				parts := strings.SplitN(endpoint, ":", 2)
-				destination := fmt.Sprintf("rsync://%s:%d/volume", parts[0], 873)
+			hooks = append(hooks, func(endpoint config.Endpoint, done <-chan struct{}) {
+				destination := fmt.Sprintf("rsync://%s:%d/volume", endpoint.GetHost(), 873)
 				sync.StartRsync(done, syncDirs, destination, 1*time.Second)
 			})
 		}

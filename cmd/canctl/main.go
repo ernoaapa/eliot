@@ -41,6 +41,11 @@ func main() {
 			Usage:  "Use specific device endpoint. E.g. '192.168.1.101:5000'",
 			EnvVar: "CAN_ENDPOINT",
 		},
+		cli.StringFlag{
+			Name:   "device",
+			Usage:  "Use specific device by name. E.g. 'somehost.local'",
+			EnvVar: "CAN_DEVICE",
+		},
 	}, cmd.GlobalFlags...)
 
 	app.Commands = []cli.Command{

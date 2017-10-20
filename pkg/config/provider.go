@@ -27,6 +27,16 @@ func (c *Provider) GetNamespace() string {
 	return c.config.Namespace
 }
 
+// GetEndpointByName finds Endpoint by name or return ok=false
+func (c *Provider) GetEndpointByName(name string) (endpoint Endpoint, ok bool) {
+	for _, endpoint := range c.GetEndpoints() {
+		if endpoint.Name == name {
+			return endpoint, true
+		}
+	}
+	return endpoint, false
+}
+
 // OverrideEndpoints set endpoint to be overrided with given value
 func (c *Provider) OverrideEndpoints(endpoints []Endpoint) {
 	c.endpointsOverride = endpoints

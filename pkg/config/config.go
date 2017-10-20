@@ -3,6 +3,7 @@ package config
 import (
 	"io/ioutil"
 	"reflect"
+	"strings"
 
 	"github.com/ernoaapa/can/pkg/converter"
 	"github.com/ernoaapa/can/pkg/fs"
@@ -20,6 +21,12 @@ type Config struct {
 type Endpoint struct {
 	Name string `yaml:"name"`
 	URL  string `yaml:"url"`
+}
+
+// GetHost return just hostname/ip of endpoint URL
+func (e Endpoint) GetHost() string {
+	parts := strings.SplitN(e.URL, ":", 2)
+	return parts[0]
 }
 
 // GetConfig reads current config from user home directory

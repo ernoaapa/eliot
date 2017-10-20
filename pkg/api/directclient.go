@@ -14,28 +14,29 @@ import (
 	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/api/stream"
+	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/progress"
 )
 
-// DirectClient connects directly to Node's RPC API
+// DirectClient connects directly to device RPC API
 type DirectClient struct {
 	Namespace string
-	Endpoint  string
+	Endpoint  config.Endpoint
 	ctx       context.Context
 }
 
 // NewDirectClient creates new RPC server client
-func NewDirectClient(namespace, serverAddr string) *DirectClient {
+func NewDirectClient(namespace string, endpoint config.Endpoint) *DirectClient {
 	return &DirectClient{
 		namespace,
-		serverAddr,
+		endpoint,
 		context.Background(),
 	}
 }
 
 // GetPods calls server and fetches all pods information
 func (c *DirectClient) GetPods() ([]*pods.Pod, error) {
-	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +77,7 @@ func (c *DirectClient) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
 		}
 	}
 
-	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -110,7 +111,7 @@ func (c *DirectClient) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
 
 // StartPod creates new pod to the target server
 func (c *DirectClient) StartPod(name string) (*pods.Pod, error) {
-	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,7 @@ func (c *DirectClient) StartPod(name string) (*pods.Pod, error) {
 
 // DeletePod creates new pod to the target server
 func (c *DirectClient) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
-	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +161,7 @@ func (c *DirectClient) Attach(containerID string, attachIO AttachIO, hooks ...At
 	ctx, cancel := context.WithCancel(metadata.NewOutgoingContext(c.ctx, md))
 	defer cancel()
 
-	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -196,7 +197,7 @@ func (c *DirectClient) Attach(containerID string, attachIO AttachIO, hooks ...At
 
 // Signal sends kill signal to container process
 func (c *DirectClient) Signal(containerID string, signal syscall.Signal) (err error) {
-	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
