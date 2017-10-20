@@ -15,6 +15,12 @@ type StdoutStreamServer interface {
 	Send(*containers.StdoutStreamResponse) error
 }
 
+// StdoutStreamClient interface for the client what reads stream of log lines
+type StdoutStreamClient interface {
+	Recv() (*containers.StdoutStreamResponse, error)
+	CloseSend() error
+}
+
 // NewWriter creates new Writer instance
 func NewWriter(stream StdoutStreamServer, stderr bool) *Writer {
 	return &Writer{stream, stderr}

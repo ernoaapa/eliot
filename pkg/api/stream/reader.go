@@ -17,6 +17,11 @@ type StdinStreamServer interface {
 	Recv() (*containers.StdinStreamRequest, error)
 }
 
+// StdinStreamClient interface for the client what sends stdin stream messages
+type StdinStreamClient interface {
+	Send(*containers.StdinStreamRequest) error
+}
+
 // NewReader creates new Reader instance
 func NewReader(stream StdinStreamServer) *Reader {
 	return &Reader{stream: stream}

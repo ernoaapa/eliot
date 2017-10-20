@@ -15,6 +15,7 @@ import (
 	"github.com/ernoaapa/can/pkg/api/mapping"
 	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/api/stream"
 	"github.com/ernoaapa/can/pkg/progress"
 )
 
@@ -32,6 +33,7 @@ type AttachIO struct {
 	Stderr io.Writer
 }
 
+// NewAttachIO is wrapper for stdin, stdout and stderr
 func NewAttachIO(stdin io.Reader, stdout, stderr io.Writer) AttachIO {
 	return AttachIO{stdin, stdout, stderr}
 }
@@ -165,14 +167,15 @@ func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 
 // Attach calls server and fetches pod logs
 func (c *Client) Attach(containerID string, attachIO AttachIO) (err error) {
-	done := make(chan struct{})
-	errc := make(chan error)
+	done := make(chan error)
 
 	md := metadata.Pairs(
 		"namespace", c.namespace,
 		"container", containerID,
 	)
-	ctx := metadata.NewOutgoingContext(c.ctx, md)
+	ctx, cancel := context.WithCancel(metadata.NewOutgoingContext(c.ctx, md))
+	defer cancel()
+
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return err
@@ -187,66 +190,59 @@ func (c *Client) Attach(containerID string, attachIO AttachIO) (err error) {
 	}
 
 	go func() {
-		defer close(done)
-		for {
-			resp, err := stream.Recv()
-			if err == io.EOF {
-				err = stream.CloseSend()
-				if err != nil {
-					errc <- err
-				}
-				break
-			}
-			if err != nil {
-				errc <- errors.Wrapf(err, "Received error while reading attach stream")
-				break
-			}
-
-			target := attachIO.Stdout
-			if resp.Stderr {
-				target = attachIO.Stderr
-			}
-
-			_, err = io.Copy(target, bytes.NewReader(resp.Output))
-			if err != nil {
-				errc <- errors.Wrapf(err, "Error while copying data")
-				break
-			}
-		}
+		done <- PipeStdout(stream, attachIO.Stdout, attachIO.Stderr)
 	}()
 
 	if attachIO.Stdin != nil {
 		go func() {
-			defer close(done)
-
-			for {
-				buf := make([]byte, 1024)
-				n, err := attachIO.Stdin.Read(buf)
-				if err == io.EOF {
-					// nothing else to pipe, kill this goroutine
-					break
-				}
-				if err != nil {
-					errc <- errors.Wrapf(err, "Error while reading stdin to buffer")
-					break
-				}
-
-				err = stream.Send(&containers.StdinStreamRequest{
-					Input: buf[:n],
-				})
-				if err != nil {
-					errc <- errors.Wrapf(err, "Sending to stream returned error")
-					break
-				}
-			}
+			done <- PipeStdin(stream, attachIO.Stdin)
 		}()
 	}
 
+	return <-done
+}
+
+// PipeStdout reads stdout from grpc stream and writes it to stdout/stderr
+func PipeStdout(s stream.StdoutStreamClient, stdout, stderr io.Writer) error {
 	for {
-		select {
-		case <-done:
-			return err
-		case err = <-errc:
+		resp, err := s.Recv()
+		if err == io.EOF {
+			err = s.CloseSend()
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		if err != nil {
+			return errors.Wrapf(err, "Received error while reading attach stream")
+		}
+
+		target := stdout
+		if resp.Stderr {
+			target = stderr
+		}
+
+		_, err = io.Copy(target, bytes.NewReader(resp.Output))
+		if err != nil {
+			return errors.Wrapf(err, "Error while copying data")
+		}
+	}
+}
+
+// PipeStdin reads input from Stdin and writes it to the grpc stream
+func PipeStdin(s stream.StdinStreamClient, stdin io.Reader) error {
+	for {
+		buf := make([]byte, 1024)
+		n, err := stdin.Read(buf)
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return errors.Wrapf(err, "Error while reading stdin to buffer")
+		}
+
+		if err := s.Send(&containers.StdinStreamRequest{Input: buf[:n]}); err != nil {
+			return errors.Wrapf(err, "Sending to stream returned error")
 		}
 	}
 }
