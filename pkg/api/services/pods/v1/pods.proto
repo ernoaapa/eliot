@@ -77,4 +77,5 @@ message PodSpec {
 
 message PodStatus {
 	repeated cand.services.containers.v1.ContainerStatus containerStatuses = 1;
+	string hostname = 2;
 }

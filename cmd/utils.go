@@ -149,11 +149,12 @@ func GetLabels(clicontext *cli.Context) map[string]string {
 }
 
 // GetRuntimeClient initialises new runtime client from CLI parameters
-func GetRuntimeClient(clicontext *cli.Context) runtime.Client {
+func GetRuntimeClient(clicontext *cli.Context, hostname string) runtime.Client {
 	return runtime.NewContainerdClient(
 		context.Background(),
 		clicontext.GlobalDuration("timeout"),
 		clicontext.GlobalString("containerd"),
+		hostname,
 	)
 }
 
@@ -209,8 +210,8 @@ func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, in <-c
 }
 
 // GetController creates new Controller
-func GetController(clicontext *cli.Context, in <-chan []model.Pod, out chan<- []model.Pod) *controller.Controller {
-	client := GetRuntimeClient(clicontext)
+func GetController(clicontext *cli.Context, hostname string, in <-chan []model.Pod, out chan<- []model.Pod) *controller.Controller {
+	client := GetRuntimeClient(clicontext, hostname)
 	interval := clicontext.Duration("update-interval")
 	return controller.New(client, interval, in, out)
 }

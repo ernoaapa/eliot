@@ -19,17 +19,19 @@ type PodSpec struct {
 
 // PodStatus represents latest known state of pod
 type PodStatus struct {
+	Hostname          string
 	ContainerStatuses []ContainerStatus `validate:"dive"`
 }
 
 // NewPod creates new Pod struct with name and namespace metadata
-func NewPod(namespace, name string) Pod {
+func NewPod(namespace, name, hostname string) Pod {
 	return Pod{
 		Metadata: NewMetadata(namespace, name),
 		Spec: PodSpec{
 			Containers: []Container{},
 		},
 		Status: PodStatus{
+			Hostname:          hostname,
 			ContainerStatuses: []ContainerStatus{},
 		},
 	}

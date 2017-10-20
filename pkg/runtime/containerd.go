@@ -30,17 +30,19 @@ var (
 
 // ContainerdClient is containerd client wrapper
 type ContainerdClient struct {
-	context context.Context
-	timeout time.Duration
-	address string
+	context  context.Context
+	timeout  time.Duration
+	address  string
+	hostname string
 }
 
 // NewContainerdClient creates new containerd client with given timeout
-func NewContainerdClient(context context.Context, timeout time.Duration, address string) *ContainerdClient {
+func NewContainerdClient(context context.Context, timeout time.Duration, address, hostname string) *ContainerdClient {
 	return &ContainerdClient{
-		context: context,
-		timeout: timeout,
-		address: address,
+		context:  context,
+		timeout:  timeout,
+		address:  address,
+		hostname: hostname,
 	}
 }
 
@@ -86,7 +88,7 @@ func (c *ContainerdClient) GetPods(namespace string) ([]model.Pod, error) {
 	for _, container := range containers {
 		podName := mapping.GetPodName(container)
 		if _, ok := pods[podName]; !ok {
-			pod := model.NewPod(namespace, podName)
+			pod := model.NewPod(namespace, podName, c.hostname)
 			pods[podName] = &pod
 		}
 

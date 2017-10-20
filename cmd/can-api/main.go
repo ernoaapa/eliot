@@ -5,6 +5,7 @@ import (
 
 	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/api"
+	"github.com/ernoaapa/can/pkg/device"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -36,7 +37,9 @@ func main() {
 	app.Before = cmd.GlobalBefore
 
 	app.Action = func(clicontext *cli.Context) error {
-		client := cmd.GetRuntimeClient(clicontext)
+		resolver := device.NewResolver(cmd.GetLabels(clicontext))
+		device := resolver.GetInfo()
+		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
 		listen := clicontext.String("listen")
 		server := api.NewServer(listen, client)
 

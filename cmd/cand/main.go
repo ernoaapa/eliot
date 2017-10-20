@@ -84,6 +84,7 @@ func main() {
 	app.Action = func(clicontext *cli.Context) error {
 		var wg sync.WaitGroup
 		resolver := device.NewResolver(cmd.GetLabels(clicontext))
+		device := resolver.GetInfo()
 
 		sourceUpdates := make(chan []model.Pod)
 		stateUpdates := make(chan []model.Pod)
@@ -108,7 +109,7 @@ func main() {
 			reporter.Start()
 		}()
 
-		controller := cmd.GetController(clicontext, sourceUpdates, stateUpdates)
+		controller := cmd.GetController(clicontext, device.Hostname, sourceUpdates, stateUpdates)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

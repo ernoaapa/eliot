@@ -8,21 +8,6 @@ import (
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
-// MapModelByPodNamesToInternalModel builds from container label information pod data structure
-func MapModelByPodNamesToInternalModel(containers []containerd.Container) map[string][]model.Container {
-	result := make(map[string][]model.Container)
-	for _, container := range containers {
-		podName := GetPodName(container)
-
-		if _, ok := result[podName]; !ok {
-			result[podName] = []model.Container{}
-		}
-
-		result[podName] = append(result[podName], MapContainerToInternalModel(container))
-	}
-	return result
-}
-
 // GetPodName resolves pod name where the container belongs
 func GetPodName(container containerd.Container) string {
 	labels := ContainerLabels(container.Info().Labels)

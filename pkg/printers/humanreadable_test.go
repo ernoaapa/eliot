@@ -56,6 +56,9 @@ func TestPrintDetails(t *testing.T) {
 				&containers.Container{},
 			},
 		},
+		Status: &pods.PodStatus{
+			Hostname: "testing.local",
+		},
 	}
 
 	err := printer.PrintPodDetails(data, &buffer)

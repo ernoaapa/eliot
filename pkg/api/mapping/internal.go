@@ -28,6 +28,7 @@ func MapPodToAPIModel(pod model.Pod) *pods.Pod {
 			HostPID:     pod.Spec.HostPID,
 		},
 		Status: &pods.PodStatus{
+			Hostname:          pod.Status.Hostname,
 			ContainerStatuses: MapContainerStatusesToAPIModel(pod.Status.ContainerStatuses),
 		},
 	}
