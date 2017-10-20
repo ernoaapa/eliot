@@ -31,7 +31,7 @@ func (p *HumanReadablePrinter) PrintPodsTable(pods []*pods.Pod, writer io.Writer
 	fmt.Fprintln(writer, "NAMESPACE\tNAME\tCONTAINERS\tSTATUS")
 
 	for _, pod := range pods {
-		_, err := fmt.Fprintf(writer, "%s\t%s\t%d\t%s", pod.Metadata.Namespace, pod.Metadata.Name, len(pod.Spec.Containers), getStatus(pod))
+		_, err := fmt.Fprintf(writer, "%s\t%s\t%d\t%s\n", pod.Metadata.Namespace, pod.Metadata.Name, len(pod.Spec.Containers), getStatus(pod))
 		if err != nil {
 			return errors.Wrapf(err, "Error while writing pod row")
 		}
