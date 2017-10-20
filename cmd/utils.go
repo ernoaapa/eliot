@@ -265,6 +265,15 @@ func GetBinds(clicontext *cli.Context, extra ...string) (result []*containers.Mo
 	return result
 }
 
+// MustParseBindFlag is like ParseBindFlag but panics if syntax is invalid
+func MustParseBindFlag(b string) *containers.Mount {
+	m, err := ParseBindFlag(b)
+	if err != nil {
+		panic("Invalid mount format: " + b + ". Error: " + err.Error())
+	}
+	return m
+}
+
 // ParseBindFlag parses a mount string in the form "/var:/var:rshared"
 func ParseBindFlag(b string) (*containers.Mount, error) {
 	parts := strings.Split(b, ":")

@@ -79,8 +79,18 @@ func (c *Client) GetPod(podName string) (*pods.Pod, error) {
 	return nil, fmt.Errorf("No pod found with name [%s]", podName)
 }
 
+// PodOpts adds more information to the Pod going to be created
+type PodOpts func(pod *pods.Pod) error
+
 // CreatePod creates new pod to the target server
-func (c *Client) CreatePod(pod *pods.Pod) error {
+func (c *Client) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
+	for _, o := range opts {
+		err := o(pod)
+		if err != nil {
+			return err
+		}
+	}
+
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return err

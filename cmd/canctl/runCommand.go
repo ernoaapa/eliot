@@ -145,32 +145,26 @@ var runCommand = cli.Command{
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)
 
-		cont := []*containers.Container{
-			&containers.Container{
-				Name:       name,
-				Image:      image,
-				Tty:        tty,
-				Args:       args,
-				Env:        env,
-				WorkingDir: workdir,
-				Mounts:     append(mounts, binds...),
-			},
-		}
+		opts := []api.PodOpts{}
 
 		if !noSync {
-			workdirMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:%s:rw,rshared", name, projectConfig.Sync.Target))
+			syncTargetPath := projectConfig.Sync.Target
 
-			cont[0].Mounts = append(cont[0].Mounts, workdirMount)
-			if cont[0].WorkingDir == "" {
-				cont[0].WorkingDir = projectConfig.Sync.Target
+			opts = append(opts, api.WithContainer(&containers.Container{
+				Name:  fmt.Sprintf("rsync-%s", name),
+				Image: cmd.ExpandToFQIN(projectConfig.Sync.Image),
+				Env: []string{
+					fmt.Sprintf("VOLUME=%s", syncTargetPath),
+				},
+			}))
+
+			opts = append(opts, api.WithSharedMount(
+				cmd.MustParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:%s:rw,rshared", name, syncTargetPath)),
+			))
+
+			if !clicontext.IsSet("workdir") {
+				opts = append(opts, api.WithWorkingDir(syncTargetPath))
 			}
-
-			syncMount, _ := cmd.ParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:/volume:rw,rshared", name))
-			cont = append(cont, &containers.Container{
-				Name:   fmt.Sprintf("rsync-%s", name),
-				Image:  cmd.ExpandToFQIN(projectConfig.Sync.Image),
-				Mounts: []*containers.Mount{syncMount},
-			})
 		}
 
 		pod := &pods.Pod{
@@ -180,11 +174,21 @@ var runCommand = cli.Command{
 			},
 			Spec: &pods.PodSpec{
 				HostNetwork: true,
-				Containers:  cont,
+				Containers: []*containers.Container{
+					&containers.Container{
+						Name:       name,
+						Image:      image,
+						Tty:        tty,
+						Args:       args,
+						Env:        env,
+						WorkingDir: workdir,
+						Mounts:     append(mounts, binds...),
+					},
+				},
 			},
 		}
 
-		if err := client.CreatePod(pod); err != nil {
+		if err := client.CreatePod(pod, opts...); err != nil {
 			return errors.Wrapf(err, "Error in creating pod")
 		}
 
