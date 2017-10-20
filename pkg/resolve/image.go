@@ -44,7 +44,6 @@ func isGolangProject(projectDir string) bool {
 func containsFiles(path, extension string) bool {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		log.Warnf("Unable to list files in [%s] directory. Cannot detect golang project", path)
 		return false
 	}
 
