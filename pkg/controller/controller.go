@@ -154,7 +154,8 @@ func (c *Controller) createMissingContainers(namespace string, pods podsManifest
 				if err := c.client.PullImage(pod.Metadata.Namespace, container.Image, &progress.ImageFetch{}); err != nil {
 					return errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
 				}
-				if err := c.client.CreateContainer(pod, container); err != nil {
+				_, err := c.client.CreateContainer(pod, container)
+				if err != nil {
 					return errors.Wrapf(err, "Failed to create container %s %s", pod.Metadata.Name, container.Name)
 				}
 			}

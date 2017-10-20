@@ -136,18 +136,18 @@ func (c *ContainerdClient) GetPod(namespace, podName string) (model.Pod, error) 
 }
 
 // CreateContainer creates given container
-func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) error {
+func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Container) (status model.ContainerStatus, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
 	client, connectionErr := c.getConnection(pod.Metadata.Namespace)
 	if connectionErr != nil {
-		return connectionErr
+		return status, connectionErr
 	}
 
 	image, imageErr := client.GetImage(ctx, container.Image)
 	if imageErr != nil {
-		return imageErr
+		return status, imageErr
 	}
 
 	specOpts := []containerd.SpecOpts{
@@ -174,7 +174,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	if len(container.Mounts) > 0 {
 		err := ensureMountSourceDirExists(container.Mounts)
 		if err != nil {
-			return errors.Wrapf(err, "Error while ensuring mount source directories exist")
+			return status, errors.Wrapf(err, "Error while ensuring mount source directories exist")
 		}
 		log.Debugf("Adding %d mounts to container", len(container.Mounts))
 		specOpts = append(specOpts, opts.WithMounts(container.Mounts))
@@ -193,7 +193,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
-	_, err := client.NewContainer(ctx,
+	created, err := client.NewContainer(ctx,
 		container.Name,
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
 		containerd.WithNewSpec(specOpts...),
@@ -202,9 +202,9 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 	)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
+		return status, errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
-	return nil
+	return mapping.MapContainerStatusToInternalModel(created, resolveContainerStatus(ctx, created)), nil
 }
 
 // StartContainer starts the already created container

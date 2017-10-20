@@ -13,7 +13,7 @@ type Client interface {
 	GetPods(namespace string) ([]model.Pod, error)
 	GetPod(namespace, podName string) (model.Pod, error)
 	PullImage(namespace, ref string, status *progress.ImageFetch) error
-	CreateContainer(pod model.Pod, container model.Container) error
+	CreateContainer(pod model.Pod, container model.Container) (model.ContainerStatus, error)
 	StartContainer(namespace, name string, tty bool) (model.ContainerStatus, error)
 	StopContainer(namespace, name string) (model.ContainerStatus, error)
 	GetNamespaces() ([]string, error)

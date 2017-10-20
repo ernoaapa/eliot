@@ -68,7 +68,8 @@ func (s *Server) Create(req *pods.CreatePodRequest, server pods.Pods_CreateServe
 		}
 		progress.AllDone()
 
-		if err := s.client.CreateContainer(pod, container); err != nil {
+		_, err := s.client.CreateContainer(pod, container)
+		if err != nil {
 			return errors.Wrapf(err, "Failed to create container [%s]", container.Name)
 		}
 		log.Debugf("Container [%s] created", container.Name)

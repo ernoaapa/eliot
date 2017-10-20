@@ -45,9 +45,11 @@ func (c *FakeClient) PullImage(namespace, ref string, progress *progress.ImageFe
 }
 
 // CreateContainer fake impl.
-func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) error {
+func (c *FakeClient) CreateContainer(pod model.Pod, container model.Container) (model.ContainerStatus, error) {
 	c.createdCount++
-	return nil
+	return model.ContainerStatus{
+		State: "created",
+	}, nil
 }
 
 // StartContainer fake impl.
