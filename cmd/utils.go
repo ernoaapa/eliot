@@ -52,8 +52,8 @@ func GlobalBefore(context *cli.Context) error {
 }
 
 // GetClient creates new cloud API client
-func GetClient(config *config.Provider) *api.Client {
-	return api.NewClient(
+func GetClient(config *config.Provider) api.Client {
+	return api.NewDirectClient(
 		config.GetNamespace(),
 		config.GetEndpoint(),
 	)

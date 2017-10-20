@@ -1,12 +1,10 @@
 package api
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"syscall"
 
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -19,28 +17,16 @@ import (
 	"github.com/ernoaapa/can/pkg/progress"
 )
 
-// Client connects to RPC server
-type Client struct {
+// DirectClient connects directly to Node's RPC API
+type DirectClient struct {
 	Namespace string
 	Endpoint  string
 	ctx       context.Context
 }
 
-// AttachIO wraps stdin/stdout for attach
-type AttachIO struct {
-	Stdin  io.Reader
-	Stdout io.Writer
-	Stderr io.Writer
-}
-
-// NewAttachIO is wrapper for stdin, stdout and stderr
-func NewAttachIO(stdin io.Reader, stdout, stderr io.Writer) AttachIO {
-	return AttachIO{stdin, stdout, stderr}
-}
-
-// NewClient creates new RPC server client
-func NewClient(namespace, serverAddr string) *Client {
-	return &Client{
+// NewDirectClient creates new RPC server client
+func NewDirectClient(namespace, serverAddr string) *DirectClient {
+	return &DirectClient{
 		namespace,
 		serverAddr,
 		context.Background(),
@@ -48,7 +34,7 @@ func NewClient(namespace, serverAddr string) *Client {
 }
 
 // GetPods calls server and fetches all pods information
-func (c *Client) GetPods() ([]*pods.Pod, error) {
+func (c *DirectClient) GetPods() ([]*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
@@ -67,7 +53,7 @@ func (c *Client) GetPods() ([]*pods.Pod, error) {
 }
 
 // GetPod return Pod by name
-func (c *Client) GetPod(podName string) (*pods.Pod, error) {
+func (c *DirectClient) GetPod(podName string) (*pods.Pod, error) {
 	pods, err := c.GetPods()
 	if err != nil {
 		return nil, err
@@ -81,11 +67,8 @@ func (c *Client) GetPod(podName string) (*pods.Pod, error) {
 	return nil, fmt.Errorf("No pod found with name [%s]", podName)
 }
 
-// PodOpts adds more information to the Pod going to be created
-type PodOpts func(pod *pods.Pod) error
-
 // CreatePod creates new pod to the target server
-func (c *Client) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
+func (c *DirectClient) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
 	for _, o := range opts {
 		err := o(pod)
 		if err != nil {
@@ -126,7 +109,7 @@ func (c *Client) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
 }
 
 // StartPod creates new pod to the target server
-func (c *Client) StartPod(name string) (*pods.Pod, error) {
+func (c *DirectClient) StartPod(name string) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
@@ -146,7 +129,7 @@ func (c *Client) StartPod(name string) (*pods.Pod, error) {
 }
 
 // DeletePod creates new pod to the target server
-func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
+func (c *DirectClient) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
@@ -165,10 +148,8 @@ func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	return resp.GetPod(), nil
 }
 
-type AttachHooks func(client *Client, done <-chan struct{})
-
 // Attach calls server and fetches pod logs
-func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error) {
+func (c *DirectClient) Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error) {
 	done := make(chan struct{})
 	errc := make(chan error)
 
@@ -187,23 +168,23 @@ func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHo
 
 	client := containers.NewContainersClient(conn)
 	log.Debugf("Open stream connection to server to get logs")
-	stream, err := client.Attach(ctx)
+	s, err := client.Attach(ctx)
 	if err != nil {
 		return err
 	}
 
 	go func() {
-		errc <- PipeStdout(stream, attachIO.Stdout, attachIO.Stderr)
+		errc <- stream.PipeStdout(s, attachIO.Stdout, attachIO.Stderr)
 	}()
 
 	if attachIO.Stdin != nil {
 		go func() {
-			errc <- PipeStdin(stream, attachIO.Stdin)
+			errc <- stream.PipeStdin(s, attachIO.Stdin)
 		}()
 	}
 
 	for _, hook := range hooks {
-		go hook(c, done)
+		go hook(c.Endpoint, done)
 	}
 
 	for {
@@ -213,53 +194,8 @@ func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHo
 	}
 }
 
-// PipeStdout reads stdout from grpc stream and writes it to stdout/stderr
-func PipeStdout(s stream.StdoutStreamClient, stdout, stderr io.Writer) error {
-	for {
-		resp, err := s.Recv()
-		if err == io.EOF {
-			err = s.CloseSend()
-			if err != nil {
-				return err
-			}
-			return nil
-		}
-		if err != nil {
-			return errors.Wrapf(err, "Received error while reading attach stream")
-		}
-
-		target := stdout
-		if resp.Stderr {
-			target = stderr
-		}
-
-		_, err = io.Copy(target, bytes.NewReader(resp.Output))
-		if err != nil {
-			return errors.Wrapf(err, "Error while copying data")
-		}
-	}
-}
-
-// PipeStdin reads input from Stdin and writes it to the grpc stream
-func PipeStdin(s stream.StdinStreamClient, stdin io.Reader) error {
-	for {
-		buf := make([]byte, 1024)
-		n, err := stdin.Read(buf)
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return errors.Wrapf(err, "Error while reading stdin to buffer")
-		}
-
-		if err := s.Send(&containers.StdinStreamRequest{Input: buf[:n]}); err != nil {
-			return errors.Wrapf(err, "Sending to stream returned error")
-		}
-	}
-}
-
 // Signal sends kill signal to container process
-func (c *Client) Signal(containerID string, signal syscall.Signal) (err error) {
+func (c *DirectClient) Signal(containerID string, signal syscall.Signal) (err error) {
 	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return err

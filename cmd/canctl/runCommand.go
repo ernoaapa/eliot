@@ -221,8 +221,8 @@ var runCommand = cli.Command{
 
 		hooks := []api.AttachHooks{}
 		if !noSync {
-			hooks = append(hooks, func(client *api.Client, done <-chan struct{}) {
-				parts := strings.SplitN(client.Endpoint, ":", 2)
+			hooks = append(hooks, func(endpoint string, done <-chan struct{}) {
+				parts := strings.SplitN(endpoint, ":", 2)
 				destination := fmt.Sprintf("rsync://%s:%d/volume", parts[0], 873)
 				sync.StartRsync(done, syncDirs, destination, 1*time.Second)
 			})
