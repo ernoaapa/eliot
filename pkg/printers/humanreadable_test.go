@@ -74,10 +74,7 @@ func TestPrintConfig(t *testing.T) {
 		Endpoints: []config.Endpoint{
 			config.Endpoint{Name: "localhost", URL: "localhost:5000"},
 		},
-		Contexts: []config.Context{
-			config.Context{Name: "local-dev", Endpoint: "localhost", Namespace: "default"},
-		},
-		CurrentContext: "local-dev",
+		Namespace: "default",
 	}
 
 	err := printer.PrintConfig(data, &buffer)

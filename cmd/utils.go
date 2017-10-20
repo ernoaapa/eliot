@@ -53,10 +53,18 @@ func GlobalBefore(context *cli.Context) error {
 
 // GetClient creates new cloud API client
 func GetClient(config *config.Provider) api.Client {
-	return api.NewDirectClient(
-		config.GetNamespace(),
-		config.GetEndpoint(),
-	)
+	endpoints := config.GetEndpoints()
+	if len(endpoints) == 0 {
+		log.Fatalf("Unable to discover devices automatically. You must give device endpoint. E.g. --endpoint=192.168.1.2")
+	} else if len(endpoints) == 1 {
+		return api.NewDirectClient(
+			config.GetNamespace(),
+			endpoints[0].URL,
+		)
+	} else {
+		log.Fatalf("Discovered %d devices from network, get list of devices with command 'get devices'", len(endpoints))
+	}
+	return nil
 }
 
 // GetConfig parse yaml config and return the file representation
@@ -79,26 +87,28 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 	}
 
 	if clicontext.GlobalIsSet("endpoint") && clicontext.GlobalString("endpoint") != "" {
-		provider.OverrideEndpoint(clicontext.GlobalString("endpoint"))
+		provider.OverrideEndpoints([]config.Endpoint{{
+			Name: clicontext.GlobalString("endpoint"),
+			URL:  clicontext.GlobalString("endpoint"),
+		}})
 	}
 
-	if provider.GetEndpoint() == "" {
-		log.Infoln("No endpoint url defined in configuration, try to discover from network automatically...")
+	if len(provider.GetEndpoints()) == 0 {
+		log.Infoln("No device endpoints defined in configuration, try to discover from network automatically...")
 
 		devices, err := discovery.Devices(2 * time.Second)
 		if err != nil {
 			log.Fatalf("Failed to auto-discover devices in network: %s", err)
 		}
 
-		if len(devices) == 1 {
-			device := devices[0]
-			log.Infof("Discovered device [%s] Will use endpoint [%s]", device.Hostname, device.GetPrimaryEndpoint())
-			provider.OverrideEndpoint(devices[0].GetPrimaryEndpoint())
-		} else if len(devices) > 1 {
-			log.Fatalf("Discovered %d devices from network, get list of devices with command 'get devices'", len(devices))
-		} else {
-			log.Fatalf("Unable to discover device Automatically. You must give device endpoint. E.g. --endpoint=192.168.1.2")
+		endpoints := []config.Endpoint{}
+		for _, device := range devices {
+			endpoints = append(endpoints, config.Endpoint{
+				Name: device.Hostname,
+				URL:  device.GetPrimaryEndpoint(),
+			})
 		}
+		provider.OverrideEndpoints(endpoints)
 	}
 
 	return provider

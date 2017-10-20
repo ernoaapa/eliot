@@ -12,9 +12,8 @@ import (
 
 // Config is struct for configuration for CLI client
 type Config struct {
-	Endpoints      []Endpoint `yaml:"endpoints"`
-	Contexts       []Context  `yaml:"contexts"`
-	CurrentContext string     `yaml:"current-context"`
+	Endpoints []Endpoint `yaml:"endpoints"`
+	Namespace string     `yaml:"namespace"`
 }
 
 // Endpoint represents Can server
@@ -23,27 +22,13 @@ type Endpoint struct {
 	URL  string `yaml:"url"`
 }
 
-// Context represents single user in single endpoint
-type Context struct {
-	Name      string `yaml:"name"`
-	Endpoint  string `yaml:"endpoint"`
-	Namespace string `yaml:"namespace"`
-}
-
-// DefaultConfig returns new Config instance with default values
-func DefaultConfig() *Config {
-	return &Config{
-		Contexts: []Context{
-			{Name: "cand", Namespace: "cand"},
-		},
-		CurrentContext: "cand",
-	}
-}
-
 // GetConfig reads current config from user home directory
 func GetConfig(path string) (*Config, error) {
+	config := &Config{
+		Namespace: "cand",
+	}
 	if !fs.FileExist(path) {
-		return DefaultConfig(), nil
+		return config, nil
 	}
 
 	data, readErr := ioutil.ReadFile(path)
@@ -51,8 +36,7 @@ func GetConfig(path string) (*Config, error) {
 		return nil, errors.Wrapf(readErr, "Failed to read configuration file: %s", path)
 	}
 
-	config := &Config{}
-	unmarshalErr := yaml.Unmarshal(data, config)
+	unmarshalErr := yaml.Unmarshal(data, &config)
 	if unmarshalErr != nil {
 		return nil, errors.Wrapf(unmarshalErr, "Unable to parse Yaml config: %s", path)
 	}
@@ -73,42 +57,10 @@ func WriteConfig(path string, config *Config) error {
 	return nil
 }
 
-// GetCurrentContext return current context
-func (c Config) GetCurrentContext() Context {
-	return c.GetContext(c.CurrentContext)
-}
-
-// GetCurrentEndpoint return current context
-func (c Config) GetCurrentEndpoint() Endpoint {
-	return c.GetEndpoint(c.GetCurrentContext().Endpoint)
-}
-
 // Set mutates the Config by updating single field with value
 func (c *Config) Set(field, value string) {
 	v := reflect.ValueOf(c).Elem().FieldByName(converter.KebabCaseToCamelCase(field))
 	if v.IsValid() {
 		v.SetString(value)
 	}
-}
-
-// GetContext return context by name
-func (c Config) GetContext(name string) Context {
-	for _, context := range c.Contexts {
-		if context.Name == name {
-			return context
-		}
-	}
-
-	return Context{}
-}
-
-// GetEndpoint return endpoint by name
-func (c *Config) GetEndpoint(name string) Endpoint {
-	for _, endpoint := range c.Endpoints {
-		if endpoint.Name == name {
-			return endpoint
-		}
-	}
-
-	return Endpoint{}
 }
