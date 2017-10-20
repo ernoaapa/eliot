@@ -1,7 +1,5 @@
 package config
 
-import "strings"
-
 // Provider works as Facade for underlying config with capability to override some values
 type Provider struct {
 	config            *Config
@@ -40,11 +38,4 @@ func (c *Provider) GetEndpoint() string {
 		return c.endpointOverride
 	}
 	return c.config.GetCurrentEndpoint().URL
-}
-
-// GetEndpointHost return only the host (or ip) of endpoint
-func (c *Provider) GetEndpointHost() string {
-	endpoint := c.GetEndpoint()
-	parts := strings.SplitN(endpoint, ":", 2)
-	return parts[0]
 }

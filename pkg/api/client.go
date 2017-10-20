@@ -21,9 +21,9 @@ import (
 
 // Client connects to RPC server
 type Client struct {
-	namespace  string
-	serverAddr string
-	ctx        context.Context
+	Namespace string
+	Endpoint  string
+	ctx       context.Context
 }
 
 // AttachIO wraps stdin/stdout for attach
@@ -49,7 +49,7 @@ func NewClient(namespace, serverAddr string) *Client {
 
 // GetPods calls server and fetches all pods information
 func (c *Client) GetPods() ([]*pods.Pod, error) {
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *Client) GetPods() ([]*pods.Pod, error) {
 
 	client := pods.NewPodsClient(conn)
 	resp, err := client.List(c.ctx, &pods.ListPodsRequest{
-		Namespace: c.namespace,
+		Namespace: c.Namespace,
 	})
 	if err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func (c *Client) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
 		}
 	}
 
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (c *Client) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
 
 // StartPod creates new pod to the target server
 func (c *Client) StartPod(name string) (*pods.Pod, error) {
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (c *Client) StartPod(name string) (*pods.Pod, error) {
 
 	client := pods.NewPodsClient(conn)
 	resp, err := client.Start(c.ctx, &pods.StartPodRequest{
-		Namespace: c.namespace,
+		Namespace: c.Namespace,
 		Name:      name,
 	})
 	if err != nil {
@@ -147,7 +147,7 @@ func (c *Client) StartPod(name string) (*pods.Pod, error) {
 
 // DeletePod creates new pod to the target server
 func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -165,18 +165,21 @@ func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	return resp.GetPod(), nil
 }
 
+type AttachHooks func(client *Client, done <-chan struct{})
+
 // Attach calls server and fetches pod logs
-func (c *Client) Attach(containerID string, attachIO AttachIO) (err error) {
-	done := make(chan error)
+func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error) {
+	done := make(chan struct{})
+	errc := make(chan error)
 
 	md := metadata.Pairs(
-		"namespace", c.namespace,
+		"namespace", c.Namespace,
 		"container", containerID,
 	)
 	ctx, cancel := context.WithCancel(metadata.NewOutgoingContext(c.ctx, md))
 	defer cancel()
 
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -190,16 +193,24 @@ func (c *Client) Attach(containerID string, attachIO AttachIO) (err error) {
 	}
 
 	go func() {
-		done <- PipeStdout(stream, attachIO.Stdout, attachIO.Stderr)
+		errc <- PipeStdout(stream, attachIO.Stdout, attachIO.Stderr)
 	}()
 
 	if attachIO.Stdin != nil {
 		go func() {
-			done <- PipeStdin(stream, attachIO.Stdin)
+			errc <- PipeStdin(stream, attachIO.Stdin)
 		}()
 	}
 
-	return <-done
+	for _, hook := range hooks {
+		go hook(c, done)
+	}
+
+	for {
+		err := <-errc
+		close(done)
+		return err
+	}
 }
 
 // PipeStdout reads stdout from grpc stream and writes it to stdout/stderr
@@ -249,7 +260,7 @@ func PipeStdin(s stream.StdinStreamClient, stdin io.Reader) error {
 
 // Signal sends kill signal to container process
 func (c *Client) Signal(containerID string, signal syscall.Signal) (err error) {
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.Endpoint, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -258,7 +269,7 @@ func (c *Client) Signal(containerID string, signal syscall.Signal) (err error) {
 	client := containers.NewContainersClient(conn)
 
 	_, err = client.Signal(c.ctx, &containers.SignalRequest{
-		Namespace:   c.namespace,
+		Namespace:   c.Namespace,
 		ContainerID: containerID,
 		Signal:      int32(signal),
 	})

@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -218,11 +219,13 @@ var runCommand = cli.Command{
 		// TODO: Switch to created ContainerID when API exposes it
 		attachContainerID := name
 
+		hooks := []api.AttachHooks{}
 		if !noSync {
-			done := make(chan struct{})
-			destination := fmt.Sprintf("rsync://%s:%d/volume", config.GetEndpointHost(), 873)
-			sync.StartRsync(done, syncDirs, destination, 1*time.Second)
-			defer close(done)
+			hooks = append(hooks, func(client *api.Client, done <-chan struct{}) {
+				parts := strings.SplitN(client.Endpoint, ":", 2)
+				destination := fmt.Sprintf("rsync://%s:%d/volume", parts[0], 873)
+				sync.StartRsync(done, syncDirs, destination, 1*time.Second)
+			})
 		}
 
 		term := term.TTY{
@@ -241,7 +244,7 @@ var runCommand = cli.Command{
 
 		return term.Safe(func() error {
 			log.Debugln("Attach to container [%s]", attachContainerID)
-			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr))
+			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr), hooks...)
 		})
 	},
 }
