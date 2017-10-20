@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ernoaapa/can/cmd"
+	"github.com/ernoaapa/can/pkg/api"
 	"github.com/ernoaapa/can/pkg/api/core"
 	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
@@ -236,7 +237,7 @@ var runCommand = cli.Command{
 
 		return term.Safe(func() error {
 			log.Debugln("Attach to container [%s]", attachContainerID)
-			return client.Attach(attachContainerID, term.In, term.Out, stderr)
+			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr))
 		})
 	},
 }

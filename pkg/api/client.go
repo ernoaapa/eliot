@@ -25,6 +25,17 @@ type Client struct {
 	ctx        context.Context
 }
 
+// AttachIO wraps stdin/stdout for attach
+type AttachIO struct {
+	Stdin  io.Reader
+	Stdout io.Writer
+	Stderr io.Writer
+}
+
+func NewAttachIO(stdin io.Reader, stdout, stderr io.Writer) AttachIO {
+	return AttachIO{stdin, stdout, stderr}
+}
+
 // NewClient creates new RPC server client
 func NewClient(namespace, serverAddr string) *Client {
 	return &Client{
@@ -143,7 +154,7 @@ func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 }
 
 // Attach calls server and fetches pod logs
-func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.Writer) (err error) {
+func (c *Client) Attach(containerID string, attachIO AttachIO) (err error) {
 	done := make(chan struct{})
 	errc := make(chan error)
 
@@ -181,9 +192,9 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 				break
 			}
 
-			target := stdout
+			target := attachIO.Stdout
 			if resp.Stderr {
-				target = stderr
+				target = attachIO.Stderr
 			}
 
 			_, err = io.Copy(target, bytes.NewReader(resp.Output))
@@ -194,13 +205,13 @@ func (c *Client) Attach(containerID string, stdin io.Reader, stdout, stderr io.W
 		}
 	}()
 
-	if stdin != nil {
+	if attachIO.Stdin != nil {
 		go func() {
 			defer close(done)
 
 			for {
 				buf := make([]byte, 1024)
-				n, err := stdin.Read(buf)
+				n, err := attachIO.Stdin.Read(buf)
 				if err == io.EOF {
 					// nothing else to pipe, kill this goroutine
 					break

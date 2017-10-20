@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ernoaapa/can/cmd"
+	"github.com/ernoaapa/can/pkg/api"
 	"github.com/ernoaapa/can/pkg/term"
 	"github.com/urfave/cli"
 )
@@ -73,7 +74,7 @@ var attachCommand = cli.Command{
 		}
 
 		return term.Safe(func() error {
-			return client.Attach(containerName, stdin, stdout, stderr)
+			return client.Attach(containerName, api.NewAttachIO(stdin, stdout, stderr))
 		})
 	},
 }
