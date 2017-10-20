@@ -18,11 +18,11 @@ func main() {
 	app := cli.NewApp()
 	app.Version = VersionString
 	app.Before = cmd.GlobalBefore
-	app.Name = "can-cli"
+	app.Name = "canctl"
 	app.Usage = "commandline tool for managing 'cand'"
-	app.Description = `The 'can-cli' is tool for managing 'cand' agent in the device.
+	app.Description = `The 'canctl' is tool for managing 'cand' agent in the device.
 	 With this tool, you can create, view and remove containers from the device.`
-	app.UsageText = "can-cli [global options] command [command options] [arguments...]"
+	app.UsageText = "canctl [global options] command [command options] [arguments...]"
 
 	app.Flags = append([]cli.Flag{
 		cli.StringFlag{

@@ -29,19 +29,19 @@ var runCommand = cli.Command{
 	HelpName:    "run",
 	Usage:       "Start container in the device",
 	Description: "With run command, you can start new containers in the device",
-	UsageText: `can-cli run [options] -- <command>
+	UsageText: `canctl run [options] -- <command>
 
 	 # Run code in current directory in the device
-	 can-cli run
+	 canctl run
 
 	 # Run 'build.sh' command in device with files in current directory
-	 can-cli run -- ./build.sh
+	 canctl run -- ./build.sh
 	 
 	 # Run container image in the container
-	 can-cli run --image docker.io/eaapa/hello-world:latest
+	 canctl run --image docker.io/eaapa/hello-world:latest
 
 	 # Run container with name in the device
-	 can-cli run --image docker.io/eaapa/hello-world:latest --name my-pod
+	 canctl run --image docker.io/eaapa/hello-world:latest --name my-pod
 `,
 	Flags: []cli.Flag{
 		cli.StringFlag{

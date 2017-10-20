@@ -22,7 +22,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// Server implements the GRPC API for the can-cli
+// Server implements the GRPC API for the canctl
 type Server struct {
 	client runtime.Client
 	grpc   *grpc.Server

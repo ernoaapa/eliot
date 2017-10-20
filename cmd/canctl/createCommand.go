@@ -17,10 +17,10 @@ var createCommand = cli.Command{
 	HelpName:    "create",
 	Usage:       "Create pod based on yaml spec",
 	Description: "With create command, you can create new pod into the device based on yaml specification",
-	UsageText: `can-cli create [options] -f ./pod.yml
+	UsageText: `canctl create [options] -f ./pod.yml
 
 	 # Create pod based on pod.yml
-	 can-cli create -f ./pod.yml
+	 canctl create -f ./pod.yml
 `,
 	Flags: []cli.Flag{
 		cli.StringSliceFlag{

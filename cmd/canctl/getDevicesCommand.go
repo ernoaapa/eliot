@@ -15,10 +15,10 @@ var getDevicesCommand = cli.Command{
 	Name:    "devices",
 	Aliases: []string{"device"},
 	Usage:   "Get Device resources",
-	UsageText: `can-cli get devices [options]
+	UsageText: `canctl get devices [options]
 			 
 	 # Get table of known devices
-	 can-cli get devices`,
+	 canctl get devices`,
 	Action: func(clicontext *cli.Context) error {
 		devices := make(chan model.DeviceInfo)
 		defer close(devices)

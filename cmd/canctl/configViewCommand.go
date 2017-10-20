@@ -11,7 +11,7 @@ import (
 var configViewCommand = cli.Command{
 	Name:      "view",
 	Usage:     "View client config",
-	UsageText: "can-cli config view",
+	UsageText: "canctl config view",
 	Action: func(clicontext *cli.Context) error {
 		config := cmd.GetConfig(clicontext)
 

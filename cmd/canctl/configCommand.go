@@ -10,7 +10,7 @@ var configCommand = cli.Command{
 	Usage:    `View and edit client configuration`,
 	Description: `With this command you view and edit the client configurations
 	 like device address, username, namespace, etc.`,
-	ArgsUsage: "can-cli config view",
+	ArgsUsage: "canctl config view",
 	Subcommands: []cli.Command{
 		configViewCommand,
 		configSetCommand,

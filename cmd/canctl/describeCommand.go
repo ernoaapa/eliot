@@ -13,26 +13,26 @@ var describeCommand = cli.Command{
 	HelpName:    "describe",
 	Usage:       "View details of resource",
 	Description: "With this command you can get details of resources",
-	ArgsUsage: `can-cli describe RESOURCE [options] [POD NAME]
+	ArgsUsage: `canctl describe RESOURCE [options] [POD NAME]
 	
 	# Describe a pod
-	can-cli describe pod my-pod-name
+	canctl describe pod my-pod-name
 
 	# Describe all pods
-	can-cli describe pods
+	canctl describe pods
 `,
 	Subcommands: []cli.Command{
 		{
 			Name:    "pod",
 			Aliases: []string{"pods"},
 			Usage:   "Return details of pod",
-			UsageText: `can-cli describe RESOURCE [options] [POD NAME]
+			UsageText: `canctl describe RESOURCE [options] [POD NAME]
 	
 	# Describe a pod
-	can-cli describe pod my-pod-name
+	canctl describe pod my-pod-name
 
 	# Describe all pods
-	can-cli describe pods
+	canctl describe pods
 `,
 			Action: func(clicontext *cli.Context) error {
 				config := cmd.GetConfigProvider(clicontext)

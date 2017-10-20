@@ -12,25 +12,25 @@ var deleteCommand = cli.Command{
 	HelpName:    "delete",
 	Usage:       `Delete one or more resources`,
 	Description: "With this command you can delete resources",
-	ArgsUsage: `can-cli delete RESOURCE [options]
+	ArgsUsage: `canctl delete RESOURCE [options]
 
 	 # Delete all running pods
-	 can-cli delete pods
+	 canctl delete pods
 
 	 # Delete all 'my-pod' pod
-	 can-cli delete pod my-pod`,
+	 canctl delete pod my-pod`,
 	Subcommands: []cli.Command{
 		{
 			Name:    "pod",
 			Aliases: []string{"pods"},
 			Usage:   "Delete Pod resource(s)",
-			UsageText: `can-cli delete pods [options] [POD NAME]
+			UsageText: `canctl delete pods [options] [POD NAME]
 			 
 	 # Delete all Pods
-	 can-cli delete pods
+	 canctl delete pods
 
 	 # Delete all 'my-pod' pod
-	 can-cli delete pod my-pod`,
+	 canctl delete pod my-pod`,
 			Action: func(clicontext *cli.Context) error {
 				config := cmd.GetConfigProvider(clicontext)
 				client := cmd.GetClient(config)

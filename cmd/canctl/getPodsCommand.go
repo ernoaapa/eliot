@@ -12,10 +12,10 @@ var getPodsCommand = cli.Command{
 	Name:    "pods",
 	Aliases: []string{"pod"},
 	Usage:   "Get Pod resources",
-	UsageText: `can-cli get pods [options]
+	UsageText: `canctl get pods [options]
 			 
 	 # Get table of running pods
-	 can-cli get pods`,
+	 canctl get pods`,
 	Action: func(clicontext *cli.Context) error {
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)

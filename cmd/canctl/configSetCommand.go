@@ -9,7 +9,7 @@ import (
 var configSetCommand = cli.Command{
 	Name:      "set",
 	Usage:     "Set client config parameter",
-	UsageText: "can-cli config set NAME VALUE",
+	UsageText: "canctl config set NAME VALUE",
 	Action: func(clicontext *cli.Context) error {
 		if clicontext.NArg() != 2 {
 			log.Fatalf("You must give two parameters, NAME and VALUE")

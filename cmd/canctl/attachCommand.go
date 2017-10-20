@@ -15,13 +15,13 @@ var attachCommand = cli.Command{
 	HelpName:    "attach",
 	Usage:       "Attach to container stdout and stderr output",
 	Description: "You can use this command to get connection to container process and receive stdout and stderr output",
-	UsageText: `can-cli attach [options] POD_NAME
+	UsageText: `canctl attach [options] POD_NAME
 
 	 # View pod attach
-	 can-cli attach my-pod
+	 canctl attach my-pod
 
 	 # If pod contains multiple containers, you must define container id
-	 can-cli attach --container some-id my-pod
+	 canctl attach --container some-id my-pod
 `,
 	Flags: []cli.Flag{
 		cli.StringFlag{
