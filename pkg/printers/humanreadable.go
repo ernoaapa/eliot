@@ -13,6 +13,7 @@ import (
 	"github.com/ernoaapa/can/pkg/config"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers/humanreadable"
+	"github.com/pkg/errors"
 )
 
 // HumanReadablePrinter is an implementation of ResourcePrinter which prints
@@ -30,10 +31,12 @@ func (p *HumanReadablePrinter) PrintPodsTable(pods []*pods.Pod, writer io.Writer
 	fmt.Fprintln(writer, "NAMESPACE\tNAME\tCONTAINERS\tSTATUS")
 
 	for _, pod := range pods {
-		fmt.Fprintf(writer, "%s\t%s\t%d\t%s", pod.Metadata.Namespace, pod.Metadata.Name, len(pod.Spec.Containers), getStatus(pod))
-		fmt.Fprint(writer, "\n")
+		_, err := fmt.Fprintf(writer, "%s\t%s\t%d\t%s", pod.Metadata.Namespace, pod.Metadata.Name, len(pod.Spec.Containers), getStatus(pod))
+		if err != nil {
+			return errors.Wrapf(err, "Error while writing pod row")
+		}
 	}
-	fmt.Fprint(writer, "\n")
+
 	return nil
 }
 
@@ -75,10 +78,10 @@ func (p *HumanReadablePrinter) PrintDevicesTable(devices <-chan model.DeviceInfo
 
 	go func(devices <-chan model.DeviceInfo) {
 		for device := range devices {
-			fmt.Fprintf(writer, "%s\t%s", device.Hostname, device.GetPrimaryEndpoint())
-			fmt.Fprint(writer, "\n")
+			fmt.Fprintf(writer, "%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint())
 		}
 	}(devices)
+
 	return nil
 }
 
@@ -111,6 +114,5 @@ func (p *HumanReadablePrinter) PrintConfig(config *config.Config, writer io.Writ
 		return err
 	}
 
-	fmt.Fprint(writer, "\n")
 	return nil
 }

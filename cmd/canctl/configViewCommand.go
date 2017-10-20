@@ -16,6 +16,7 @@ var configViewCommand = cli.Command{
 		config := cmd.GetConfig(clicontext)
 
 		writer := printers.GetNewTabWriter(os.Stdout)
+		defer writer.Flush()
 		printer := cmd.GetPrinter(clicontext)
 		return printer.PrintConfig(config, writer)
 	},

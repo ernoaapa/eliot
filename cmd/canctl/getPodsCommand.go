@@ -26,6 +26,7 @@ var getPodsCommand = cli.Command{
 		}
 
 		writer := printers.GetNewTabWriter(os.Stdout)
+		defer writer.Flush()
 		printer := cmd.GetPrinter(clicontext)
 		return printer.PrintPodsTable(pods, writer)
 	},

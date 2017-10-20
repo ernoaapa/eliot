@@ -205,6 +205,7 @@ var runCommand = cli.Command{
 
 		if detach {
 			writer := printers.GetNewTabWriter(os.Stdout)
+			defer writer.Flush()
 			printer := cmd.GetPrinter(clicontext)
 			return printer.PrintPodDetails(result, writer)
 		}

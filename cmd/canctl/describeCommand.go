@@ -49,6 +49,7 @@ var describeCommand = cli.Command{
 				}
 
 				writer := printers.GetNewTabWriter(os.Stdout)
+				defer writer.Flush()
 				printer := cmd.GetPrinter(clicontext)
 				for _, pod := range pods {
 					if err := printer.PrintPodDetails(pod, writer); err != nil {

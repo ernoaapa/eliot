@@ -21,8 +21,11 @@ var getDevicesCommand = cli.Command{
 	 can-cli get devices`,
 	Action: func(clicontext *cli.Context) error {
 		devices := make(chan model.DeviceInfo)
+		defer close(devices)
 
 		writer := printers.GetNewTabWriter(os.Stdout)
+		defer writer.Flush()
+
 		printer := cmd.GetPrinter(clicontext)
 		printer.PrintDevicesTable(devices, writer)
 
