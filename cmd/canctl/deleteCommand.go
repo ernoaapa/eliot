@@ -45,6 +45,10 @@ var deleteCommand = cli.Command{
 					pods = cmd.FilterByPodName(pods, podName)
 				}
 
+				if len(pods) == 0 {
+					return fmt.Errorf("No pod found with name %s", podName)
+				}
+
 				for _, pod := range pods {
 					deleted, err := client.DeletePod(pod)
 					if err != nil {

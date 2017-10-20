@@ -65,7 +65,7 @@ func (c *DirectClient) GetPod(podName string) (*pods.Pod, error) {
 			return pod, nil
 		}
 	}
-	return nil, fmt.Errorf("No pod found with name [%s]", podName)
+	return nil, fmt.Errorf("Pod with name [%s] not found", podName)
 }
 
 // CreatePod creates new pod to the target server
