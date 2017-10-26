@@ -12,26 +12,40 @@ import (
 	"github.com/apoorvam/goterminal"
 )
 
-// Terminal is UI implementation which prints output
-// to user terminal session
+var (
+	terminal = NewTerminal()
+)
+
+// NewOutputLine creates new updateable output Line
+func NewOutputLine() *Line {
+	return terminal.NewLine()
+}
+
+// Terminal is tracks the Lines and updates all of them when needed
 type Terminal struct {
-	rows   []*Row
+	rows   []*Line
 	change chan struct{}
 	writer *goterminal.Writer
 
 	mtx *sync.Mutex
 }
 
+// State of the line
 type State int
 
 const (
+	// INFO is the default state which just displays the text
 	INFO State = iota
+	// PROGRESS state displays progress some progress
 	PROGRESS
+	// DONE represents that the task were done
 	DONE
+	// ERROR is something went wrong
 	ERROR
 )
 
-type Row struct {
+// Line is single text line in the terminal output what you can update
+type Line struct {
 	change  chan struct{}
 	state   State
 	Text    string
@@ -75,55 +89,61 @@ func (t *Terminal) update() {
 	t.writer.Print()
 }
 
-func (t *Terminal) NewRow() *Row {
+// NewLine creates new terminal output line what you can update
+func (t *Terminal) NewLine() *Line {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	row := &Row{change: t.change}
+	row := &Line{change: t.change}
 	t.rows = append(t.rows, row)
 	return row
 }
 
-func (r *Row) SetTextf(format string, args ...interface{}) {
+// SetTextf updates the text according to provided format
+func (r *Line) SetTextf(format string, args ...interface{}) {
 	r.SetText(fmt.Sprintf(format, args...))
 }
 
-func (r *Row) SetText(str string) {
+// SetText updates the text in the line
+func (r *Line) SetText(str string) {
 	r.Text = str
 	r.Update()
 }
 
-func (r *Row) SetProgress(current, total int64) {
+// SetProgress mark this line to be in progress with given progress
+func (r *Line) SetProgress(current, total int64) {
 	r.state = PROGRESS
 	r.current = current
 	r.total = total
 	r.Update()
 }
 
-func (r *Row) Error() {
+// Error mark this line to be in error with given message
+func (r *Line) Error(text string) {
 	r.state = ERROR
-	r.Update()
+	r.SetText(text)
 }
 
-func (r *Row) Done() {
+// Done marks this line to be done and updates the text
+func (r *Line) Done(text string) {
 	r.state = DONE
-	r.Update()
+	r.SetText(text)
 }
 
-func (r *Row) render() string {
+func (r *Line) render() string {
 	switch r.state {
 	case PROGRESS:
 		return pad.Left(spinner.Rotate(), 5, " ") + " " + r.Text + string(progressBar.Render(70, r.current, r.total))
 	case DONE:
-		return color.GreenString(pad.Left("✓", 5, " ") + " " + r.Text)
+		return color.GreenString(pad.Left("✓", 5, " ")) + " " + r.Text
 	case ERROR:
-		return color.RedString(pad.Left("✘", 5, " ") + " " + r.Text)
+		return color.RedString(pad.Left("✘", 5, " ")) + " " + r.Text
 	default:
 		return "    " + r.Text
 	}
 }
 
 // Update triggers re-rendering
-func (r *Row) Update() {
+func (r *Line) Update() {
 	r.change <- struct{}{}
 }

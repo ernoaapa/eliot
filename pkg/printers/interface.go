@@ -19,11 +19,3 @@ type ResourcePrinter interface {
 	// PrintConfig receives config and formats it to human readable format
 	PrintConfig(*config.Config, io.Writer) error
 }
-
-var (
-	terminal = NewTerminal()
-)
-
-func NewTerminalRow() *Row {
-	return terminal.NewRow()
-}
