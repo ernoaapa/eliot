@@ -6,6 +6,8 @@ import (
 	"sync"
 
 	"github.com/ernoaapa/can/pkg/printers/humanreadable"
+	"github.com/fatih/color"
+	"github.com/willf/pad"
 
 	"github.com/apoorvam/goterminal"
 )
@@ -39,6 +41,7 @@ type Row struct {
 
 var (
 	progressBar = humanreadable.NewBar()
+	spinner     = humanreadable.NewDots()
 )
 
 // NewTerminal creates new Terminal UI which prints
@@ -87,30 +90,40 @@ func (r *Row) SetTextf(format string, args ...interface{}) {
 
 func (r *Row) SetText(str string) {
 	r.Text = str
-	r.update()
+	r.Update()
 }
 
 func (r *Row) SetProgress(current, total int64) {
 	r.state = PROGRESS
 	r.current = current
 	r.total = total
-	r.update()
+	r.Update()
+}
+
+func (r *Row) Error() {
+	r.state = ERROR
+	r.Update()
 }
 
 func (r *Row) Done() {
 	r.state = DONE
-	r.update()
+	r.Update()
 }
 
 func (r *Row) render() string {
 	switch r.state {
 	case PROGRESS:
-		return r.Text + string(progressBar.Render(70, r.current, r.total))
+		return pad.Left(spinner.Rotate(), 5, " ") + " " + r.Text + string(progressBar.Render(70, r.current, r.total))
+	case DONE:
+		return color.GreenString(pad.Left("✓", 5, " ") + " " + r.Text)
+	case ERROR:
+		return color.RedString(pad.Left("✘", 5, " ") + " " + r.Text)
 	default:
-		return r.Text
+		return "    " + r.Text
 	}
 }
 
-func (r *Row) update() {
+// Update triggers re-rendering
+func (r *Row) Update() {
 	r.change <- struct{}{}
 }
