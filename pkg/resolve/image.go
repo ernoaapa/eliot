@@ -11,14 +11,14 @@ import (
 )
 
 // Image try to resolve what container image should be used to run project in the directory
-func Image(projectDir string) (string, error) {
+func Image(projectDir string) (projectType, image string, err error) {
 	if isNodeProject(projectDir) {
-		return "docker.io/library/node:latest", nil
+		return "nodejs", "docker.io/library/node:latest", nil
 	} else if isGolangProject(projectDir) {
-		return "docker.io/library/golang:latest", nil
+		return "golang", "docker.io/library/golang:latest", nil
 	}
 
-	return "", fmt.Errorf("Unable to resolve container image for project in directory [%s]", projectDir)
+	return "", "", fmt.Errorf("Unable to resolve container image for project in directory [%s]", projectDir)
 }
 
 func isNodeProject(projectDir string) bool {

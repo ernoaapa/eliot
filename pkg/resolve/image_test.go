@@ -10,17 +10,19 @@ import (
 
 func TestImageResolveNode(t *testing.T) {
 	projectDir := getExampleDirectory("node")
-	image, err := Image(projectDir)
+	projectType, image, err := Image(projectDir)
 	assert.NoError(t, err)
 
+	assert.Equal(t, "nodejs", projectType)
 	assert.Equal(t, "docker.io/library/node:latest", image)
 }
 
 func TestImageResolveGolang(t *testing.T) {
 	projectDir := getExampleDirectory("golang")
-	image, err := Image(projectDir)
+	projectType, image, err := Image(projectDir)
 	assert.NoError(t, err)
 
+	assert.Equal(t, "golang", projectType)
 	assert.Equal(t, "docker.io/library/golang:latest", image)
 }
 

@@ -36,7 +36,11 @@ var describeCommand = cli.Command{
 `,
 			Action: func(clicontext *cli.Context) error {
 				config := cmd.GetConfigProvider(clicontext)
-				client := cmd.GetClient(config)
+				client, err := cmd.GetClient(config)
+				if err != nil {
+					return err
+				}
+
 				podName := clicontext.Args().First()
 
 				pods, err := client.GetPods()

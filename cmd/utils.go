@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/ernoaapa/can/pkg/discovery"
+	"github.com/ernoaapa/can/pkg/display"
 	"github.com/ernoaapa/can/pkg/printers"
 
 	log "github.com/sirupsen/logrus"
@@ -52,16 +53,21 @@ func GlobalBefore(context *cli.Context) error {
 }
 
 // GetClient creates new cloud API client
-func GetClient(config *config.Provider) api.Client {
+func GetClient(config *config.Provider) (api.Client, error) {
+	display := display.NewLine()
+
 	endpoints := config.GetEndpoints()
-	if len(endpoints) == 0 {
-		log.Fatalf("Unable to discover devices automatically. You must give device endpoint. E.g. --endpoint=192.168.1.2")
-	} else if len(endpoints) == 1 {
-		return api.NewDirectClient(config.GetNamespace(), endpoints[0])
-	} else {
-		return api.NewMultiDirectClient(config.GetNamespace(), endpoints)
+	switch len(endpoints) {
+	case 0:
+		display.Error("No devices to connect. You must give device endpoint. E.g. --endpoint=192.168.1.2")
+		return nil, fmt.Errorf("Unable to discover devices automatically. You must give device endpoint. E.g. --endpoint=192.168.1.2")
+	case 1:
+		display.Donef("Connect to %s (%s)", endpoints[0].Name, endpoints[0].URL)
+		return api.NewDirectClient(config.GetNamespace(), endpoints[0]), nil
+	default:
+		display.Donef("Connect to %d devices", len(endpoints))
+		return api.NewMultiDirectClient(config.GetNamespace(), endpoints), nil
 	}
-	return nil
 }
 
 // GetConfig parse yaml config and return the file representation
@@ -77,6 +83,7 @@ func GetConfig(clicontext *cli.Context) *config.Config {
 
 // GetConfigProvider return config.Provider to access the current configuration
 func GetConfigProvider(clicontext *cli.Context) *config.Provider {
+	display := display.NewLine()
 	provider := config.NewProvider(GetConfig(clicontext))
 
 	if clicontext.GlobalIsSet("namespace") && clicontext.GlobalString("namespace") != "" {
@@ -91,11 +98,12 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 	}
 
 	if len(provider.GetEndpoints()) == 0 {
-		log.Infoln("No device endpoints defined in configuration, try to discover from network automatically...")
-
+		display.Active("Discover from network automatically...")
 		devices, err := discovery.Devices(2 * time.Second)
 		if err != nil {
-			log.Fatalf("Failed to auto-discover devices in network: %s", err)
+			display.Errorf("Failed to auto-discover devices in network: %s", err)
+		} else {
+			display.Donef("Discovered %d devices from network", len(devices))
 		}
 
 		endpoints := []config.Endpoint{}
@@ -112,7 +120,7 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 		deviceName := clicontext.GlobalString("device")
 		endpoint, found := provider.GetEndpointByName(deviceName)
 		if !found {
-			log.Fatalf("Failed to find device with name %s", deviceName)
+			display.Errorf("Failed to find device with name %s", deviceName)
 		}
 		provider.OverrideEndpoints([]config.Endpoint{endpoint})
 	}

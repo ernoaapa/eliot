@@ -37,8 +37,12 @@ var createCommand = cli.Command{
 		writer := printers.GetNewTabWriter(os.Stdout)
 		defer writer.Flush()
 		printer := cmd.GetPrinter(clicontext)
+
 		config := cmd.GetConfigProvider(clicontext)
-		client := cmd.GetClient(config)
+		client, err := cmd.GetClient(config)
+		if err != nil {
+			return err
+		}
 
 		pods, err := resolve.Pods(sources)
 		if err != nil {

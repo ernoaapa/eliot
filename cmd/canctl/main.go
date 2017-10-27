@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/ernoaapa/can/cmd"
+	"github.com/ernoaapa/can/pkg/display"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -59,6 +60,8 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		display.Stop()
+		log.Debug(err)
 	}
 }

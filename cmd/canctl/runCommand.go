@@ -14,6 +14,7 @@ import (
 	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
+	"github.com/ernoaapa/can/pkg/display"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers"
 	"github.com/ernoaapa/can/pkg/resolve"
@@ -117,13 +118,14 @@ var runCommand = cli.Command{
 		)
 
 		if image == "" {
-			log.Println("No image defined, try to detect image for project...")
-			image, err = resolve.Image(cmd.GetCurrentDirectory())
+			display := display.NewLine()
+			display.Active("Resolve image for the project...")
+			projectType, image, err := resolve.Image(cmd.GetCurrentDirectory())
 			if err != nil {
-				log.Debugf("Unable to resolve automatically container image for project in directory [%s]. Error: %s", cmd.GetCurrentDirectory(), err)
+				display.Error("Unable to automatically resolve container image for the project. You must define target container image with --image option")
 				return fmt.Errorf("Unable to detect image for project. You must define target container image with --image option")
 			}
-			log.Printf("Auto-resolved image for project. Will use image: %s", image)
+			display.Donef("Detected %s project, use image: %s", projectType, image)
 		}
 		image = cmd.ExpandToFQIN(image)
 
@@ -143,7 +145,10 @@ var runCommand = cli.Command{
 		}
 
 		conf := cmd.GetConfigProvider(clicontext)
-		client := cmd.GetClient(conf)
+		client, err := cmd.GetClient(conf)
+		if err != nil {
+			return err
+		}
 
 		opts := []api.PodOpts{}
 
@@ -199,11 +204,13 @@ var runCommand = cli.Command{
 
 		if rm {
 			defer func() {
+				display := display.NewLine()
+				display.Activef("Delete pod %s", pod.Metadata.Name)
 				_, err := client.DeletePod(pod)
 				if err != nil {
-					log.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
+					display.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
 				} else {
-					log.Infof("Deleted pod [%s]", pod.Metadata.Name)
+					display.Donef("Deleted pod [%s]", pod.Metadata.Name)
 				}
 			}()
 		}
@@ -239,6 +246,10 @@ var runCommand = cli.Command{
 			})
 			defer stopCatch(sigc)
 		}
+
+		// Stop updating display output, let the std piping take the terminal
+		display.Stop()
+		defer display.Start()
 
 		return term.Safe(func() error {
 			log.Debugln("Attach to container [%s]", attachContainerID)

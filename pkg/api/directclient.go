@@ -15,7 +15,7 @@ import (
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/api/stream"
 	"github.com/ernoaapa/can/pkg/config"
-	"github.com/ernoaapa/can/pkg/progress"
+	"github.com/ernoaapa/can/pkg/display"
 )
 
 // DirectClient connects directly to device RPC API
@@ -91,21 +91,41 @@ func (c *DirectClient) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
 		return err
 	}
 
-	progress := progress.NewRenderer()
-	defer progress.Stop()
+	// progress := progress.NewRenderer()
+	// defer progress.Stop()
+	displays := map[string]*display.Line{}
 
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
 			err = stream.CloseSend()
-			progress.Done()
+			// progress.Done()
 			return err
 		}
 		if err != nil {
+			display.NewLine().Error(err)
 			return err
 		}
 
-		progress.Update(mapping.MapAPIModelToImageFetchProgress(resp.Images))
+		for _, fetch := range mapping.MapAPIModelToImageFetchProgress(resp.Images) {
+			current := int64(0)
+			total := int64(0)
+			if _, ok := displays[fetch.Image]; !ok {
+				displays[fetch.Image] = display.NewLine()
+			}
+			for _, layer := range fetch.GetLayers() {
+				current += layer.Offset
+				total += layer.Total
+			}
+
+			if current == total && current != 0 {
+				displays[fetch.Image].Donef("downloaded %s", fetch.Image)
+			} else {
+				displays[fetch.Image].SetProgress(current, total)
+				displays[fetch.Image].SetTextf("Download %s", fetch.Image)
+			}
+		}
+		// progress.Update(mapping.MapAPIModelToImageFetchProgress(resp.Images))
 	}
 }
 
