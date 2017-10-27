@@ -28,7 +28,7 @@ func NewHumanReadablePrinter() *HumanReadablePrinter {
 
 // PrintPodsTable writes list of Pods in human readable table format to the writer
 func (p *HumanReadablePrinter) PrintPodsTable(pods []*pods.Pod, writer io.Writer) error {
-	fmt.Fprintln(writer, "NAMESPACE\tNAME\tCONTAINERS\tSTATUS")
+	fmt.Fprintln(writer, "\nNAMESPACE\tNAME\tCONTAINERS\tSTATUS")
 
 	for _, pod := range pods {
 		_, err := fmt.Fprintf(writer, "%s\t%s\t%d\t%s\n", pod.Metadata.Namespace, pod.Metadata.Name, len(pod.Spec.Containers), getStatus(pod))
@@ -73,14 +73,12 @@ func getKeys(source map[string]int) (result []string) {
 }
 
 // PrintDevicesTable writes stream of Devices in human readable table format to the writer
-func (p *HumanReadablePrinter) PrintDevicesTable(devices <-chan model.DeviceInfo, writer io.Writer) error {
-	fmt.Fprintln(writer, "HOSTNAME\tENDPOINT")
+func (p *HumanReadablePrinter) PrintDevicesTable(devices []model.DeviceInfo, writer io.Writer) error {
+	fmt.Fprintln(writer, "\nHOSTNAME\tENDPOINT")
 
-	go func(devices <-chan model.DeviceInfo) {
-		for device := range devices {
-			fmt.Fprintf(writer, "%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint())
-		}
-	}(devices)
+	for _, device := range devices {
+		fmt.Fprintf(writer, "%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint())
+	}
 
 	return nil
 }

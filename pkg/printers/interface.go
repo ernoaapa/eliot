@@ -13,7 +13,7 @@ type ResourcePrinter interface {
 	// PrintPodsTable receives a list of Pods, formats it as table and prints it to a writer.
 	PrintPodsTable([]*pb.Pod, io.Writer) error
 	// PrintDevicesTable receives a channel of Devices, formats the output as table
-	PrintDevicesTable(<-chan model.DeviceInfo, io.Writer) error
+	PrintDevicesTable([]model.DeviceInfo, io.Writer) error
 	// PrintPodDetails receives a list of Pods, formats it to detailed description and prints it to the writer.
 	PrintPodDetails(*pb.Pod, io.Writer) error
 	// PrintConfig receives config and formats it to human readable format
