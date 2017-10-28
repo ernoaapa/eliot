@@ -6,13 +6,14 @@ import (
 
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
+	"github.com/ernoaapa/can/pkg/progress"
 )
 
 // Client interface for all API clients
 type Client interface {
 	GetPods() ([]*pods.Pod, error)
 	GetPod(podName string) (*pods.Pod, error)
-	CreatePod(pod *pods.Pod, opts ...PodOpts) error
+	CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, opts ...PodOpts) error
 	StartPod(name string) (*pods.Pod, error)
 	DeletePod(pod *pods.Pod) (*pods.Pod, error)
 	Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error)

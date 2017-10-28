@@ -26,7 +26,8 @@ message ImageFetch {
 	string containerID = 1;
 	string image = 2;
 	bool resolved = 3;
-	repeated ImageLayerStatus layers = 4;
+	bool failed = 4;
+	repeated ImageLayerStatus layers = 5;
 }
 
 message ImageLayerStatus {

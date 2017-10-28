@@ -20,13 +20,11 @@ var getDevicesCommand = cli.Command{
 	 # Get table of known devices
 	 canctl get devices`,
 	Action: func(clicontext *cli.Context) error {
-		display := display.NewLine()
-		display.Active("Discover from network automatically...")
+		display := display.New().Loading("Discover from network automatically...")
 
 		devices, err := discovery.Devices(5 * time.Second)
 		if err != nil {
-			display.Errorf("Failed to auto-discover devices in network: %s", err)
-			return err
+			display.Fatalf("Failed to auto-discover devices in network: %s", err)
 		}
 		display.Donef("Discovered %d devices from network", len(devices))
 
@@ -34,8 +32,6 @@ var getDevicesCommand = cli.Command{
 		defer writer.Flush()
 
 		printer := cmd.GetPrinter(clicontext)
-		printer.PrintDevicesTable(devices, writer)
-
-		return nil
+		return printer.PrintDevicesTable(devices, writer)
 	},
 }

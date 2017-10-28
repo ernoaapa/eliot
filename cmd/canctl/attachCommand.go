@@ -37,10 +37,7 @@ var attachCommand = cli.Command{
 		)
 
 		config := cmd.GetConfigProvider(clicontext)
-		client, err := cmd.GetClient(config)
-		if err != nil {
-			return err
-		}
+		client := cmd.GetClient(config)
 
 		if clicontext.NArg() == 0 || clicontext.Args().First() == "" {
 			return fmt.Errorf("You must give Pod name as first argument")

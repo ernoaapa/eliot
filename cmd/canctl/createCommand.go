@@ -5,7 +5,9 @@ import (
 	"os"
 
 	"github.com/ernoaapa/can/cmd"
+	"github.com/ernoaapa/can/pkg/display"
 	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/can/pkg/progress"
 	"github.com/ernoaapa/can/pkg/resolve"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -34,15 +36,8 @@ var createCommand = cli.Command{
 			return fmt.Errorf("You must give --file parameter")
 		}
 
-		writer := printers.GetNewTabWriter(os.Stdout)
-		defer writer.Flush()
-		printer := cmd.GetPrinter(clicontext)
-
 		config := cmd.GetConfigProvider(clicontext)
-		client, err := cmd.GetClient(config)
-		if err != nil {
-			return err
-		}
+		client := cmd.GetClient(config)
 
 		pods, err := resolve.Pods(sources)
 		if err != nil {
@@ -50,7 +45,30 @@ var createCommand = cli.Command{
 		}
 
 		for _, pod := range pods {
-			if err := client.CreatePod(pod); err != nil {
+			displays := map[string]*display.Line{}
+			progressc := make(chan []*progress.ImageFetch)
+
+			go func() {
+				for _, fetch := range <-progressc {
+					if _, ok := displays[fetch.Image]; !ok {
+						displays[fetch.Image] = display.New()
+					}
+
+					if fetch.IsDone() {
+						if fetch.Failed {
+							displays[fetch.Image].Errorf("Failed %s", fetch.Image)
+						} else {
+							displays[fetch.Image].Donef("Downloaded %s", fetch.Image)
+						}
+					} else {
+						current, total := fetch.GetProgress()
+						displays[fetch.Image].WithProgress(current, total).Loadingf("Download %s", fetch.Image)
+					}
+				}
+			}()
+			err := client.CreatePod(progressc, pod)
+			close(progressc)
+			if err != nil {
 				return err
 			}
 
@@ -58,6 +76,10 @@ var createCommand = cli.Command{
 			if err != nil {
 				return err
 			}
+
+			writer := printers.GetNewTabWriter(os.Stdout)
+			defer writer.Flush()
+			printer := cmd.GetPrinter(clicontext)
 
 			if err := printer.PrintPodDetails(result, writer); err != nil {
 				log.Errorf("Error while printing pod details: %s", err)

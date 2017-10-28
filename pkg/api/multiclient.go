@@ -8,6 +8,7 @@ import (
 
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
+	"github.com/ernoaapa/can/pkg/progress"
 )
 
 // MultiDirectClient connects directly to multiples devices RPC API
@@ -49,7 +50,7 @@ func (c *MultiDirectClient) GetPod(podName string) (*pods.Pod, error) {
 }
 
 // CreatePod will return error, because creating pod to multiple devices is not yet supported
-func (c *MultiDirectClient) CreatePod(pod *pods.Pod, opts ...PodOpts) error {
+func (c *MultiDirectClient) CreatePod(updates chan<- []*progress.ImageFetch, pod *pods.Pod, opts ...PodOpts) error {
 	return fmt.Errorf("Create pod to multiple devices is not yet supported. You need to specify device")
 }
 

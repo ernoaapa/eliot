@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/display"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -59,9 +58,8 @@ func main() {
 		configCommand,
 	}
 
-	if err := app.Run(os.Args); err != nil {
-		// log.Fatal(err)
-		display.Stop()
-		log.Debug(err)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
 	}
 }

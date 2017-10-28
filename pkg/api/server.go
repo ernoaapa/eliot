@@ -64,6 +64,7 @@ func (s *Server) Create(req *pods.CreatePodRequest, server pods.Pods_CreateServe
 		progresses = append(progresses, progress)
 
 		if err := s.client.PullImage(pod.Metadata.Namespace, container.Image, progress); err != nil {
+			progress.SetToFailed()
 			return errors.Wrapf(err, "Failed to pull image [%s]", container.Image)
 		}
 		progress.AllDone()

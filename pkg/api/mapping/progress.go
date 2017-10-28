@@ -21,6 +21,7 @@ func MapImageFetchProgressToAPIModel(progresses []*progress.ImageFetch) (result 
 			ContainerID: progress.ContainerID,
 			Image:       progress.Image,
 			Resolved:    progress.Resolved,
+			Failed:      progress.Failed,
 			Layers:      Layers,
 		})
 	}

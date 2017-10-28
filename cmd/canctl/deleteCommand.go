@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/display"
 	"github.com/urfave/cli"
@@ -34,32 +32,25 @@ var deleteCommand = cli.Command{
 	 canctl delete pod my-pod`,
 			Action: func(clicontext *cli.Context) error {
 				config := cmd.GetConfigProvider(clicontext)
-				client, err := cmd.GetClient(config)
-				if err != nil {
-					return err
-				}
+				client := cmd.GetClient(config)
 
 				podName := clicontext.Args().First()
 
-				display := display.NewLine()
-				display.Active("Fetch pods...")
+				display := display.New().Loading("Fetch pods...")
 				pods, err := client.GetPods()
 				if err != nil {
-					display.Error(err)
-					return err
+					display.Fatalf("Failed to fetch pods information: %s", err)
 				}
 
 				if len(pods) == 0 {
-					display.Error("No pods found")
-					return fmt.Errorf("No pods found")
+					display.Fatal("No pods found")
 				}
 
 				if podName != "" {
 					pods = cmd.FilterByPodName(pods, podName)
 
 					if len(pods) == 0 {
-						display.Errorf("No pod found with name %s", podName)
-						return fmt.Errorf("No pod found with name %s", podName)
+						display.Fatalf("No pod found with name %s", podName)
 					}
 				}
 
@@ -68,7 +59,7 @@ var deleteCommand = cli.Command{
 					if err != nil {
 						return err
 					}
-					display.Done("Deleted pod %s", deleted.Metadata.Name)
+					display.Donef("Deleted pod %s", deleted.Metadata.Name)
 				}
 				return nil
 			},

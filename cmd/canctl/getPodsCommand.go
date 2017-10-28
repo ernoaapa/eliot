@@ -18,10 +18,7 @@ var getPodsCommand = cli.Command{
 	 canctl get pods`,
 	Action: func(clicontext *cli.Context) error {
 		config := cmd.GetConfigProvider(clicontext)
-		client, err := cmd.GetClient(config)
-		if err != nil {
-			return err
-		}
+		client := cmd.GetClient(config)
 
 		pods, err := client.GetPods()
 		if err != nil {

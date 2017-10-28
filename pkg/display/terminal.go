@@ -21,9 +21,9 @@ func Stop() {
 	display.Stop()
 }
 
-// NewLine creates new updateable output Line
-func NewLine() *Line {
-	return display.NewLine(display)
+// New creates new updateable output Line
+func New() *Line {
+	return display.New(display)
 }
 
 // Terminal is tracks the Lines and updates all of them when needed
@@ -80,8 +80,8 @@ func (t *Terminal) Update() {
 	t.writer.Print()
 }
 
-// NewLine creates new terminal output line what you can update
-func (t *Terminal) NewLine(terminal *Terminal) *Line {
+// New creates new terminal output line what you can update
+func (t *Terminal) New(terminal *Terminal) *Line {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 

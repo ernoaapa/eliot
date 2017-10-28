@@ -1,12 +1,15 @@
 package progress
 
-import "sync"
+import (
+	"sync"
+)
 
 // ImageFetch stores container pull status
 type ImageFetch struct {
 	ContainerID string
 	Image       string
 	Resolved    bool
+	Failed      bool
 	layers      map[string]*Status
 	mu          sync.Mutex
 }
@@ -62,6 +65,21 @@ func CreateImageFetch(containerID, image string, resolved bool, layers map[strin
 	}
 }
 
+// IsDone return true if all bytes of all layers are downloaded
+func (s *ImageFetch) IsDone() bool {
+	current, total := s.GetProgress()
+	return current == total && current != 0
+}
+
+// GetProgress calculates current and total bytes of all layers
+func (s *ImageFetch) GetProgress() (current, total int64) {
+	for _, layer := range s.layers {
+		current += layer.Offset
+		total += layer.Total
+	}
+	return current, total
+}
+
 // Add new layer ref to the progress list
 func (s *ImageFetch) Add(ref, digest string) {
 	s.mu.Lock()
@@ -110,6 +128,13 @@ func (s *ImageFetch) SetToDone(ref string) {
 	}
 
 	s.layers[ref].Done()
+}
+
+// SetToFailed marks fetch to be failed
+func (s *ImageFetch) SetToFailed() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Failed = true
 }
 
 // AllDone marks all layers downloaded

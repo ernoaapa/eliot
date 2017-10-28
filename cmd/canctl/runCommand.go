@@ -17,6 +17,7 @@ import (
 	"github.com/ernoaapa/can/pkg/display"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/can/pkg/progress"
 	"github.com/ernoaapa/can/pkg/resolve"
 	"github.com/ernoaapa/can/pkg/sync"
 	"github.com/ernoaapa/can/pkg/term"
@@ -118,12 +119,10 @@ var runCommand = cli.Command{
 		)
 
 		if image == "" {
-			display := display.NewLine()
-			display.Active("Resolve image for the project...")
+			display := display.New().Loading("Resolve image for the project...")
 			projectType, image, err := resolve.Image(cmd.GetCurrentDirectory())
 			if err != nil {
-				display.Error("Unable to automatically resolve container image for the project. You must define target container image with --image option")
-				return fmt.Errorf("Unable to detect image for project. You must define target container image with --image option")
+				display.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
 			}
 			display.Donef("Detected %s project, use image: %s", projectType, image)
 		}
@@ -145,10 +144,7 @@ var runCommand = cli.Command{
 		}
 
 		conf := cmd.GetConfigProvider(clicontext)
-		client, err := cmd.GetClient(conf)
-		if err != nil {
-			return err
-		}
+		client := cmd.GetClient(conf)
 
 		opts := []api.PodOpts{}
 
@@ -193,8 +189,34 @@ var runCommand = cli.Command{
 			},
 		}
 
-		if err := client.CreatePod(pod, opts...); err != nil {
-			return errors.Wrapf(err, "Error in creating pod")
+		displays := map[string]*display.Line{}
+		progressc := make(chan []*progress.ImageFetch)
+
+		go func() {
+			for fetches := range progressc {
+				for _, fetch := range fetches {
+					if _, ok := displays[fetch.Image]; !ok {
+						displays[fetch.Image] = display.New().
+							Loadingf("Download %s", fetch.Image)
+					}
+
+					if fetch.IsDone() {
+						if fetch.Failed {
+							displays[fetch.Image].Errorf("Failed %s", fetch.Image)
+						} else {
+							displays[fetch.Image].Donef("Downloaded %s", fetch.Image)
+						}
+					} else {
+						current, total := fetch.GetProgress()
+						displays[fetch.Image].WithProgress(current, total)
+					}
+				}
+			}
+		}()
+		createErr := client.CreatePod(progressc, pod, opts...)
+		close(progressc)
+		if createErr != nil {
+			return errors.Wrapf(createErr, "Error in creating pod")
 		}
 
 		result, err := client.StartPod(name)
@@ -204,8 +226,7 @@ var runCommand = cli.Command{
 
 		if rm {
 			defer func() {
-				display := display.NewLine()
-				display.Activef("Delete pod %s", pod.Metadata.Name)
+				display := display.New().Loadingf("Delete pod %s", pod.Metadata.Name)
 				_, err := client.DeletePod(pod)
 				if err != nil {
 					display.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
