@@ -1,10 +1,10 @@
-package display
+package log
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/ernoaapa/can/pkg/display/terminal"
+	"github.com/ernoaapa/can/pkg/cmd/log/terminal"
 	"github.com/fatih/color"
 	"github.com/willf/pad"
 )

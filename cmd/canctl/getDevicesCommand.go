@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/ernoaapa/can/cmd"
+	"github.com/ernoaapa/can/pkg/cmd/log"
 	"github.com/ernoaapa/can/pkg/discovery"
-	"github.com/ernoaapa/can/pkg/display"
 	"github.com/ernoaapa/can/pkg/printers"
 	"github.com/urfave/cli"
 )
@@ -20,13 +20,13 @@ var getDevicesCommand = cli.Command{
 	 # Get table of known devices
 	 canctl get devices`,
 	Action: func(clicontext *cli.Context) error {
-		display := display.New().Loading("Discover from network automatically...")
+		log := log.NewLine().Loading("Discover from network automatically...")
 
 		devices, err := discovery.Devices(5 * time.Second)
 		if err != nil {
-			display.Fatalf("Failed to auto-discover devices in network: %s", err)
+			log.Fatalf("Failed to auto-discover devices in network: %s", err)
 		}
-		display.Donef("Discovered %d devices from network", len(devices))
+		log.Donef("Discovered %d devices from network", len(devices))
 
 		writer := printers.GetNewTabWriter(os.Stdout)
 		defer writer.Flush()

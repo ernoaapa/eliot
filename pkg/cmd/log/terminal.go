@@ -1,4 +1,4 @@
-package display
+package log
 
 import (
 	"fmt"
@@ -10,20 +10,22 @@ import (
 )
 
 var (
-	display = NewTerminal()
+	output = NewTerminal()
 )
 
+// Start starts the logging output
 func Start() {
-	display.Start()
+	output.Start()
 }
 
+// Stop halts updating the output
 func Stop() {
-	display.Stop()
+	output.Stop()
 }
 
-// New creates new updateable output Line
-func New() *Line {
-	return display.New(display)
+// NewLine creates new updateable output Line
+func NewLine() *Line {
+	return output.NewLine()
 }
 
 // Terminal is tracks the Lines and updates all of them when needed
@@ -80,12 +82,12 @@ func (t *Terminal) Update() {
 	t.writer.Print()
 }
 
-// New creates new terminal output line what you can update
-func (t *Terminal) New(terminal *Terminal) *Line {
+// NewLine creates new terminal output line what you can update
+func (t *Terminal) NewLine() *Line {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	row := &Line{terminal: terminal}
+	row := &Line{terminal: t}
 	t.rows = append(t.rows, row)
 	return row
 }

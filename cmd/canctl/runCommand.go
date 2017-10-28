@@ -13,8 +13,8 @@ import (
 	"github.com/ernoaapa/can/pkg/api/core"
 	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/can/pkg/cmd/log"
 	"github.com/ernoaapa/can/pkg/config"
-	"github.com/ernoaapa/can/pkg/display"
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/printers"
 	"github.com/ernoaapa/can/pkg/progress"
@@ -22,7 +22,6 @@ import (
 	"github.com/ernoaapa/can/pkg/sync"
 	"github.com/ernoaapa/can/pkg/term"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -119,12 +118,12 @@ var runCommand = cli.Command{
 		)
 
 		if image == "" {
-			display := display.New().Loading("Resolve image for the project...")
+			log := log.NewLine().Loading("Resolve image for the project...")
 			projectType, image, err := resolve.Image(cmd.GetCurrentDirectory())
 			if err != nil {
-				display.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
+				log.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
 			}
-			display.Donef("Detected %s project, use image: %s", projectType, image)
+			log.Donef("Detected %s project, use image: %s", projectType, image)
 		}
 		image = cmd.ExpandToFQIN(image)
 
@@ -189,26 +188,25 @@ var runCommand = cli.Command{
 			},
 		}
 
-		displays := map[string]*display.Line{}
+		logs := map[string]*log.Line{}
 		progressc := make(chan []*progress.ImageFetch)
 
 		go func() {
 			for fetches := range progressc {
 				for _, fetch := range fetches {
-					if _, ok := displays[fetch.Image]; !ok {
-						displays[fetch.Image] = display.New().
-							Loadingf("Download %s", fetch.Image)
+					if _, ok := logs[fetch.Image]; !ok {
+						logs[fetch.Image] = log.NewLine().Loadingf("Download %s", fetch.Image)
 					}
 
 					if fetch.IsDone() {
 						if fetch.Failed {
-							displays[fetch.Image].Errorf("Failed %s", fetch.Image)
+							logs[fetch.Image].Errorf("Failed %s", fetch.Image)
 						} else {
-							displays[fetch.Image].Donef("Downloaded %s", fetch.Image)
+							logs[fetch.Image].Donef("Downloaded %s", fetch.Image)
 						}
 					} else {
 						current, total := fetch.GetProgress()
-						displays[fetch.Image].WithProgress(current, total)
+						logs[fetch.Image].WithProgress(current, total)
 					}
 				}
 			}
@@ -226,12 +224,12 @@ var runCommand = cli.Command{
 
 		if rm {
 			defer func() {
-				display := display.New().Loadingf("Delete pod %s", pod.Metadata.Name)
+				log := log.NewLine().Loadingf("Delete pod %s", pod.Metadata.Name)
 				_, err := client.DeletePod(pod)
 				if err != nil {
-					display.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
+					log.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
 				} else {
-					display.Donef("Deleted pod [%s]", pod.Metadata.Name)
+					log.Donef("Deleted pod [%s]", pod.Metadata.Name)
 				}
 			}()
 		}
@@ -268,12 +266,11 @@ var runCommand = cli.Command{
 			defer stopCatch(sigc)
 		}
 
-		// Stop updating display output, let the std piping take the terminal
-		display.Stop()
-		defer display.Start()
+		// Stop updating log lines, let the std piping take the terminal
+		log.Stop()
+		defer log.Start()
 
 		return term.Safe(func() error {
-			log.Debugln("Attach to container [%s]", attachContainerID)
 			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr), hooks...)
 		})
 	},

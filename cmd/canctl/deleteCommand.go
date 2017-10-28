@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/display"
+	"github.com/ernoaapa/can/pkg/cmd/log"
 	"github.com/urfave/cli"
 )
 
@@ -36,21 +36,21 @@ var deleteCommand = cli.Command{
 
 				podName := clicontext.Args().First()
 
-				display := display.New().Loading("Fetch pods...")
+				log := log.NewLine().Loading("Fetch pods...")
 				pods, err := client.GetPods()
 				if err != nil {
-					display.Fatalf("Failed to fetch pods information: %s", err)
+					log.Fatalf("Failed to fetch pods information: %s", err)
 				}
 
 				if len(pods) == 0 {
-					display.Fatal("No pods found")
+					log.Fatal("No pods found")
 				}
 
 				if podName != "" {
 					pods = cmd.FilterByPodName(pods, podName)
 
 					if len(pods) == 0 {
-						display.Fatalf("No pod found with name %s", podName)
+						log.Fatalf("No pod found with name %s", podName)
 					}
 				}
 
@@ -59,7 +59,7 @@ var deleteCommand = cli.Command{
 					if err != nil {
 						return err
 					}
-					display.Donef("Deleted pod %s", deleted.Metadata.Name)
+					log.Donef("Deleted pod %s", deleted.Metadata.Name)
 				}
 				return nil
 			},
