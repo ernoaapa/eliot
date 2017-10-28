@@ -26,11 +26,11 @@ const (
 
 // Line is single text line in the terminal output what you can update
 type Line struct {
-	change  chan struct{}
-	state   State
-	Text    string
-	current int64
-	total   int64
+	terminal *Terminal
+	state    State
+	Text     string
+	current  int64
+	total    int64
 }
 
 var (
@@ -107,5 +107,5 @@ func (r *Line) render() string {
 
 // Update triggers re-rendering
 func (r *Line) Update() {
-	r.change <- struct{}{}
+	r.terminal.Update()
 }
