@@ -4,26 +4,31 @@ import (
 	"os"
 
 	"github.com/ernoaapa/can/cmd"
+	"github.com/ernoaapa/can/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
-// Version string to be set at compile time via command line (-ldflags "-X main.VersionString=1.2.3")
-var (
-	VersionString string
-	extraCmds     = []cli.Command{}
-)
-
 func main() {
 	app := cli.NewApp()
-	app.Version = VersionString
-	app.Before = cmd.GlobalBefore
 	app.Name = "canctl"
-	app.Usage = "commandline tool for managing 'cand'"
-	app.Description = `The 'canctl' is tool for managing 'cand' agent in the device.
-	 With this tool, you can create, view and remove containers from the device.`
-	app.UsageText = "canctl [global options] command [command options] [arguments...]"
+	app.Usage = `commandline interface for managing can`
+	app.UsageText = `canctl [global options] command [command options] [arguments...]
 
+	 # Detect devices
+	 canctl get devices
+
+	 # Get running pods
+	 canctl get pods
+
+	# Get pods in device
+	canctl --device hostname.local. get pods
+
+	# See help of commands
+	canctl run --help
+	`
+	app.Description = `The 'canctl' is tool for managing agent in the device.
+	 With this tool, you can create, view and remove containers from the device.`
 	app.Flags = append([]cli.Flag{
 		cli.StringFlag{
 			Name:   "config, c",
@@ -47,6 +52,8 @@ func main() {
 			EnvVar: "CAN_DEVICE",
 		},
 	}, cmd.GlobalFlags...)
+	app.Version = version.VERSION
+	app.Before = cmd.GlobalBefore
 
 	app.Commands = []cli.Command{
 		getCommand,
