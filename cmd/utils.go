@@ -23,7 +23,6 @@ import (
 	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/can/pkg/config"
-	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/fs"
 	"github.com/ernoaapa/can/pkg/manifest"
@@ -219,13 +218,6 @@ func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, in <-c
 		in,
 		reportParam,
 	), nil
-}
-
-// GetController creates new Controller
-func GetController(clicontext *cli.Context, hostname string, in <-chan []model.Pod, out chan<- []model.Pod) *controller.Controller {
-	client := GetRuntimeClient(clicontext, hostname)
-	interval := clicontext.Duration("update-interval")
-	return controller.New(client, interval, in, out)
 }
 
 // GetPrinter returns printer for formating resources output

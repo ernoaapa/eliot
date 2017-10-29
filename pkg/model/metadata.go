@@ -1,10 +1,5 @@
 package model
 
-var (
-	nameKey      = "name"
-	namespaceKey = "namespace"
-)
-
 // Metadata is metadata that all resources must have
 type Metadata struct {
 	Name      string `validate:"required,gt=0,alphanumOrDash"`
