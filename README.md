@@ -1,34 +1,83 @@
-# Can
+# CAN
+> Note: this is early alpha version! There's not all features yet implemented and code might get large breaking changes until the first release.
+
+Can is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity and security.
+
+Docker and Kubernetes have inspired heavily and if you're familiar with them, you find really easy to get started with Can.
+
+<sub>Built with ❤︎ by [Erno Aapa](https://github.com/ernoaapa) and [contributors](https://github.com/ernoaapa/can)</sub>
+
+## Usage
+![architecture](design/architecture.png)
+
+Can is based on top of the [containerd](https://github.com/containerd/containerd) to provide simple API for managing containers. 
+
+Can is built from following components
+- `canctl` - Command line tool for managing the device
+- `can-api` - GRPC API for client to manage containers
+- `can-discovery` - _(Optional)_ component to make device automatically discoverable by the `canctl` client
+
+### What is pod?
+A _Pod_ is a group of one or more containers what are tightly coupled to each other to build the service. Often the _pod_ contains only one container but sometimes you need some external service, for example in-memory database, addition to your process. In this case, both containers should be in the same pod.
+
+### Features
+- Manage running pods (softwares) in the device
+- Attach to container remotely for debugging
+- _develop-in-device_ fast development start
+
+### Get list of devices
+```
+# List all the devices what are discoverable in the network
+canctl get devices
+```
+
+### Start new pod
+`canctl` creates pods based on `yaml` configuration file.
+```shell
+cat <<EOF >> pods.yaml
+metadata:
+  name: "node-hello"
+spec:
+  containers:
+    - name: "hello-world"
+      image: "docker.io/eaapa/hello-world:latest"
+EOF
+```
+> Note: You can define multiple pods in same yaml file by separating them with `---` line.
+
+```shell
+canctl create -f pods.yaml
+```
+
+### List running pods
+```
+canctl get pods
+```
+
+### View details of pod
+```
+canctl describe pod <pod name>
+```
+
+## Installation
+### Prerequisites
+- containerd - [see the installation docs](https://github.com/containerd/containerd/blob/master/docs/getting-started.md)
+- [runc](https://github.com/opencontainers/runc) (required by containerd)
+
+### Install
+`can-api` is just single binary what you can download from releases or build as described below.
+By default `can-api` uses `/run/containerd/containerd.sock` socket file to connect containerd.
+If you have the file somewhere else, please provide `--containerd` flag.
+
+### Install from releases
+TODO
+
+### Build from the sources
+Install Go 1.9.x and clone the repository to your `$GOPATH`
+```
+BIN=can-api make build
+BIN=canctl make build
+```
+
 ## Development
-### Build
-You can build binaries inside container so you don't need to install Go locally
-```
-make build
-```
-
-To build container
-```
-make container
-```
-
-### Test
-You can run tests inside container so you don't need to install all tools locally
-```
-make test
-```
-
-### Run
-Build container with `make container` and run (update the image name to match with latest):
-```
-docker run -it --rm -e MACHINE_ID=ernoaaapa ernoaapa/cand-amd64:3a56852-dirty --debug --labels foo=bar --manifest https://gist.githubusercontent.com/ernoaapa/9e0f8cc1945544182eaf9468fbb84ca8/raw/manifest.yaml
-```
-
-#### Run locally with loading manifest from file
-```
-go run ./cmd/cand/main.go --debug --labels foo=bar --manifest ./examples/hello-world.yml
-```
-
-#### Run locally with loading manifest from url
-```
-go run ./cmd/cand/main.go --debug --labels foo=bar --manifest https://gist.githubusercontent.com/ernoaapa/9e0f8cc1945544182eaf9468fbb84ca8/raw/manifest.yaml
-```
+See the [development getting started](docs/development-getting-started.md) documentation.
