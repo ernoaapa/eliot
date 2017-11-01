@@ -48,20 +48,22 @@ var createCommand = cli.Command{
 			progressc := make(chan []*progress.ImageFetch)
 
 			go func() {
-				for _, fetch := range <-progressc {
-					if _, ok := logs[fetch.Image]; !ok {
-						logs[fetch.Image] = log.NewLine().Loadingf("Download %s", fetch.Image)
-					}
-
-					if fetch.IsDone() {
-						if fetch.Failed {
-							logs[fetch.Image].Errorf("Failed %s", fetch.Image)
-						} else {
-							logs[fetch.Image].Donef("Downloaded %s", fetch.Image)
+				for fetches := range progressc {
+					for _, fetch := range fetches {
+						if _, ok := logs[fetch.Image]; !ok {
+							logs[fetch.Image] = log.NewLine().Loadingf("Download %s", fetch.Image)
 						}
-					} else {
-						current, total := fetch.GetProgress()
-						logs[fetch.Image].WithProgress(current, total)
+
+						if fetch.IsDone() {
+							if fetch.Failed {
+								logs[fetch.Image].Errorf("Failed %s", fetch.Image)
+							} else {
+								logs[fetch.Image].Donef("Downloaded %s", fetch.Image)
+							}
+						} else {
+							current, total := fetch.GetProgress()
+							logs[fetch.Image].WithProgress(current, total)
+						}
 					}
 				}
 			}()
