@@ -86,9 +86,14 @@ func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pod
 		return nil, errors.Wrapf(err, "Failed to find containers to start for pod [%s] in namespace [%s]", req.Name, req.Namespace)
 	}
 
+	iosets, err := buildContainerIOSets(pod.Spec.Containers)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Cannot start pod [%s], error while building IO sets for containers", req.Name)
+	}
+
 	statuses := []model.ContainerStatus{}
 	for _, container := range pod.Spec.Containers {
-		status, err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, container.Io, container.Tty)
+		status, err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, *iosets[container.Name])
 		if err != nil {
 			return nil, errors.Wrapf(err, "Failed to start container [%s]", container.Name)
 		}
@@ -101,6 +106,27 @@ func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pod
 	return &pods.StartPodResponse{
 		Pod: mapping.MapPodToAPIModel(pod),
 	}, nil
+}
+
+func buildContainerIOSets(containers []model.Container) (map[string]*runtime.IOSet, error) {
+	iosets := map[string]*runtime.IOSet{}
+
+	for _, container := range containers {
+		ioset, err := runtime.NewIOSet(container.Name)
+		if err != nil {
+			return nil, err
+		}
+		iosets[container.Name] = ioset
+	}
+
+	for _, container := range containers {
+		ioset := iosets[container.Name]
+		if container.Pipe != nil {
+			target := iosets[container.Pipe.Stdout.Stdin.Name]
+			ioset.PipeStdoutTo(target)
+		}
+	}
+	return iosets, nil
 }
 
 // Delete is 'pods' service Delete implementation

@@ -2,6 +2,7 @@ package mapping
 
 import (
 	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/can/pkg/runtime/containerd/extensions"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
@@ -12,5 +13,16 @@ func MapMountToContainerdModel(mount model.Mount) specs.Mount {
 		Source:      mount.Source,
 		Destination: mount.Destination,
 		Options:     mount.Options,
+	}
+}
+
+// MapPipeToContainerdModel maps model.PipeSet to containerd extension PipeSet
+func MapPipeToContainerdModel(pipe model.PipeSet) extensions.PipeSet {
+	return extensions.PipeSet{
+		Stdout: extensions.PipeFromStdout{
+			Stdin: extensions.PipeToStdin{
+				Name: pipe.Stdout.Stdin.Name,
+			},
+		},
 	}
 }

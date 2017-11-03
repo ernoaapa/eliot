@@ -5,7 +5,7 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/ernoaapa/can/pkg/model"
-	specs "github.com/opencontainers/runtime-spec/specs-go"
+	"github.com/ernoaapa/can/pkg/runtime/containerd/extensions"
 )
 
 // GetPodName resolves pod name where the container belongs
@@ -29,17 +29,39 @@ func MapContainersToInternalModel(containers []containerd.Container) (result []m
 
 // MapContainerToInternalModel maps containerd model to internal model
 func MapContainerToInternalModel(container containerd.Container) model.Container {
-	labels := ContainerLabels(container.Info().Labels)
-	spec, err := container.Spec()
-	if err != nil {
-		log.Fatalf("Cannot read container spec: %s", err)
-		spec = &specs.Spec{}
-	}
 	return model.Container{
 		Name:  container.ID(),
 		Image: container.Info().Image,
-		Tty:   spec.Process.Terminal,
-		Io:    labels.getIoSet(),
+		Tty:   RequireTty(container),
+		Pipe:  mapPipeToInternalModel(container),
+	}
+}
+
+// RequireTty find out is the container configured to create TTY
+func RequireTty(container containerd.Container) bool {
+	spec, err := container.Spec()
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve process TTY value: %s", err)
+		return false
+	}
+	return spec.Process.Terminal
+}
+
+func mapPipeToInternalModel(container containerd.Container) *model.PipeSet {
+	pipe, err := extensions.GetPipeExtension(container)
+	if err != nil {
+		log.Errorf("Failed to read Pipe extension from container [%s]: %s", container.ID(), err)
+	}
+	if pipe == nil {
+		return nil
+	}
+
+	return &model.PipeSet{
+		Stdout: &model.PipeFromStdout{
+			Stdin: &model.PipeToStdin{
+				Name: pipe.Stdout.Stdin.Name,
+			},
+		},
 	}
 }
 

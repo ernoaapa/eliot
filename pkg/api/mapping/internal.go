@@ -40,9 +40,23 @@ func MapContainersToAPIModel(source []model.Container) (result []*containers.Con
 		result = append(result, &containers.Container{
 			Name:  container.Name,
 			Image: container.Image,
+			Pipe:  mapPipeToAPIModel(container.Pipe),
 		})
 	}
 	return result
+}
+
+func mapPipeToAPIModel(pipe *model.PipeSet) *containers.PipeSet {
+	if pipe == nil {
+		return nil
+	}
+	return &containers.PipeSet{
+		Stdout: &containers.PipeFromStdout{
+			Stdin: &containers.PipeToStdin{
+				Name: pipe.Stdout.Stdin.Name,
+			},
+		},
+	}
 }
 
 // MapContainerStatusesToAPIModel maps list of internal ContainerStatus models to API model

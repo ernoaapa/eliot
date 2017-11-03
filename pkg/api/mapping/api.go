@@ -40,17 +40,23 @@ func MapContainerToInternalModel(containers []*containers.Container) (result []m
 			Env:        container.Env,
 			WorkingDir: container.WorkingDir,
 			Mounts:     mapMountsToInternalModel(container.Mounts),
-			Io:         mapIOSetToInternalModel(container.Io),
+			Pipe:       mapPipeToInternalModel(container.Pipe),
 		})
 	}
 	return result
 }
 
-func mapIOSetToInternalModel(io *containers.IOSet) model.IOSet {
-	return model.IOSet{
-		In:  io.In,
-		Out: io.Out,
-		Err: io.Err,
+func mapPipeToInternalModel(pipe *containers.PipeSet) *model.PipeSet {
+	if pipe == nil {
+		return nil
+	}
+
+	return &model.PipeSet{
+		Stdout: &model.PipeFromStdout{
+			Stdin: &model.PipeToStdin{
+				Name: pipe.Stdout.Stdin.Name,
+			},
+		},
 	}
 }
 

@@ -1,0 +1,6 @@
+metadata:
+  name: "hello-world"
+spec:
+  containers:
+    - name: "hello-world"
+      image: "docker.io/eaapa/hello-world:latest"

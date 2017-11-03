@@ -35,13 +35,19 @@ message Container {
 	repeated string args = 5;
 	repeated string env = 6;
 	repeated Mount mounts = 7;
-	IOSet io = 8;
+	PipeSet pipe = 8;
 }
 
-message IOSet {
-	string in = 1;
-	string out = 2;
-	string err = 3;
+message PipeSet {
+	PipeFromStdout stdout = 1;
+}
+
+message PipeFromStdout {
+	PipeToStdin stdin = 1;
+}
+
+message PipeToStdin {
+	string name = 1;
 }
 
 message Mount {

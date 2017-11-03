@@ -16,6 +16,7 @@ import (
 	"github.com/ernoaapa/can/pkg/model"
 	"github.com/ernoaapa/can/pkg/progress"
 	opts "github.com/ernoaapa/can/pkg/runtime/containerd"
+	"github.com/ernoaapa/can/pkg/runtime/containerd/extensions"
 	"github.com/ernoaapa/can/pkg/runtime/containerd/mapping"
 	imagespecs "github.com/opencontainers/image-spec/specs-go/v1"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
@@ -194,15 +195,22 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		specOpts = append(specOpts, containerd.WithHostNamespace(specs.PIDNamespace))
 	}
 
-	log.Debugf("Create new container from image %s...", image.Name())
-	created, err := client.NewContainer(ctx,
-		container.Name,
+	containerOpts := []containerd.NewContainerOpts{
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
 		containerd.WithNewSpec(specOpts...),
 		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshot(container.Name, image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
-	)
+	}
+
+	if container.Pipe != nil {
+		containerOpts = append(containerOpts, extensions.WithPipeExtension(
+			mapping.MapPipeToContainerdModel(*container.Pipe),
+		))
+	}
+
+	log.Debugf("Create new container from image %s...", image.Name())
+	created, err := client.NewContainer(ctx, container.Name, containerOpts...)
 	if err != nil {
 		return status, errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
@@ -210,7 +218,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 }
 
 // StartContainer starts the already created container
-func (c *ContainerdClient) StartContainer(namespace, name string, ioSet model.IOSet, tty bool) (result model.ContainerStatus, err error) {
+func (c *ContainerdClient) StartContainer(namespace, name string, ioSet IOSet) (result model.ContainerStatus, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -225,7 +233,7 @@ func (c *ContainerdClient) StartContainer(namespace, name string, ioSet model.IO
 	}
 
 	log.Debugf("Create task in container: %s", container.ID())
-	io, err := opts.NewDirectIO(ctx, ioSet, tty)
+	io, err := opts.NewDirectIO(ctx, ioSet.Stdin, ioSet.Stdout, ioSet.Stderr, mapping.RequireTty(container))
 	if err != nil {
 		return result, errors.Wrapf(err, "Error while creating container task IO")
 	}

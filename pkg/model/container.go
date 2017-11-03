@@ -9,13 +9,22 @@ type Container struct {
 	Env        []string `validate:"dive,envKeyValuePair"`
 	WorkingDir string   `validate:"omitempty,gt=0"`
 	Mounts     []Mount  `validate:"dive"`
-	Io         IOSet
+	Pipe       *PipeSet
 }
 
-type IOSet struct {
-	In  string
-	Out string
-	Err string
+// PipeSet allows defining pipe from some source(s) to another container
+type PipeSet struct {
+	Stdout *PipeFromStdout
+}
+
+// PipeFromStdout defines container stdout as source for the piping
+type PipeFromStdout struct {
+	Stdin *PipeToStdin
+}
+
+// PipeToStdin defines container stdin as target for the piping
+type PipeToStdin struct {
+	Name string
 }
 
 // Mount defines directory mount from host to the container

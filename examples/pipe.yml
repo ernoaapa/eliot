@@ -1,0 +1,15 @@
+metadata:
+  name: "pipe-example"
+spec:
+  containers:
+    # hello-world will print "Hello world" to stdout...
+    - name: "pipe-hello-world"
+      image: "docker.io/eaapa/hello-world:latest"
+      pipe:
+        stdout:
+          stdin: 
+            name: pipe-hello-counter
+    # hello-counter reads stdin line by line and add "Counting XX" -prefix to each line
+    - name: "pipe-hello-counter"
+      image: "docker.io/eaapa/hello-counter:latest"
+
