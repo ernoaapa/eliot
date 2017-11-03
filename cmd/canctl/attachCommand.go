@@ -6,6 +6,7 @@ import (
 
 	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/api"
+	"github.com/ernoaapa/can/pkg/cmd/log"
 	"github.com/ernoaapa/can/pkg/term"
 	"github.com/urfave/cli"
 )
@@ -24,6 +25,10 @@ var attachCommand = cli.Command{
 	 canctl attach --container some-id my-pod
 `,
 	Flags: []cli.Flag{
+		cli.BoolTFlag{
+			Name:  "stdin, i",
+			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached (default: true)",
+		},
 		cli.StringFlag{
 			Name:  "container, c",
 			Usage: "Print logs of this container",
@@ -69,12 +74,14 @@ var attachCommand = cli.Command{
 		if clicontext.Bool("stdin") {
 			term.In = stdin
 			term.Raw = true
-		} else {
-			stdin = nil
 		}
 
+		// Stop updating log lines, let the std piping take the terminal
+		log.Stop()
+		defer log.Start()
+
 		return term.Safe(func() error {
-			return client.Attach(containerName, api.NewAttachIO(stdin, stdout, stderr))
+			return client.Attach(containerName, api.NewAttachIO(term.In, term.Out, stderr))
 		})
 	},
 }
