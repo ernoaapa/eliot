@@ -1,6 +1,9 @@
 package pods
 
-import "github.com/ernoaapa/can/pkg/model"
+import (
+	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	"github.com/ernoaapa/can/pkg/model"
+)
 
 // Defaults set default values to pod definitions
 func Defaults(pods []*Pod) (result []*Pod) {
@@ -15,5 +18,7 @@ func Default(pod *Pod) *Pod {
 	if pod.Metadata.Namespace == "" {
 		pod.Metadata.Namespace = model.DefaultNamespace
 	}
+
+	pod.Spec.Containers = containers.Defaults(pod.Spec.Containers)
 	return pod
 }

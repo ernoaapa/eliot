@@ -40,9 +40,18 @@ func MapContainerToInternalModel(containers []*containers.Container) (result []m
 			Env:        container.Env,
 			WorkingDir: container.WorkingDir,
 			Mounts:     mapMountsToInternalModel(container.Mounts),
+			Io:         mapIOSetToInternalModel(container.Io),
 		})
 	}
 	return result
+}
+
+func mapIOSetToInternalModel(io *containers.IOSet) model.IOSet {
+	return model.IOSet{
+		In:  io.In,
+		Out: io.Out,
+		Err: io.Err,
+	}
 }
 
 func mapMountsToInternalModel(mounts []*containers.Mount) (result []model.Mount) {

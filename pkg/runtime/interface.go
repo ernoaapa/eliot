@@ -14,7 +14,7 @@ type Client interface {
 	GetPod(namespace, podName string) (model.Pod, error)
 	PullImage(namespace, ref string, status *progress.ImageFetch) error
 	CreateContainer(pod model.Pod, container model.Container) (model.ContainerStatus, error)
-	StartContainer(namespace, name string, tty bool) (model.ContainerStatus, error)
+	StartContainer(namespace, name string, ioSet model.IOSet, tty bool) (model.ContainerStatus, error)
 	StopContainer(namespace, name string) (model.ContainerStatus, error)
 	GetNamespaces() ([]string, error)
 	IsContainerRunning(namespace, name string) (bool, error)

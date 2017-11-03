@@ -9,6 +9,13 @@ type Container struct {
 	Env        []string `validate:"dive,envKeyValuePair"`
 	WorkingDir string   `validate:"omitempty,gt=0"`
 	Mounts     []Mount  `validate:"dive"`
+	Io         IOSet
+}
+
+type IOSet struct {
+	In  string
+	Out string
+	Err string
 }
 
 // Mount defines directory mount from host to the container

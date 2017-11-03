@@ -35,6 +35,13 @@ message Container {
 	repeated string args = 5;
 	repeated string env = 6;
 	repeated Mount mounts = 7;
+	IOSet io = 8;
+}
+
+message IOSet {
+	string in = 1;
+	string out = 2;
+	string err = 3;
 }
 
 message Mount {

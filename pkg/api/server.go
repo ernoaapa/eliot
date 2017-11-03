@@ -88,7 +88,7 @@ func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pod
 
 	statuses := []model.ContainerStatus{}
 	for _, container := range pod.Spec.Containers {
-		status, err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, container.Tty)
+		status, err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, container.Io, container.Tty)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Failed to start container [%s]", container.Name)
 		}

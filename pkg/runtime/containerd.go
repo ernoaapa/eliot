@@ -210,7 +210,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 }
 
 // StartContainer starts the already created container
-func (c *ContainerdClient) StartContainer(namespace, name string, tty bool) (result model.ContainerStatus, err error) {
+func (c *ContainerdClient) StartContainer(namespace, name string, ioSet model.IOSet, tty bool) (result model.ContainerStatus, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -225,7 +225,7 @@ func (c *ContainerdClient) StartContainer(namespace, name string, tty bool) (res
 	}
 
 	log.Debugf("Create task in container: %s", container.ID())
-	io, err := containerd.NewDirectIO(ctx, tty)
+	io, err := opts.NewDirectIO(ctx, ioSet, tty)
 	if err != nil {
 		return result, errors.Wrapf(err, "Error while creating container task IO")
 	}

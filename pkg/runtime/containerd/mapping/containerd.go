@@ -29,6 +29,7 @@ func MapContainersToInternalModel(containers []containerd.Container) (result []m
 
 // MapContainerToInternalModel maps containerd model to internal model
 func MapContainerToInternalModel(container containerd.Container) model.Container {
+	labels := ContainerLabels(container.Info().Labels)
 	spec, err := container.Spec()
 	if err != nil {
 		log.Fatalf("Cannot read container spec: %s", err)
@@ -38,6 +39,7 @@ func MapContainerToInternalModel(container containerd.Container) model.Container
 		Name:  container.ID(),
 		Image: container.Info().Image,
 		Tty:   spec.Process.Terminal,
+		Io:    labels.getIoSet(),
 	}
 }
 
