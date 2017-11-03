@@ -85,7 +85,19 @@ func (p *HumanReadablePrinter) PrintDevicesTable(devices []model.DeviceInfo, wri
 
 // PrintPodDetails writes list of pods in human readable detailed format to the writer
 func (p *HumanReadablePrinter) PrintPodDetails(pod *pods.Pod, writer io.Writer) error {
-	t := template.New("pod-details")
+	t := template.New("pod-details").Funcs(template.FuncMap{
+		"GetStatus": func(pod pods.Pod, name string) *containers.ContainerStatus {
+			if pod.Status == nil {
+				return nil
+			}
+			for _, status := range pod.Status.ContainerStatuses {
+				if status.ContainerID == name {
+					return status
+				}
+			}
+			return nil
+		},
+	})
 	t, err := t.Parse(humanreadable.PodDetailsTemplate)
 	if err != nil {
 		log.Fatalf("Invalid pod template: %s", err)
