@@ -9,9 +9,11 @@ State:	{{.Status}}
 Containers:{{range .Pod.Spec.Containers}}
   {{- $status := GetStatus $pod .Name}}
   {{.Name}}:
+    Image: {{$.Image}}
+    {{- if $status }}
     ContainerID: {{$status.ContainerID}}
-    Image: {{$status.Image}}
     State: {{$status.State}}
+    {{- end}}
     {{- if .Pipe}}
     Pipe:
       stdout -> stdin: {{.Pipe.Stdout.Stdin.Name}}
