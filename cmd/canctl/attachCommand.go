@@ -55,15 +55,24 @@ var attachCommand = cli.Command{
 			return err
 		}
 
-		containerCount := len(pod.Spec.Containers)
+		containerID := ""
+		containerCount := len(pod.Status.ContainerStatuses)
 		if containerCount == 0 {
 			return fmt.Errorf("Pod [%s] don't have any containers", podName)
 		} else if containerCount == 1 {
+			containerID = pod.Status.ContainerStatuses[0].ContainerID
+		} else {
 			if containerName == "" {
-				containerName = pod.Spec.Containers[0].Name
+				return fmt.Errorf("Pod [%s] contains %d containers, you must define --container flag", podName, containerCount)
+			}
+
+			for _, status := range pod.Status.ContainerStatuses {
+				if status.Name == containerName {
+					containerID = status.ContainerID
+				}
 			}
 		}
-		if containerName == "" {
+		if containerID == "" {
 			return fmt.Errorf("Pod [%s] contains %d containers, you must define --container flag", podName, containerCount)
 		}
 
@@ -81,7 +90,7 @@ var attachCommand = cli.Command{
 		defer log.Start()
 
 		return term.Safe(func() error {
-			return client.Attach(containerName, api.NewAttachIO(term.In, term.Out, stderr))
+			return client.Attach(containerID, api.NewAttachIO(term.In, term.Out, stderr))
 		})
 	},
 }

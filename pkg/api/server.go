@@ -86,18 +86,18 @@ func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pod
 		return nil, errors.Wrapf(err, "Failed to find containers to start for pod [%s] in namespace [%s]", req.Name, req.Namespace)
 	}
 
-	iosets, err := buildContainerIOSets(pod.Spec.Containers)
+	iosets, err := buildContainerIOSets(pod.Metadata.Name, pod.Spec.Containers)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Cannot start pod [%s], error while building IO sets for containers", req.Name)
 	}
 
 	statuses := []model.ContainerStatus{}
-	for _, container := range pod.Spec.Containers {
-		status, err := s.client.StartContainer(pod.Metadata.Namespace, container.Name, *iosets[container.Name])
+	for _, status := range pod.Status.ContainerStatuses {
+		status, err := s.client.StartContainer(pod.Metadata.Namespace, status.ContainerID, *iosets[status.Name])
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to start container [%s]", container.Name)
+			return nil, errors.Wrapf(err, "Failed to start container [%s]", status.Name)
 		}
-		log.Debugf("Container [%s] started", container.Name)
+		log.Debugf("Container [%s] started", status.Name)
 		statuses = append(statuses, status)
 	}
 
@@ -108,11 +108,11 @@ func (s *Server) Start(context context.Context, req *pods.StartPodRequest) (*pod
 	}, nil
 }
 
-func buildContainerIOSets(containers []model.Container) (map[string]*runtime.IOSet, error) {
+func buildContainerIOSets(podName string, containers []model.Container) (map[string]*runtime.IOSet, error) {
 	iosets := map[string]*runtime.IOSet{}
 
 	for _, container := range containers {
-		ioset, err := runtime.NewIOSet(container.Name)
+		ioset, err := runtime.NewIOSet(fmt.Sprintf("%s.%s", podName, container.Name))
 		if err != nil {
 			return nil, err
 		}
@@ -123,6 +123,9 @@ func buildContainerIOSets(containers []model.Container) (map[string]*runtime.IOS
 		ioset := iosets[container.Name]
 		if container.Pipe != nil {
 			target := iosets[container.Pipe.Stdout.Stdin.Name]
+			if target == nil {
+				return nil, fmt.Errorf("Invalid pipe definition, target container with name [%s] not found", container.Pipe.Stdout.Stdin.Name)
+			}
 			ioset.PipeStdoutTo(target)
 		}
 	}

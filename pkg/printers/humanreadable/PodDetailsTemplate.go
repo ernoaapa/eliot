@@ -8,15 +8,15 @@ Device:	{{.Pod.Status.Hostname}}
 State:	{{.Status}}
 Containers:{{range .Pod.Spec.Containers}}
   {{- $status := GetStatus $pod .Name}}
-  {{.Name}}:
-    Image: {{$.Image}}
+	{{.Name}}:
+		Image:	{{.Image}}
     {{- if $status }}
-    ContainerID: {{$status.ContainerID}}
-    State: {{$status.State}}
+		ContainerID:	{{$status.ContainerID}}
+		State:	{{$status.State}}
     {{- end}}
     {{- if .Pipe}}
-    Pipe:
-      stdout -> stdin: {{.Pipe.Stdout.Stdin.Name}}
+		Pipe:
+			stdout -> stdin: {{.Pipe.Stdout.Stdin.Name}}
 		{{- end}}
 	{{end}}
 `

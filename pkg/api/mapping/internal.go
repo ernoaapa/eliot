@@ -64,6 +64,7 @@ func MapContainerStatusesToAPIModel(statuses []model.ContainerStatus) (result []
 	for _, status := range statuses {
 		result = append(result, &containers.ContainerStatus{
 			ContainerID: status.ContainerID,
+			Name:        status.Name,
 			Image:       status.Image,
 			State:       status.State,
 		})

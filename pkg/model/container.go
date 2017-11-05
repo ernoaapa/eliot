@@ -38,6 +38,7 @@ type Mount struct {
 // ContainerStatus represents one container status
 type ContainerStatus struct {
 	ContainerID string `validate:"required,gt=0"`
+	Name        string `validate:"required,gt=0"`
 	Image       string `validate:"required,gt=0,imageRef"`
 	State       string `validate:"required,gt=0"`
 }

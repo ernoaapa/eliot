@@ -59,6 +59,7 @@ message Mount {
 
 message ContainerStatus {
 	string containerID = 1;
-	string image = 2;
-	string state = 3;
+	string name = 2;
+	string image = 3;
+	string state = 4;
 }

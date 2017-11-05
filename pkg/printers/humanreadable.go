@@ -91,7 +91,7 @@ func (p *HumanReadablePrinter) PrintPodDetails(pod *pods.Pod, writer io.Writer) 
 				return nil
 			}
 			for _, status := range pod.Status.ContainerStatuses {
-				if status.ContainerID == name {
+				if status.Name == name {
 					return status
 				}
 			}

@@ -21,7 +21,7 @@ import (
 	imagespecs "github.com/opencontainers/image-spec/specs-go/v1"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
-
+	"github.com/rs/xid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -195,11 +195,12 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		specOpts = append(specOpts, containerd.WithHostNamespace(specs.PIDNamespace))
 	}
 
+	id := xid.New()
 	containerOpts := []containerd.NewContainerOpts{
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
 		containerd.WithNewSpec(specOpts...),
 		containerd.WithSnapshotter(snapshotter),
-		containerd.WithNewSnapshot(container.Name, image),
+		containerd.WithNewSnapshot(id.String(), image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 	}
 
@@ -210,7 +211,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
-	created, err := client.NewContainer(ctx, container.Name, containerOpts...)
+	created, err := client.NewContainer(ctx, id.String(), containerOpts...)
 	if err != nil {
 		return status, errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
@@ -218,7 +219,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 }
 
 // StartContainer starts the already created container
-func (c *ContainerdClient) StartContainer(namespace, name string, ioSet IOSet) (result model.ContainerStatus, err error) {
+func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (result model.ContainerStatus, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
@@ -227,9 +228,9 @@ func (c *ContainerdClient) StartContainer(namespace, name string, ioSet IOSet) (
 		return result, connectionErr
 	}
 
-	container, err := client.LoadContainer(ctx, name)
+	container, err := client.LoadContainer(ctx, id)
 	if err != nil {
-		return result, errors.Wrapf(err, "Failed to load container [%s], cannot start it", name)
+		return result, errors.Wrapf(err, "Failed to load container [%s], cannot start it", id)
 	}
 
 	log.Debugf("Create task in container: %s", container.ID())

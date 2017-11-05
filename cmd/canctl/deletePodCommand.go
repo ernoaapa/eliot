@@ -23,30 +23,32 @@ var deletePodCommand = cli.Command{
 
 		podName := clicontext.Args().First()
 
-		log := log.NewLine().Loading("Fetch pods...")
+		logl := log.NewLine().Loading("Fetch pods...")
 		pods, err := client.GetPods()
 		if err != nil {
-			log.Fatalf("Failed to fetch pods information: %s", err)
+			logl.Fatalf("Failed to fetch pods information: %s", err)
 		}
+		logl.Done("Fetched pods")
 
 		if len(pods) == 0 {
-			log.Fatal("No pods found")
+			logl.Fatal("No pods found")
 		}
 
 		if podName != "" {
 			pods = cmd.FilterByPodName(pods, podName)
 
 			if len(pods) == 0 {
-				log.Fatalf("No pod found with name %s", podName)
+				logl.Fatalf("No pod found with name %s", podName)
 			}
 		}
 
 		for _, pod := range pods {
+			logl = log.NewLine().Loadingf("Deleting pod %s", pod.Metadata.Name)
 			deleted, err := client.DeletePod(pod)
 			if err != nil {
 				return err
 			}
-			log.Donef("Deleted pod %s", deleted.Metadata.Name)
+			logl.Donef("Deleted pod %s", deleted.Metadata.Name)
 		}
 		return nil
 	},

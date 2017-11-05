@@ -29,8 +29,9 @@ func MapContainersToInternalModel(containers []containerd.Container) (result []m
 
 // MapContainerToInternalModel maps containerd model to internal model
 func MapContainerToInternalModel(container containerd.Container) model.Container {
+	labels := ContainerLabels(container.Info().Labels)
 	return model.Container{
-		Name:  container.ID(),
+		Name:  labels.getContainerName(),
 		Image: container.Info().Image,
 		Tty:   RequireTty(container),
 		Pipe:  mapPipeToInternalModel(container),
@@ -67,8 +68,10 @@ func mapPipeToInternalModel(container containerd.Container) *model.PipeSet {
 
 // MapContainerStatusToInternalModel maps containerd model to internal container status model
 func MapContainerStatusToInternalModel(container containerd.Container, status containerd.Status) model.ContainerStatus {
+	labels := ContainerLabels(container.Info().Labels)
 	return model.ContainerStatus{
 		ContainerID: container.ID(),
+		Name:        labels.getContainerName(),
 		Image:       container.Info().Image,
 		State:       mapContainerStatus(status),
 	}

@@ -241,8 +241,10 @@ var runCommand = cli.Command{
 			return printer.PrintPodDetails(result, writer)
 		}
 
-		// TODO: Switch to created ContainerID when API exposes it
-		attachContainerID := name
+		attachContainerID, err := findRunningContainerID(result, name)
+		if err != nil {
+			return errors.Wrapf(err, "Cannot attach to container")
+		}
 
 		hooks := []api.AttachHooks{}
 		if !noSync {
@@ -274,6 +276,18 @@ var runCommand = cli.Command{
 			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr), hooks...)
 		})
 	},
+}
+
+func findRunningContainerID(pod *pods.Pod, name string) (string, error) {
+	if pod.Status != nil && len(pod.Status.ContainerStatuses) > 0 {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name == name {
+				return status.ContainerID, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("Cannot find ContainerID with name %s", name)
 }
 
 func stopCatch(sigc chan os.Signal) {
