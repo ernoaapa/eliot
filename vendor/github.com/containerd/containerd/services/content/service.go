@@ -4,7 +4,6 @@ import (
 	"io"
 	"sync"
 
-	"github.com/boltdb/bolt"
 	api "github.com/containerd/containerd/api/services/content/v1"
 	eventsapi "github.com/containerd/containerd/api/services/events/v1"
 	"github.com/containerd/containerd/content"
@@ -39,27 +38,25 @@ func init() {
 	plugin.Register(&plugin.Registration{
 		Type: plugin.GRPCPlugin,
 		ID:   "content",
-		Requires: []plugin.PluginType{
-			plugin.ContentPlugin,
+		Requires: []plugin.Type{
 			plugin.MetadataPlugin,
 		},
-		Init: NewService,
+		InitFn: func(ic *plugin.InitContext) (interface{}, error) {
+			m, err := ic.Get(plugin.MetadataPlugin)
+			if err != nil {
+				return nil, err
+			}
+
+			s, err := NewService(m.(*metadata.DB).ContentStore(), ic.Events)
+			return s, err
+		},
 	})
 }
 
-func NewService(ic *plugin.InitContext) (interface{}, error) {
-	c, err := ic.Get(plugin.ContentPlugin)
-	if err != nil {
-		return nil, err
-	}
-	m, err := ic.Get(plugin.MetadataPlugin)
-	if err != nil {
-		return nil, err
-	}
-	cs := metadata.NewContentStore(m.(*bolt.DB), c.(content.Store))
+func NewService(cs content.Store, publisher events.Publisher) (*Service, error) {
 	return &Service{
 		store:     cs,
-		publisher: ic.Events,
+		publisher: publisher,
 	}, nil
 }
 

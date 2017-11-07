@@ -15,13 +15,17 @@ import (
 	"github.com/containerd/containerd/api/services/tasks/v1"
 	"github.com/containerd/containerd/api/types"
 	"github.com/containerd/containerd/content"
+	"github.com/containerd/containerd/diff"
 	"github.com/containerd/containerd/errdefs"
+	"github.com/containerd/containerd/log"
 	"github.com/containerd/containerd/mount"
 	"github.com/containerd/containerd/plugin"
 	"github.com/containerd/containerd/rootfs"
 	"github.com/containerd/typeurl"
+	google_protobuf "github.com/gogo/protobuf/types"
 	digest "github.com/opencontainers/go-digest"
 	"github.com/opencontainers/image-spec/specs-go/v1"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 )
@@ -39,6 +43,14 @@ type Status struct {
 	ExitStatus uint32
 	// ExitedTime is the time at which the process died
 	ExitTime time.Time
+}
+
+type ProcessInfo struct {
+	// Pid is the process ID
+	Pid uint32
+	// Info includes additional process information
+	// Info varies by platform
+	Info *google_protobuf.Any
 }
 
 // ProcessStatus returns a human readable status for the Process representing its current status
@@ -107,7 +119,7 @@ type Task interface {
 	// Exec creates a new process inside the task
 	Exec(context.Context, string, *specs.Process, IOCreation) (Process, error)
 	// Pids returns a list of system specific process ids inside the task
-	Pids(context.Context) ([]uint32, error)
+	Pids(context.Context) ([]ProcessInfo, error)
 	// Checkpoint serializes the runtime and memory information of a task into an
 	// OCI Index that can be push and pulled from a remote resource.
 	//
@@ -294,14 +306,21 @@ func (t *task) Exec(ctx context.Context, id string, spec *specs.Process, ioCreat
 	}, nil
 }
 
-func (t *task) Pids(ctx context.Context) ([]uint32, error) {
+func (t *task) Pids(ctx context.Context) ([]ProcessInfo, error) {
 	response, err := t.client.TaskService().ListPids(ctx, &tasks.ListPidsRequest{
 		ContainerID: t.id,
 	})
 	if err != nil {
 		return nil, errdefs.FromGRPC(err)
 	}
-	return response.Pids, nil
+	var processList []ProcessInfo
+	for _, p := range response.Processes {
+		processList = append(processList, ProcessInfo{
+			Pid:  p.Pid,
+			Info: p.Info,
+		})
+	}
+	return processList, nil
 }
 
 func (t *task) CloseIO(ctx context.Context, opts ...IOCloserOpts) error {
@@ -469,7 +488,13 @@ func (t *task) checkpointTask(ctx context.Context, index *v1.Index, request *tas
 }
 
 func (t *task) checkpointRWSnapshot(ctx context.Context, index *v1.Index, snapshotterName string, id string) error {
-	rw, err := rootfs.Diff(ctx, id, fmt.Sprintf("checkpoint-rw-%s", id), t.client.SnapshotService(snapshotterName), t.client.DiffService())
+	opts := []diff.Opt{
+		diff.WithReference(fmt.Sprintf("checkpoint-rw-%s", id)),
+		diff.WithLabels(map[string]string{
+			"containerd.io/gc.root": time.Now().UTC().Format(time.RFC3339),
+		}),
+	}
+	rw, err := rootfs.Diff(ctx, id, t.client.SnapshotService(snapshotterName), t.client.DiffService(), opts...)
 	if err != nil {
 		return err
 	}
@@ -493,15 +518,32 @@ func (t *task) checkpointImage(ctx context.Context, index *v1.Index, image strin
 	return nil
 }
 
-func (t *task) writeIndex(ctx context.Context, index *v1.Index) (v1.Descriptor, error) {
+func (t *task) writeIndex(ctx context.Context, index *v1.Index) (d v1.Descriptor, err error) {
+	labels := map[string]string{
+		"containerd.io/gc.root": time.Now().UTC().Format(time.RFC3339),
+	}
+
+	for i, m := range index.Manifests {
+		labels[fmt.Sprintf("containerd.io/gc.ref.content.%d", i)] = m.Digest.String()
+		defer func(m ocispec.Descriptor) {
+			if err == nil {
+				info := content.Info{Digest: m.Digest}
+				if _, uerr := t.client.ContentStore().Update(ctx, info, "labels.containerd.io/gc.root"); uerr != nil {
+					log.G(ctx).WithError(uerr).WithField("dgst", m.Digest).Warnf("failed to remove root marker")
+				}
+			}
+		}(m)
+	}
+
 	buf := bytes.NewBuffer(nil)
 	if err := json.NewEncoder(buf).Encode(index); err != nil {
 		return v1.Descriptor{}, err
 	}
-	return writeContent(ctx, t.client.ContentStore(), v1.MediaTypeImageIndex, t.id, buf)
+
+	return writeContent(ctx, t.client.ContentStore(), v1.MediaTypeImageIndex, t.id, buf, content.WithLabels(labels))
 }
 
-func writeContent(ctx context.Context, store content.Store, mediaType, ref string, r io.Reader) (d v1.Descriptor, err error) {
+func writeContent(ctx context.Context, store content.Store, mediaType, ref string, r io.Reader, opts ...content.Opt) (d v1.Descriptor, err error) {
 	writer, err := store.Writer(ctx, ref, 0, "")
 	if err != nil {
 		return d, err
@@ -511,7 +553,7 @@ func writeContent(ctx context.Context, store content.Store, mediaType, ref strin
 	if err != nil {
 		return d, err
 	}
-	if err := writer.Commit(ctx, size, ""); err != nil {
+	if err := writer.Commit(ctx, size, "", opts...); err != nil {
 		return d, err
 	}
 	return v1.Descriptor{

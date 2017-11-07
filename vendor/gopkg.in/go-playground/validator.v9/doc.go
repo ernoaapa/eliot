@@ -31,7 +31,7 @@ Custom Validation Functions
 Custom Validation functions can be added. Example:
 
 	// Structure
-	func customFunc(fl FielddLevel) bool {
+	func customFunc(fl FieldLevel) bool {
 
 		if fl.Field().String() == "invalid" {
 			return false
@@ -56,7 +56,7 @@ Cross-Field Validation can be done via the following tags:
 	- eqcsfield
 	- necsfield
 	- gtcsfield
-	- ftecsfield
+	- gtecsfield
 	- ltcsfield
 	- ltecsfield
 
@@ -219,6 +219,13 @@ not "". For slices, maps, pointers, interfaces, channels and functions
 ensures the value is not nil.
 
 	Usage: required
+
+Is Default
+
+This validates that the value is the default value and is almost the
+opposite of required.
+
+	Usage: isdefault
 
 Length
 
@@ -460,6 +467,12 @@ This does the same as ltefield except that it validates the field provided relat
 to the top level struct.
 
 	Usage: ltecsfield=InnerStructField.Field
+
+Unique
+
+For arrays & slices, unique will ensure that there are no duplicates.
+
+	Usage: unique
 
 Alpha Only
 

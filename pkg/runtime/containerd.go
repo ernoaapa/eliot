@@ -87,15 +87,19 @@ func (c *ContainerdClient) GetPods(namespace string) ([]model.Pod, error) {
 	}
 
 	for _, container := range containers {
-		podName := mapping.GetPodName(container)
+		info, err := container.Info(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "Error while fetching container info")
+		}
+		podName := mapping.GetPodName(info)
 		if _, ok := pods[podName]; !ok {
 			pod := model.NewPod(namespace, podName, c.hostname)
 			pods[podName] = &pod
 		}
 
 		pods[podName].AppendContainer(
-			mapping.MapContainerToInternalModel(container),
-			mapping.MapContainerStatusToInternalModel(container, resolveContainerStatus(ctx, container)),
+			mapping.MapContainerToInternalModel(info),
+			mapping.MapContainerStatusToInternalModel(info, resolveContainerStatus(ctx, container)),
 		)
 	}
 
@@ -215,7 +219,13 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	if err != nil {
 		return status, errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
-	return mapping.MapContainerStatusToInternalModel(created, resolveContainerStatus(ctx, created)), nil
+
+	info, err := created.Info(ctx)
+	if err != nil {
+		return status, errors.Wrap(err, "Error while fetching container info")
+	}
+
+	return mapping.MapContainerStatusToInternalModel(info, resolveContainerStatus(ctx, created)), nil
 }
 
 // StartContainer starts the already created container
@@ -233,8 +243,13 @@ func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (re
 		return result, errors.Wrapf(err, "Failed to load container [%s], cannot start it", id)
 	}
 
+	info, err := container.Info(ctx)
+	if err != nil {
+		return result, errors.Wrap(err, "Error while fetching container info")
+	}
+
 	log.Debugf("Create task in container: %s", container.ID())
-	io, err := opts.NewDirectIO(ctx, ioSet.Stdin, ioSet.Stdout, ioSet.Stderr, mapping.RequireTty(container))
+	io, err := opts.NewDirectIO(ctx, ioSet.Stdin, ioSet.Stdout, ioSet.Stderr, mapping.RequireTty(info))
 	if err != nil {
 		return result, errors.Wrapf(err, "Error while creating container task IO")
 	}
@@ -250,7 +265,7 @@ func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (re
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
 
-	return mapping.MapContainerStatusToInternalModel(container, resolveContainerStatus(ctx, container)), nil
+	return mapping.MapContainerStatusToInternalModel(info, resolveContainerStatus(ctx, container)), nil
 }
 
 // StopContainer stops given container
@@ -289,9 +304,14 @@ func (c *ContainerdClient) StopContainer(namespace, name string) (result model.C
 		}
 	}
 
+	info, err := container.Info(ctx)
+	if err != nil {
+		return result, errors.Wrap(err, "Error while fetching container info")
+	}
+
 	return model.ContainerStatus{
-		ContainerID: container.ID(),
-		Image:       container.Info().Image,
+		ContainerID: info.ID,
+		Image:       info.Image,
 		State:       "stopped",
 	}, nil
 }

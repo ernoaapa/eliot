@@ -24,10 +24,10 @@ func (c *FakeContainer) ID() string {
 }
 
 // Info fake impl.
-func (c *FakeContainer) Info() containers.Container {
+func (c *FakeContainer) Info(context.Context) (containers.Container, error) {
 	return containers.Container{
 		Labels: c.labels,
-	}
+	}, nil
 }
 
 // Delete fake impl.
@@ -41,7 +41,7 @@ func (c *FakeContainer) NewTask(context.Context, containerd.IOCreation, ...conta
 }
 
 // Spec fake impl.
-func (c *FakeContainer) Spec() (*specs.Spec, error) {
+func (c *FakeContainer) Spec(context.Context) (*specs.Spec, error) {
 	return &specs.Spec{
 		Process: &specs.Process{},
 	}, nil
@@ -71,8 +71,13 @@ func (c *FakeContainer) SetLabels(context.Context, map[string]string) (labels ma
 }
 
 // Extensions fake impl.
-func (c *FakeContainer) Extensions() map[string]prototypes.Any {
-	return map[string]prototypes.Any{}
+func (c *FakeContainer) Extensions(ctx context.Context) (map[string]prototypes.Any, error) {
+	return map[string]prototypes.Any{}, nil
+}
+
+// Update fake impl.
+func (c *FakeContainer) Update(context.Context, ...containerd.UpdateContainerOpts) error {
+	return nil
 }
 
 func fakeRunningContainer(namespace, podName, containerName string) containerd.Container {

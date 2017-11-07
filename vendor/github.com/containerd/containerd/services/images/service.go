@@ -10,6 +10,7 @@ import (
 	"github.com/containerd/containerd/metadata"
 	"github.com/containerd/containerd/plugin"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -20,25 +21,25 @@ func init() {
 	plugin.Register(&plugin.Registration{
 		Type: plugin.GRPCPlugin,
 		ID:   "images",
-		Requires: []plugin.PluginType{
+		Requires: []plugin.Type{
 			plugin.MetadataPlugin,
 		},
-		Init: func(ic *plugin.InitContext) (interface{}, error) {
+		InitFn: func(ic *plugin.InitContext) (interface{}, error) {
 			m, err := ic.Get(plugin.MetadataPlugin)
 			if err != nil {
 				return nil, err
 			}
-			return NewService(m.(*bolt.DB), ic.Events), nil
+			return NewService(m.(*metadata.DB), ic.Events), nil
 		},
 	})
 }
 
 type Service struct {
-	db        *bolt.DB
+	db        *metadata.DB
 	publisher events.Publisher
 }
 
-func NewService(db *bolt.DB, publisher events.Publisher) imagesapi.ImagesServer {
+func NewService(db *metadata.DB, publisher events.Publisher) imagesapi.ImagesServer {
 	return &Service{
 		db:        db,
 		publisher: publisher,
@@ -159,6 +160,10 @@ func (s *Service) Delete(ctx context.Context, req *imagesapi.DeleteImageRequest)
 		Name: req.Name,
 	}); err != nil {
 		return nil, err
+	}
+
+	if err := s.db.GarbageCollect(ctx); err != nil {
+		return nil, errdefs.ToGRPC(errors.Wrap(err, "garbage collection failed"))
 	}
 
 	return &empty.Empty{}, nil

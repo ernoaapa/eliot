@@ -44,9 +44,8 @@ func WithPipeExtension(pipe PipeSet) containerd.NewContainerOpts {
 }
 
 // GetPipeExtension returns PipeSet from container extensions or nil if not defined
-func GetPipeExtension(container containerd.Container) (*PipeSet, error) {
-	extensions := container.Extensions()
-	extension, ok := extensions[pipeSetExtensionName]
+func GetPipeExtension(container containers.Container) (*PipeSet, error) {
+	extension, ok := container.Extensions[pipeSetExtensionName]
 	if !ok {
 		return nil, nil
 	}
@@ -58,7 +57,7 @@ func GetPipeExtension(container containerd.Container) (*PipeSet, error) {
 
 	io, ok := decoded.(*PipeSet)
 	if !ok {
-		return nil, fmt.Errorf("Failed to decode PipeSet from container [%s] extensions", container.ID())
+		return nil, fmt.Errorf("Failed to decode PipeSet from container [%s] extensions", container.ID)
 	}
 
 	return io, err

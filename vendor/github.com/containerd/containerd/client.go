@@ -15,12 +15,14 @@ import (
 	diffapi "github.com/containerd/containerd/api/services/diff/v1"
 	eventsapi "github.com/containerd/containerd/api/services/events/v1"
 	imagesapi "github.com/containerd/containerd/api/services/images/v1"
+	introspectionapi "github.com/containerd/containerd/api/services/introspection/v1"
 	namespacesapi "github.com/containerd/containerd/api/services/namespaces/v1"
 	snapshotapi "github.com/containerd/containerd/api/services/snapshot/v1"
 	"github.com/containerd/containerd/api/services/tasks/v1"
 	versionservice "github.com/containerd/containerd/api/services/version/v1"
 	"github.com/containerd/containerd/containers"
 	"github.com/containerd/containerd/content"
+	"github.com/containerd/containerd/diff"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/platforms"
@@ -30,7 +32,6 @@ import (
 	"github.com/containerd/containerd/remotes/docker"
 	"github.com/containerd/containerd/remotes/docker/schema1"
 	contentservice "github.com/containerd/containerd/services/content"
-	"github.com/containerd/containerd/services/diff"
 	diffservice "github.com/containerd/containerd/services/diff"
 	imagesservice "github.com/containerd/containerd/services/images"
 	snapshotservice "github.com/containerd/containerd/services/snapshot"
@@ -300,7 +301,7 @@ func (c *Client) Push(ctx context.Context, ref string, desc ocispec.Descriptor, 
 			m.Lock()
 			manifestStack = append(manifestStack, desc)
 			m.Unlock()
-			return nil, images.StopHandler
+			return nil, images.ErrStopHandler
 		default:
 			return nil, nil
 		}
@@ -438,9 +439,13 @@ func (c *Client) ImageService() images.Store {
 	return imagesservice.NewStoreFromClient(imagesapi.NewImagesClient(c.conn))
 }
 
-// DiffService returns the underlying DiffService
-func (c *Client) DiffService() diff.DiffService {
+// DiffService returns the underlying Differ
+func (c *Client) DiffService() diff.Differ {
 	return diffservice.NewDiffServiceFromClient(diffapi.NewDiffClient(c.conn))
+}
+
+func (c *Client) IntrospectionService() introspectionapi.IntrospectionClient {
+	return introspectionapi.NewIntrospectionClient(c.conn)
 }
 
 // HealthService returns the underlying GRPC HealthClient
