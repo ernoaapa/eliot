@@ -207,6 +207,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		containerd.WithSnapshotter(snapshotter),
 		containerd.WithNewSnapshot(id.String(), image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
+		extensions.WithLifecycleExtension,
 	}
 
 	if container.Pipe != nil {
@@ -269,6 +270,10 @@ func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (re
 		return result, errors.Wrapf(err, "Failed to start task in container [%s]", container.ID())
 	}
 	log.Debugf("Task started (pid %d)", task.Pid())
+
+	if err := container.Update(ctx, extensions.IncrementRestart); err != nil {
+		return result, errors.Wrapf(err, "Failed to increment container [%s] start counter", container.ID())
+	}
 
 	return mapping.MapContainerStatusToInternalModel(info, resolveContainerStatus(ctx, container)), nil
 }

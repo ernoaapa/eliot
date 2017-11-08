@@ -63,10 +63,11 @@ func mapPipeToAPIModel(pipe *model.PipeSet) *containers.PipeSet {
 func MapContainerStatusesToAPIModel(statuses []model.ContainerStatus) (result []*containers.ContainerStatus) {
 	for _, status := range statuses {
 		result = append(result, &containers.ContainerStatus{
-			ContainerID: status.ContainerID,
-			Name:        status.Name,
-			Image:       status.Image,
-			State:       status.State,
+			ContainerID:  status.ContainerID,
+			Name:         status.Name,
+			Image:        status.Image,
+			State:        status.State,
+			RestartCount: int32(status.RestartCount),
 		})
 	}
 	return result

@@ -83,11 +83,24 @@ func mapPipeToInternalModel(container containers.Container) *model.PipeSet {
 func MapContainerStatusToInternalModel(container containers.Container, status containerd.Status) model.ContainerStatus {
 	labels := ContainerLabels(container.Labels)
 	return model.ContainerStatus{
-		ContainerID: container.ID,
-		Name:        labels.getContainerName(),
-		Image:       container.Image,
-		State:       mapContainerStatus(status),
+		ContainerID:  container.ID,
+		Name:         labels.getContainerName(),
+		Image:        container.Image,
+		State:        mapContainerStatus(status),
+		RestartCount: getRestartCount(container),
 	}
+}
+
+func getRestartCount(container containers.Container) int {
+	lifecycle, err := extensions.GetLifecycleExtension(container)
+	if err != nil {
+		log.Warnf("Error while resolving container restart count, fallback to zero: %s", err)
+	}
+
+	if lifecycle.StartCount <= 1 {
+		return 0
+	}
+	return lifecycle.StartCount - 1
 }
 
 func mapContainerStatus(status containerd.Status) string {

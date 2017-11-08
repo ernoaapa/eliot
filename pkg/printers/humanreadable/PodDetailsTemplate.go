@@ -13,6 +13,7 @@ Containers:{{range .Pod.Spec.Containers}}
     {{- if $status }}
 		ContainerID:	{{$status.ContainerID}}
 		State:	{{$status.State}}
+		Restart Count:	{{$status.RestartCount}}
     {{- end}}
     {{- if .Pipe}}
 		Pipe:

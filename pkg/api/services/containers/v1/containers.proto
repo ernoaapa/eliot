@@ -62,4 +62,5 @@ message ContainerStatus {
 	string name = 2;
 	string image = 3;
 	string state = 4;
+	int32 restartCount = 5;
 }
