@@ -11,6 +11,7 @@ import (
 	tasks "github.com/containerd/containerd/api/services/tasks/v1"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
+	namespaceutils "github.com/containerd/containerd/namespaces"
 	"github.com/containerd/containerd/plugin"
 	"github.com/containerd/containerd/remotes"
 	"github.com/ernoaapa/can/pkg/model"
@@ -139,7 +140,7 @@ func (c *ContainerdClient) GetPod(namespace, podName string) (model.Pod, error) 
 			return pod, nil
 		}
 	}
-	return model.Pod{}, fmt.Errorf("Pod in namespace [%s] with name [%s] not found", namespace, podName)
+	return model.Pod{}, ErrWithMessagef(ErrNotFound, "Pod in namespace [%s] with name [%s] not found", namespace, podName)
 }
 
 // CreateContainer creates given container
@@ -215,7 +216,11 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	}
 
 	log.Debugf("Create new container from image %s...", image.Name())
-	created, err := client.NewContainer(ctx, id.String(), containerOpts...)
+	created, err := client.NewContainer(
+		namespaceutils.WithNamespace(ctx, pod.Metadata.Namespace),
+		id.String(),
+		containerOpts...,
+	)
 	if err != nil {
 		return status, errors.Wrapf(err, "Failed to create new container from image %s", image.Name())
 	}
@@ -283,6 +288,11 @@ func (c *ContainerdClient) StopContainer(namespace, name string) (result model.C
 		return result, errors.Wrapf(err, "Failed to load container [%s], cannot stop it", name)
 	}
 
+	info, err := container.Info(ctx)
+	if err != nil {
+		return result, errors.Wrap(err, "Error while fetching container info")
+	}
+
 	task, err := container.Task(ctx, nil)
 	if err != nil {
 		if !errdefs.IsNotFound(err) {
@@ -302,11 +312,6 @@ func (c *ContainerdClient) StopContainer(namespace, name string) (result model.C
 		if !errdefs.IsNotFound(err) {
 			return result, errors.Wrapf(err, "Failed to delete container [%s]", container.ID())
 		}
-	}
-
-	info, err := container.Info(ctx)
-	if err != nil {
-		return result, errors.Wrap(err, "Error while fetching container info")
 	}
 
 	return model.ContainerStatus{

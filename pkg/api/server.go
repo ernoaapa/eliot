@@ -38,6 +38,10 @@ func (s *Server) Create(req *pods.CreatePodRequest, server pods.Pods_CreateServe
 	)
 	defer close(done)
 
+	if err := s.ensurePodNotExist(pod.Metadata.Namespace, pod.Metadata.Name); err != nil {
+		return errors.Wrapf(err, "Cannot create pod [%s]", pod.Metadata.Name)
+	}
+
 	go func() {
 		for {
 			select {
@@ -77,6 +81,17 @@ func (s *Server) Create(req *pods.CreatePodRequest, server pods.Pods_CreateServe
 	}
 
 	return nil
+}
+
+func (s *Server) ensurePodNotExist(namespace, name string) error {
+	_, err := s.client.GetPod(namespace, name)
+	if err != nil {
+		if runtime.IsNotFound(err) {
+			return nil
+		}
+		return err
+	}
+	return fmt.Errorf("Pod [%s] in namespace [%s] already exist", name, namespace)
 }
 
 // Start is 'pods' service Start implementation
