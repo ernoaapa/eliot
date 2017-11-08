@@ -23,6 +23,17 @@ const (
 	OnFailure
 )
 
+func (p RestartPolicy) String() string {
+	switch p {
+	case Always:
+		return "always"
+	case OnFailure:
+		return "onfailure"
+	default:
+		return "unknown"
+	}
+}
+
 // ContainerLifecycle contains all lifecycle related information like restart counter and restart policy.
 type ContainerLifecycle struct {
 	// StartCount gets incremented on every time when container get started

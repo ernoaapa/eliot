@@ -23,6 +23,21 @@ func GetPodName(container containers.Container) string {
 	return podName
 }
 
+// InitialisePodModel creates new Pod struct with name and namespace metadata
+func InitialisePodModel(container containers.Container, namespace, name, hostname string) model.Pod {
+	return model.Pod{
+		Metadata: model.NewMetadata(namespace, name),
+		Spec: model.PodSpec{
+			Containers:    []model.Container{},
+			RestartPolicy: getRestartPolicy(container),
+		},
+		Status: model.PodStatus{
+			Hostname:          hostname,
+			ContainerStatuses: []model.ContainerStatus{},
+		},
+	}
+}
+
 // MapContainersToInternalModel maps containerd models to internal model
 func MapContainersToInternalModel(containers []containers.Container) (result []model.Container) {
 	for _, container := range containers {
@@ -101,6 +116,15 @@ func getRestartCount(container containers.Container) int {
 		return 0
 	}
 	return lifecycle.StartCount - 1
+}
+
+func getRestartPolicy(container containers.Container) string {
+	lifecycle, err := extensions.GetLifecycleExtension(container)
+	if err != nil {
+		log.Warnf("Error while resolving container restart policy, fallback to default: %s", err)
+	}
+
+	return lifecycle.RestartPolicy.String()
 }
 
 func mapContainerStatus(status containerd.Status) string {

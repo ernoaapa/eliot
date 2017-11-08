@@ -94,8 +94,8 @@ func (c *ContainerdClient) GetPods(namespace string) ([]model.Pod, error) {
 		}
 		podName := mapping.GetPodName(info)
 		if _, ok := pods[podName]; !ok {
-			pod := model.NewPod(namespace, podName, c.hostname)
-			pods[podName] = &pod
+			pod := mapping.InitialisePodModel(info, namespace, podName, c.hostname)
+			pods[pod.Metadata.Name] = &pod
 		}
 
 		pods[podName].AppendContainer(
@@ -234,7 +234,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	return mapping.MapContainerStatusToInternalModel(info, resolveContainerStatus(ctx, created)), nil
 }
 
-// StartContainer starts the already created container
+// StartContainer starts the pre-created container
 func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (result model.ContainerStatus, err error) {
 	ctx, cancel := c.getContext()
 	defer cancel()
@@ -259,6 +259,17 @@ func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (re
 	if err != nil {
 		return result, errors.Wrapf(err, "Error while creating container task IO")
 	}
+
+	if task, err := container.Task(ctx, nil); err != nil {
+		if !errdefs.IsNotFound(err) {
+			return result, errors.Wrapf(err, "Error while resolving container task status")
+		}
+	} else {
+		if _, err := task.Delete(ctx); err != nil {
+			return result, errors.Wrapf(err, "Error while cleaning up old container task")
+		}
+	}
+
 	task, err := container.NewTask(ctx, io.IOCreate)
 	if err != nil {
 		return result, errors.Wrapf(err, "Error while creating task for container [%s]", container.ID())

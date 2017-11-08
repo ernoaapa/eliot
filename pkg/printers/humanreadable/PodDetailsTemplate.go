@@ -6,6 +6,7 @@ Name:	{{.Pod.Metadata.Name}}
 Namespace:	{{.Pod.Metadata.Namespace}}
 Device:	{{.Pod.Status.Hostname}}
 State:	{{.Status}}
+Restart Policy:	{{.Pod.Spec.RestartPolicy}}
 Containers:{{range .Pod.Spec.Containers}}
   {{- $status := GetStatus $pod .Name}}
 	{{.Name}}:

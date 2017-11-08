@@ -5,6 +5,7 @@ import (
 
 	"github.com/ernoaapa/can/cmd"
 	"github.com/ernoaapa/can/pkg/api"
+	"github.com/ernoaapa/can/pkg/controller"
 	"github.com/ernoaapa/can/pkg/device"
 	"github.com/ernoaapa/can/pkg/version"
 	log "github.com/sirupsen/logrus"
@@ -45,6 +46,13 @@ func main() {
 		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
 		listen := clicontext.String("listen")
 		server := api.NewServer(listen, client)
+
+		go func() {
+			controller := controller.NewLifecycle(client)
+			log.Infof("Start lifecycle controller...")
+			err := controller.Run()
+			log.Panicf("Lifecycle controller stopped with fatal error: %s", err)
+		}()
 
 		log.Infof("Start to listen %s....", listen)
 		return server.Serve()

@@ -12,29 +12,16 @@ type Pod struct {
 
 // PodSpec defines what containers should be running
 type PodSpec struct {
-	HostNetwork bool
-	HostPID     bool
-	Containers  []Container `validate:"required,gt=0,dive"`
+	HostNetwork   bool
+	HostPID       bool
+	Containers    []Container `validate:"required,gt=0,dive"`
+	RestartPolicy string
 }
 
 // PodStatus represents latest known state of pod
 type PodStatus struct {
 	Hostname          string
 	ContainerStatuses []ContainerStatus `validate:"dive"`
-}
-
-// NewPod creates new Pod struct with name and namespace metadata
-func NewPod(namespace, name, hostname string) Pod {
-	return Pod{
-		Metadata: NewMetadata(namespace, name),
-		Spec: PodSpec{
-			Containers: []Container{},
-		},
-		Status: PodStatus{
-			Hostname:          hostname,
-			ContainerStatuses: []ContainerStatus{},
-		},
-	}
 }
 
 // AppendContainer adds container to the pod information
