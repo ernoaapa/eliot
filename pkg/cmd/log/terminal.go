@@ -82,7 +82,7 @@ func (t *Terminal) Update() {
 	t.writer.Print()
 }
 
-// NewLine creates new terminal output line what you can update
+// NewLine creates new terminal output line what you can change afterward
 func (t *Terminal) NewLine() *Line {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()

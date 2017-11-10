@@ -3,38 +3,39 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/api"
-	"github.com/ernoaapa/can/pkg/controller"
-	"github.com/ernoaapa/can/pkg/device"
-	"github.com/ernoaapa/can/pkg/version"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/api"
+	"github.com/ernoaapa/elliot/pkg/controller"
+	"github.com/ernoaapa/elliot/pkg/device"
+	"github.com/ernoaapa/elliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "can-api"
-	app.Usage = "Provides GRPC API for the CLI client"
-	app.UsageText = `can-api [arguments...]
+	app.Name = "elliotd"
+	app.Usage = "Daemon which contains all Elliot, for example GRPC API for the CLI client"
+	app.UsageText = `elliotd [arguments...]
 
 	 # By default listen port 5000
-	 can-api
+	 elliotd
 	
 	 # Listen custom port
-	 can-api --listen 0.0.0.0:5001`
+	 elliotd --listen 0.0.0.0:5001`
 	app.Description = `API for create/update/delete the containers and a way to connect into the containers.`
 	app.Flags = append([]cli.Flag{
 		cli.StringFlag{
 			Name:   "containerd",
 			Usage:  "containerd socket path for containerd's GRPC server",
-			EnvVar: "CAN_CONTAINERD",
+			EnvVar: "ELLIOT_CONTAINERD",
 			Value:  "/run/containerd/containerd.sock",
 		},
 		cli.StringFlag{
-			Name:  "listen",
-			Usage: "GRPC host:port what to listen for client connections",
-			Value: "localhost:5000",
+			Name:   "listen",
+			Usage:  "GRPC host:port what to listen for client connections",
+			EnvVar: "ELLIOT_LISTEN",
+			Value:  "localhost:5000",
 		},
 	}, cmd.GlobalFlags...)
 	app.Version = version.VERSION

@@ -14,10 +14,10 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/ernoaapa/can/pkg/api/mapping"
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/device"
-	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/api/mapping"
+	pb "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/device"
+	"github.com/ernoaapa/elliot/pkg/model"
 )
 
 const (

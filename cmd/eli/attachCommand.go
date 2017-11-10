@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/api"
-	"github.com/ernoaapa/can/pkg/cmd/log"
-	"github.com/ernoaapa/can/pkg/term"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/api"
+	"github.com/ernoaapa/elliot/pkg/cmd/log"
+	"github.com/ernoaapa/elliot/pkg/term"
 	"github.com/urfave/cli"
 )
 
@@ -16,13 +16,13 @@ var attachCommand = cli.Command{
 	HelpName:    "attach",
 	Usage:       "Attach to container stdout and stderr output",
 	Description: "You can use this command to get connection to container process and receive stdout and stderr output",
-	UsageText: `canctl attach [options] POD_NAME
+	UsageText: `eli attach [options] POD_NAME
 
 	 # View pod attach
-	 canctl attach my-pod
+	 eli attach my-pod
 
 	 # If pod contains multiple containers, you must define container id
-	 canctl attach --container some-id my-pod
+	 eli attach --container some-id my-pod
 `,
 	Flags: []cli.Flag{
 		cli.BoolTFlag{

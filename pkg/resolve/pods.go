@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"path/filepath"
 
-	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/fs"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/fs"
 	"github.com/pkg/errors"
 )
 

@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var lifecycleExtensionName = "can.io.lifecycle"
+var lifecycleExtensionName = "elliot.io.lifecycle"
 
 // RestartPolicy describes policy for restarting th econtainer
 type RestartPolicy int

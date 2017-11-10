@@ -6,23 +6,23 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/model"
 
 	"golang.org/x/net/context"
 
-	"github.com/ernoaapa/can/pkg/api/mapping"
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/api/stream"
-	"github.com/ernoaapa/can/pkg/progress"
-	"github.com/ernoaapa/can/pkg/runtime"
+	"github.com/ernoaapa/elliot/pkg/api/mapping"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/api/stream"
+	"github.com/ernoaapa/elliot/pkg/progress"
+	"github.com/ernoaapa/elliot/pkg/runtime"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
-// Server implements the GRPC API for the canctl
+// Server implements the GRPC API for the eli
 type Server struct {
 	client runtime.Client
 	grpc   *grpc.Server

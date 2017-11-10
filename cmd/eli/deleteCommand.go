@@ -9,13 +9,13 @@ var deleteCommand = cli.Command{
 	HelpName:    "delete",
 	Usage:       `Delete one or more resources`,
 	Description: "With this command you can delete resources",
-	ArgsUsage: `canctl delete RESOURCE [options]
+	ArgsUsage: `eli delete RESOURCE [options]
 
 	 # Delete all running pods
-	 canctl delete pods
+	 eli delete pods
 
 	 # Delete all 'my-pod' pod
-	 canctl delete pod my-pod`,
+	 eli delete pod my-pod`,
 	Subcommands: []cli.Command{
 		deletePodCommand,
 	},

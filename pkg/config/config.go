@@ -5,8 +5,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ernoaapa/can/pkg/converter"
-	"github.com/ernoaapa/can/pkg/fs"
+	"github.com/ernoaapa/elliot/pkg/converter"
+	"github.com/ernoaapa/elliot/pkg/fs"
+	"github.com/ernoaapa/elliot/pkg/model"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -32,7 +33,7 @@ func (e Endpoint) GetHost() string {
 // GetConfig reads current config from user home directory
 func GetConfig(path string) (*Config, error) {
 	config := &Config{
-		Namespace: "cand",
+		Namespace: model.DefaultNamespace,
 	}
 	if !fs.FileExist(path) {
 		return config, nil

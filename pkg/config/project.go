@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/ernoaapa/can/pkg/fs"
+	"github.com/ernoaapa/elliot/pkg/fs"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )

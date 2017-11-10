@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ernoaapa/can/pkg/cmd/log/terminal"
+	"github.com/ernoaapa/elliot/pkg/cmd/log/terminal"
 	"github.com/fatih/color"
 	"github.com/willf/pad"
 )
@@ -25,7 +25,7 @@ const (
 	ERROR
 )
 
-// Line is single text line in the terminal output what you can update
+// Line is single text line in the terminal output what you can change afterward
 type Line struct {
 	terminal     *Terminal
 	state        State

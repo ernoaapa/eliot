@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/printers"
 	"github.com/urfave/cli"
 )
 
@@ -12,13 +12,13 @@ var describePodCommand = cli.Command{
 	Name:    "pod",
 	Aliases: []string{"pods"},
 	Usage:   "Return details of pod",
-	UsageText: `canctl describe RESOURCE [options] [POD NAME]
+	UsageText: `eli describe RESOURCE [options] [POD NAME]
 	
 	# Describe a pod
-	canctl describe pod my-pod-name
+	eli describe pod my-pod-name
 
 	# Describe all pods
-	canctl describe pods
+	eli describe pods
 `,
 	Action: func(clicontext *cli.Context) error {
 		config := cmd.GetConfigProvider(clicontext)

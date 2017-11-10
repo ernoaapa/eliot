@@ -8,19 +8,19 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/api"
-	"github.com/ernoaapa/can/pkg/api/core"
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/cmd/log"
-	"github.com/ernoaapa/can/pkg/config"
-	"github.com/ernoaapa/can/pkg/model"
-	"github.com/ernoaapa/can/pkg/printers"
-	"github.com/ernoaapa/can/pkg/progress"
-	"github.com/ernoaapa/can/pkg/resolve"
-	"github.com/ernoaapa/can/pkg/sync"
-	"github.com/ernoaapa/can/pkg/term"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/api"
+	"github.com/ernoaapa/elliot/pkg/api/core"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/cmd/log"
+	"github.com/ernoaapa/elliot/pkg/config"
+	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/printers"
+	"github.com/ernoaapa/elliot/pkg/progress"
+	"github.com/ernoaapa/elliot/pkg/resolve"
+	"github.com/ernoaapa/elliot/pkg/sync"
+	"github.com/ernoaapa/elliot/pkg/term"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
@@ -30,19 +30,19 @@ var runCommand = cli.Command{
 	HelpName:    "run",
 	Usage:       "Start container in the device",
 	Description: "With run command, you can start new containers in the device",
-	UsageText: `canctl run [options] -- <command>
+	UsageText: `eli run [options] -- <command>
 
 	 # Run code in current directory in the device
-	 canctl run
+	 eli run
 
 	 # Run 'build.sh' command in device with files in current directory
-	 canctl run -- ./build.sh
+	 eli run -- ./build.sh
 	 
 	 # Run container image in the container
-	 canctl run --image docker.io/eaapa/hello-world:latest
+	 eli run --image docker.io/eaapa/hello-world:latest
 
 	 # Run container with name in the device
-	 canctl run --image docker.io/eaapa/hello-world:latest --name my-pod
+	 eli run --image docker.io/eaapa/hello-world:latest --name my-pod
 `,
 	Flags: []cli.Flag{
 		cli.StringFlag{
@@ -98,7 +98,7 @@ var runCommand = cli.Command{
 	Action: func(clicontext *cli.Context) (err error) {
 
 		var (
-			projectConfig = config.ReadProjectConfig("./.can.yml")
+			projectConfig = config.ReadProjectConfig("./.elliot.yml")
 			name          = projectConfig.NameOrElse(clicontext.String("name"))
 			image         = projectConfig.ImageOrElse(clicontext.String("image"))
 			detach        = clicontext.Bool("detach")

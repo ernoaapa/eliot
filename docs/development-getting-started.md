@@ -4,21 +4,23 @@
 
 ## Development
 Depends on are you going to develop the CLI client or the API how you should proceed.
-### canctl
+
+### eli
 Easiest way is to just run with `go run`
 ```
-go run ./cmd/canctl/* <command>
+go run ./cmd/eli/* <command>
 ```
-### can-api
-To run fully functioning `can-api`, you need filesystem access for example to create FIFO files for container logs.
-You can develop some of the features by tunneling the `containerd` socket connection.
+
+### elliotd
+To run fully functioning `elliotd`, you need filesystem access for example to create FIFO files for container logs.
+You can develop some of the features by tunneling the `containerd` socket connection from the device to your local computer.
 
 ```
 # leave open
-ssh <user@ip> -L /run/containerd/containerd.sock:/run/containerd/containerd.sock
+ssh <user@device-ip> -L /run/containerd/containerd.sock:/run/containerd/containerd.sock
 
 # In another window
-go run ./cmd/can-api/* 
+go run ./cmd/elliotd/* 
 ```
 
 ## Test

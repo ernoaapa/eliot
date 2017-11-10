@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	utils "github.com/ernoaapa/can/pkg/utils/yaml"
+	utils "github.com/ernoaapa/elliot/pkg/utils/yaml"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"

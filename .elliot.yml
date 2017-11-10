@@ -1,5 +1,5 @@
 sync:
-  target: /go/src/github.com/ernoaapa/can
+  target: /go/src/github.com/ernoaapa/elliot
 binds:
   - /containers:/containers
   - /var/lib/volumes:/var/lib/volumes

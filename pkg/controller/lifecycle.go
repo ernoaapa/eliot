@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ernoaapa/can/pkg/runtime"
+	"github.com/ernoaapa/elliot/pkg/runtime"
 	log "github.com/sirupsen/logrus"
 )
 

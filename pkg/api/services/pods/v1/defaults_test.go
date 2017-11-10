@@ -3,8 +3,8 @@ package pods
 import (
 	"testing"
 
-	"github.com/ernoaapa/can/pkg/api/core"
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	"github.com/ernoaapa/elliot/pkg/api/core"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +36,7 @@ func TestDefaults(t *testing.T) {
 
 	result := Defaults(pods)
 
-	assert.Equal(t, "cand", result[0].Metadata.Namespace, "should set default namespace")
+	assert.Equal(t, "elliot", result[0].Metadata.Namespace, "should set default namespace")
 	assert.Equal(t, "my-namespace", result[1].Metadata.Namespace, "should not change namespace")
 	assert.NotEmpty(t, "foo", result[1].Spec.Containers[0].Name, "should not change name")
 }

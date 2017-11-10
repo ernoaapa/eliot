@@ -5,10 +5,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/device"
-	"github.com/ernoaapa/can/pkg/discovery"
-	"github.com/ernoaapa/can/pkg/version"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/device"
+	"github.com/ernoaapa/elliot/pkg/discovery"
+	"github.com/ernoaapa/elliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -16,22 +16,22 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Version = version.VERSION
-	app.Name = "can-discovery"
+	app.Name = "elliot-discovery"
 	app.Usage = `Lightweight server to expose service over Bonjour (mDNS,DNS-SD) protocol`
-	app.UsageText = `can-discovery [arguments...]
+	app.UsageText = `elliot-discovery [arguments...]
 	
-	 # If you use default 5000 port in the 'can-api' just
-	 can-discovery
+	 # If you use default 5000 port in the 'elliotd' just
+	 elliot-discovery
 
 	 # If you customised the API port number, you need to add --expose flag
-	 can-discovery --expose 5001`
-	app.Description = `To make the 'can-api' discoverable over Bonjour protocol in the network, 
+	 elliot-discovery --expose 5001`
+	app.Description = `To make the 'elliotd' discoverable over Bonjour protocol in the network, 
 	 this lightweight server will listen Bonjour protocol and exposes the configured
 	 port.`
 	app.Flags = append([]cli.Flag{
 		cli.IntFlag{
 			Name:  "expose",
-			Usage: "The port number to expose. Must match with can-api listen port",
+			Usage: "The port number to expose. Must match with elliotd listen port",
 			Value: 5000,
 		}}, cmd.GlobalFlags...)
 	app.Version = version.VERSION

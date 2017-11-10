@@ -4,8 +4,8 @@ import (
 	"io"
 	"syscall"
 
-	"github.com/ernoaapa/can/pkg/model"
-	"github.com/ernoaapa/can/pkg/progress"
+	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/progress"
 )
 
 // Client is interface for underlying container implementation

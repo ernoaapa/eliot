@@ -3,12 +3,11 @@ package mapping
 import (
 	"fmt"
 
-	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/model"
 )
 
 var (
-	// LabelPrefix is prefix what all container labels what cand creates get
-	labelPrefix        = "io.can"
+	labelPrefix        = "io.elliot"
 	podNameLabel       = "pod.name"
 	containerNameLabel = "container.name"
 )

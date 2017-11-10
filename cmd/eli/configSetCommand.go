@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ernoaapa/can/cmd"
+	"github.com/ernoaapa/elliot/cmd"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -9,7 +9,7 @@ import (
 var configSetCommand = cli.Command{
 	Name:      "set",
 	Usage:     "Set client config parameter",
-	UsageText: "canctl config set NAME VALUE",
+	UsageText: "eli config set NAME VALUE",
 	Action: func(clicontext *cli.Context) error {
 		if clicontext.NArg() != 2 {
 			log.Fatalf("You must give two parameters, NAME and VALUE")

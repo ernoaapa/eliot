@@ -9,10 +9,10 @@ var getCommand = cli.Command{
 	HelpName:    "get",
 	Usage:       `Display one or more resources`,
 	Description: "With this command you can list resources",
-	ArgsUsage: `canctl get RESOURCE [options]
+	ArgsUsage: `eli get RESOURCE [options]
 
 	 # Get table of running pods
-	 canctl get pods`,
+	 eli get pods`,
 	Subcommands: []cli.Command{
 		getPodsCommand,
 		getDevicesCommand,

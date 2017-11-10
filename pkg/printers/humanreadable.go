@@ -8,11 +8,11 @@ import (
 	"sort"
 	"strings"
 
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/config"
-	"github.com/ernoaapa/can/pkg/model"
-	"github.com/ernoaapa/can/pkg/printers/humanreadable"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/config"
+	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/printers/humanreadable"
 	"github.com/pkg/errors"
 )
 

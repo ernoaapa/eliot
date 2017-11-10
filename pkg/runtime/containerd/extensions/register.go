@@ -9,7 +9,7 @@ import (
 var versionMajor = 1
 
 func init() {
-	const prefix = "types.can.io"
+	const prefix = "types.elliot.io"
 	// register TypeUrls for commonly marshaled external types
 	major := strconv.Itoa(versionMajor)
 	typeurl.Register(&PipeSet{}, prefix, "containerd/extensions", major, "PipeSet")

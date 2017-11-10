@@ -1,8 +1,8 @@
 package state
 
 import (
-	"github.com/ernoaapa/can/pkg/device"
-	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/device"
+	"github.com/ernoaapa/elliot/pkg/model"
 	log "github.com/sirupsen/logrus"
 )
 

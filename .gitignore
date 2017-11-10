@@ -4,9 +4,3 @@
 /.push-*
 /.container-*
 /.dockerfile-*
-
-# Linuxkit
-*-cmdline
-*-initrd.img
-*-kernel
-*-state/

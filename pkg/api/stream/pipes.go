@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
 	"github.com/pkg/errors"
 )
 

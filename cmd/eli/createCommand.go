@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/cmd/log"
-	"github.com/ernoaapa/can/pkg/printers"
-	"github.com/ernoaapa/can/pkg/progress"
-	"github.com/ernoaapa/can/pkg/resolve"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/cmd/log"
+	"github.com/ernoaapa/elliot/pkg/printers"
+	"github.com/ernoaapa/elliot/pkg/progress"
+	"github.com/ernoaapa/elliot/pkg/resolve"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
@@ -18,10 +18,10 @@ var createCommand = cli.Command{
 	HelpName:    "create",
 	Usage:       "Create pod based on yaml spec",
 	Description: "With create command, you can create new pod into the device based on yaml specification",
-	UsageText: `canctl create [options] -f ./pod.yml
+	UsageText: `eli create [options] -f ./pod.yml
 
 	 # Create pod based on pod.yml
-	 canctl create -f ./pod.yml
+	 eli create -f ./pod.yml
 `,
 	Flags: []cli.Flag{
 		cli.StringSliceFlag{

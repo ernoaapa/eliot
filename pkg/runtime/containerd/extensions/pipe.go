@@ -10,7 +10,7 @@ import (
 	"github.com/gogo/protobuf/types"
 )
 
-var pipeSetExtensionName = "can.io.pipeset"
+var pipeSetExtensionName = "elliot.io.pipeset"
 
 // PipeSet allows defining pipe from some source(s) to another container
 type PipeSet struct {

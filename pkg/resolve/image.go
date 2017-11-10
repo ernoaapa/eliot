@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ernoaapa/can/pkg/fs"
+	"github.com/ernoaapa/elliot/pkg/fs"
 	log "github.com/sirupsen/logrus"
 )
 

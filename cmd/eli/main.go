@@ -3,53 +3,53 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/version"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "canctl"
-	app.Usage = `commandline interface for managing can`
-	app.UsageText = `canctl [global options] command [command options] [arguments...]
+	app.Name = "eli"
+	app.Usage = `commandline interface for managing elliot`
+	app.UsageText = `eli [global options] command [command options] [arguments...]
 
 	 # Detect devices
-	 canctl get devices
+	 eli get devices
 
 	 # Get running pods
-	 canctl get pods
+	 eli get pods
 
 	# Get pods in device
-	canctl --device hostname.local. get pods
+	eli --device hostname.local. get pods
 
 	# See help of commands
-	canctl run --help
+	eli run --help
 	`
-	app.Description = `The 'canctl' is tool for managing agent in the device.
+	app.Description = `The 'eli' is tool for managing agent in the device.
 	 With this tool, you can create, view and remove containers from the device.`
 	app.Flags = append([]cli.Flag{
 		cli.StringFlag{
 			Name:   "config, c",
 			Usage:  "Client configuration",
-			EnvVar: "CAN_CONFIG",
-			Value:  "~/.can/config",
+			EnvVar: "ELLIOT_CONFIG",
+			Value:  "~/.eli/config",
 		},
 		cli.StringFlag{
 			Name:   "namespace",
 			Usage:  "Namespace to use with commands. By default reads from config.",
-			EnvVar: "CAN_NAMESPACE",
+			EnvVar: "ELLIOT_NAMESPACE",
 		},
 		cli.StringFlag{
 			Name:   "endpoint",
 			Usage:  "Use specific device endpoint. E.g. '192.168.1.101:5000'",
-			EnvVar: "CAN_ENDPOINT",
+			EnvVar: "ELLIOT_ENDPOINT",
 		},
 		cli.StringFlag{
 			Name:   "device",
 			Usage:  "Use specific device by name. E.g. 'somehost.local'",
-			EnvVar: "CAN_DEVICE",
+			EnvVar: "ELLIOT_DEVICE",
 		},
 	}, cmd.GlobalFlags...)
 	app.Version = version.VERSION

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/printers"
 	"github.com/urfave/cli"
 )
 
@@ -12,10 +12,10 @@ var getPodsCommand = cli.Command{
 	Name:    "pods",
 	Aliases: []string{"pod"},
 	Usage:   "Get Pod resources",
-	UsageText: `canctl get pods [options]
+	UsageText: `eli get pods [options]
 			 
 	 # Get table of running pods
-	 canctl get pods`,
+	 eli get pods`,
 	Action: func(clicontext *cli.Context) error {
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)

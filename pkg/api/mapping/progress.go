@@ -1,8 +1,8 @@
 package mapping
 
 import (
-	pb "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/progress"
+	pb "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/progress"
 )
 
 // MapImageFetchProgressToAPIModel maps image fetch progress information to API model

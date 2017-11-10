@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/model"
 	"github.com/matishsiao/goInfo"
 )
 

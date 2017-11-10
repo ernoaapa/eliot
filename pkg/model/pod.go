@@ -1,7 +1,7 @@
 package model
 
 // DefaultNamespace is namespace what each pod get if there is no metadata.namespace
-var DefaultNamespace = "cand"
+var DefaultNamespace = "elliot"
 
 // Pod is set of containers
 type Pod struct {

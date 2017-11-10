@@ -1,9 +1,9 @@
 package mapping
 
 import (
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/model"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/model"
 )
 
 // MapPodsToInternalModel maps API Pod model to internal model

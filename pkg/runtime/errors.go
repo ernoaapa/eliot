@@ -9,7 +9,8 @@ import (
 // Definitions of common error types used throughout runtime implementation.
 // All errors returned by the interface will map into one of these errors classes.
 var (
-	ErrNotFound = errors.New("not found")
+	ErrNotFound      = errors.New("not found")
+	ErrAlreadyExists = errors.New("already exists")
 )
 
 // IsNotFound returns true if the error is due to a missing resource

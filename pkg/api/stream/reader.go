@@ -3,7 +3,7 @@ package stream
 import (
 	"bytes"
 
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
 )
 
 // Reader is io.Reader implementation what reads bytes from RPC stream

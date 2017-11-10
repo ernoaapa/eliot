@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/ernoaapa/can/pkg/api/core"
-	containers "github.com/ernoaapa/can/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/config"
+	"github.com/ernoaapa/elliot/pkg/api/core"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +21,7 @@ func TestPrintTable(t *testing.T) {
 		&pods.Pod{
 			Metadata: &core.ResourceMetadata{
 				Name:      "foo",
-				Namespace: "cand",
+				Namespace: "elliot",
 			},
 			Spec: &pods.PodSpec{
 				Containers: []*containers.Container{
@@ -48,7 +48,7 @@ func TestPrintDetails(t *testing.T) {
 	data := &pods.Pod{
 		Metadata: &core.ResourceMetadata{
 			Name:      "foo",
-			Namespace: "cand",
+			Namespace: "elliot",
 		},
 		Spec: &pods.PodSpec{
 			Containers: []*containers.Container{

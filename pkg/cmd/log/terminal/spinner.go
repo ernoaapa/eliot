@@ -1,6 +1,6 @@
 package terminal
 
-import "github.com/ernoaapa/can/pkg/utils"
+import "github.com/ernoaapa/elliot/pkg/utils"
 
 type Spinner struct {
 	frames []string

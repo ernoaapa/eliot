@@ -3,8 +3,8 @@ package runtime
 import (
 	"os"
 
-	"github.com/ernoaapa/can/pkg/fs"
-	"github.com/ernoaapa/can/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/fs"
+	"github.com/ernoaapa/elliot/pkg/model"
 	"github.com/pkg/errors"
 )
 

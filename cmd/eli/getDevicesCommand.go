@@ -4,10 +4,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/cmd/log"
-	"github.com/ernoaapa/can/pkg/discovery"
-	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/cmd/log"
+	"github.com/ernoaapa/elliot/pkg/discovery"
+	"github.com/ernoaapa/elliot/pkg/printers"
 	"github.com/urfave/cli"
 )
 
@@ -15,10 +15,10 @@ var getDevicesCommand = cli.Command{
 	Name:    "devices",
 	Aliases: []string{"device"},
 	Usage:   "Get Device resources",
-	UsageText: `canctl get devices [options]
+	UsageText: `eli get devices [options]
 			 
 	 # Get table of known devices
-	 canctl get devices`,
+	 eli get devices`,
 	Action: func(clicontext *cli.Context) error {
 		log := log.NewLine().Loading("Discover from network automatically...")
 

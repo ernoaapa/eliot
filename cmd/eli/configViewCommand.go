@@ -3,15 +3,15 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/printers"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/printers"
 	"github.com/urfave/cli"
 )
 
 var configViewCommand = cli.Command{
 	Name:      "view",
 	Usage:     "View client config",
-	UsageText: "canctl config view",
+	UsageText: "eli config view",
 	Action: func(clicontext *cli.Context) error {
 		config := cmd.GetConfig(clicontext)
 

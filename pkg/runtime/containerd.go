@@ -14,11 +14,11 @@ import (
 	namespaceutils "github.com/containerd/containerd/namespaces"
 	"github.com/containerd/containerd/plugin"
 	"github.com/containerd/containerd/remotes"
-	"github.com/ernoaapa/can/pkg/model"
-	"github.com/ernoaapa/can/pkg/progress"
-	opts "github.com/ernoaapa/can/pkg/runtime/containerd"
-	"github.com/ernoaapa/can/pkg/runtime/containerd/extensions"
-	"github.com/ernoaapa/can/pkg/runtime/containerd/mapping"
+	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/elliot/pkg/progress"
+	opts "github.com/ernoaapa/elliot/pkg/runtime/containerd"
+	"github.com/ernoaapa/elliot/pkg/runtime/containerd/extensions"
+	"github.com/ernoaapa/elliot/pkg/runtime/containerd/mapping"
 	imagespecs "github.com/opencontainers/image-spec/specs-go/v1"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
@@ -398,7 +398,7 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 	return nil
 }
 
-// GetNamespaces return all namespaces what cand manages
+// GetNamespaces return all namespaces
 func (c *ContainerdClient) GetNamespaces() ([]string, error) {
 	ctx, cancel := c.getContext()
 	defer cancel()

@@ -1,3 +1,4 @@
 package discovery
 
-var ZeroConfServiceName = "_can._tcp"
+// ZeroConfServiceName is the service name for discovering the elliotd
+var ZeroConfServiceName = "_elliot._tcp"

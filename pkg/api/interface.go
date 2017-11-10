@@ -4,9 +4,9 @@ import (
 	"io"
 	"syscall"
 
-	pods "github.com/ernoaapa/can/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/can/pkg/config"
-	"github.com/ernoaapa/can/pkg/progress"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/elliot/pkg/config"
+	"github.com/ernoaapa/elliot/pkg/progress"
 )
 
 // Client interface for all API clients

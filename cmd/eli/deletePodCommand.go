@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ernoaapa/can/cmd"
-	"github.com/ernoaapa/can/pkg/cmd/log"
+	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/elliot/pkg/cmd/log"
 	"github.com/urfave/cli"
 )
 
@@ -10,13 +10,13 @@ var deletePodCommand = cli.Command{
 	Name:    "pod",
 	Aliases: []string{"pods"},
 	Usage:   "Delete Pod resource(s)",
-	UsageText: `canctl delete pods [options] [POD NAME]
+	UsageText: `eli delete pods [options] [POD NAME]
 			 
 	 # Delete all Pods
-	 canctl delete pods
+	 eli delete pods
 
 	 # Delete all 'my-pod' pod
-	 canctl delete pod my-pod`,
+	 eli delete pod my-pod`,
 	Action: func(clicontext *cli.Context) error {
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)
