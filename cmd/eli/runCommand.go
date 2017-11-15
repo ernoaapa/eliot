@@ -21,6 +21,7 @@ import (
 	"github.com/ernoaapa/elliot/pkg/resolve"
 	"github.com/ernoaapa/elliot/pkg/sync"
 	"github.com/ernoaapa/elliot/pkg/term"
+	"github.com/ernoaapa/elliot/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
@@ -125,7 +126,7 @@ var runCommand = cli.Command{
 			}
 			log.Donef("Detected %s project, use image: %s", projectType, image)
 		}
-		image = cmd.ExpandToFQIN(image)
+		image = utils.ExpandToFQIN(image)
 
 		if name == "" {
 			// Default to current directory name
@@ -152,7 +153,7 @@ var runCommand = cli.Command{
 
 			opts = append(opts, api.WithContainer(&containers.Container{
 				Name:  fmt.Sprintf("rsync-%s", name),
-				Image: cmd.ExpandToFQIN(projectConfig.Sync.Image),
+				Image: utils.ExpandToFQIN(projectConfig.Sync.Image),
 				Env: []string{
 					fmt.Sprintf("VOLUME=%s", syncTargetPath),
 				},

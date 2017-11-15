@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/ernoaapa/elliot/cmd"
+	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/elliot/pkg/cmd/log"
 	"github.com/ernoaapa/elliot/pkg/printers"
 	"github.com/ernoaapa/elliot/pkg/progress"
@@ -28,20 +28,26 @@ var createCommand = cli.Command{
 			Name:  "file,f",
 			Usage: "Filename, directory, or URL to files to use to create the resource",
 		},
+		cli.StringSliceFlag{
+			Name:  "image",
+			Usage: "The container image to run",
+		},
 	},
 	Action: func(clicontext *cli.Context) (err error) {
-		sources := clicontext.StringSlice("file")
-		if len(sources) == 0 {
-			return fmt.Errorf("You must give --file parameter")
+		pods := []*pods.Pod{}
+		if clicontext.IsSet("file") && len(clicontext.StringSlice("file")) > 0 {
+			pods, err = resolve.Pods(clicontext.StringSlice("file"))
+			if err != nil {
+				return err
+			}
+		} else if clicontext.IsSet("image") && len(clicontext.StringSlice("image")) > 0 {
+			pods = resolve.BuildPods(clicontext.StringSlice("image"))
+		} else {
+			return errors.New("You need to give either --file or --image flag")
 		}
 
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)
-
-		pods, err := resolve.Pods(sources)
-		if err != nil {
-			return errors.Wrapf(err, "Failed to read pod specs from path(s) %s", sources)
-		}
 
 		for _, pod := range pods {
 			logs := map[string]*log.Line{}

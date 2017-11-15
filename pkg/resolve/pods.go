@@ -7,8 +7,11 @@ import (
 	"net/url"
 	"path/filepath"
 
+	core "github.com/ernoaapa/elliot/pkg/api/core"
+	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/elliot/pkg/fs"
+	"github.com/ernoaapa/elliot/pkg/utils"
 	"github.com/pkg/errors"
 )
 
@@ -75,4 +78,23 @@ func readFileSource(path string) ([]*pods.Pod, error) {
 func validURL(u string) bool {
 	_, err := url.ParseRequestURI(u)
 	return err == nil
+}
+
+// BuildPods creates Pod specification from container images
+func BuildPods(images []string) (result []*pods.Pod) {
+	for _, image := range images {
+		fqin := utils.ExpandToFQIN(image)
+		name := fmt.Sprintf("%s-%s", utils.GetFQINUsername(fqin), utils.GetFQINImage(fqin))
+		result = append(result, &pods.Pod{
+			Metadata: &core.ResourceMetadata{
+				Name: name,
+			},
+			Spec: &pods.PodSpec{
+				Containers: []*containers.Container{
+					{Name: name, Image: fqin},
+				},
+			},
+		})
+	}
+	return pods.Defaults(result)
 }
