@@ -23,6 +23,9 @@ ssh <user@device-ip> -L /run/containerd/containerd.sock:/run/containerd/containe
 go run ./cmd/elliotd/* 
 ```
 
+### Documentation
+If you want to improve the documentation, you can run locally the gitbook 
+
 ## Test
 You can run tests inside container so you don't need to install all tools locally
 ```

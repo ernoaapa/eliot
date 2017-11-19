@@ -4,3 +4,9 @@
 /.push-*
 /.container-*
 /.dockerfile-*
+
+node_modules
+
+
+# Output of documentation
+_book
