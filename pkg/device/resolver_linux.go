@@ -1,22 +1,20 @@
 package device
 
 import (
+	"os"
+	"runtime"
+
 	"github.com/ernoaapa/elliot/pkg/model"
-	"github.com/matishsiao/goInfo"
 )
 
 // GetInfo resolves information about the device
 func (r *Resolver) GetInfo() *model.DeviceInfo {
-	osInfo := goInfo.GetInfo()
-
+	hostname, _ := os.Hostname()
 	return &model.DeviceInfo{
 		Labels:   r.labels,
-		Platform: osInfo.Platform,
-		OS:       osInfo.GoOS,
-		Kernel:   osInfo.Kernel,
-		Core:     osInfo.Core,
-		Hostname: osInfo.Hostname,
-		CPUs:     osInfo.CPUs,
+		Arch:     runtime.GOARCH,
+		OS:       runtime.GOOS,
+		Hostname: hostname,
 
 		MachineID: resolveFirst(
 			"MachineID",
@@ -25,6 +23,7 @@ func (r *Resolver) GetInfo() *model.DeviceInfo {
 				"/etc/machine-id",
 				"/var/lib/dbus/machine-id",
 			}),
+			static("unknown"),
 		),
 
 		SystemUUID: resolveFirst(
@@ -35,6 +34,7 @@ func (r *Resolver) GetInfo() *model.DeviceInfo {
 				"/proc/device-tree/vm,uuid",
 				"/etc/machine-id",
 			}),
+			static("unknown"),
 		),
 
 		BootID: resolveFirst(
@@ -42,6 +42,7 @@ func (r *Resolver) GetInfo() *model.DeviceInfo {
 			fromFiles([]string{
 				"/proc/sys/kernel/random/boot_id",
 			}),
+			static("unknown"),
 		),
 	}
 }

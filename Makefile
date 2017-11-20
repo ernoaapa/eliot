@@ -31,14 +31,6 @@ SRC_DIRS := cmd pkg # directories which hold app source (not vendored)
 ALL_PLATFORMS := darwin-amd64 linux-amd64 linux-arm64
 CONTAINER_PLATFORMS := linux-amd64 linux-arm64
 
-# Set default base image dynamically for each arch
-ifeq ($(ARCH),amd64)
-    BASEIMAGE?=alpine
-endif
-ifeq ($(ARCH),arm64)
-    BASEIMAGE?=aarch64/busybox
-endif
-
 IMAGE := $(REGISTRY)/$(BIN)
 
 BUILD_IMAGE ?= golang:1.9-alpine
@@ -112,8 +104,7 @@ container: .container-$(DOTFILE_IMAGE) container-name
 	@sed \
 	    -e 's|ARG_BIN|$(BIN)|g' \
 			-e 's|ARG_OS|$(OS)|g' \
-	    -e 's|ARG_ARCH|$(ARCH)|g' \
-	    -e 's|ARG_FROM|$(BASEIMAGE)|g' \
+			-e 's|ARG_ARCH|$(ARCH)|g' \
 	    Dockerfile.in > .dockerfile-$(ARCH)
 	@docker build -t $(IMAGE):$(VERSION) -f .dockerfile-$(ARCH) .
 	@docker images -q $(IMAGE):$(VERSION) > $@

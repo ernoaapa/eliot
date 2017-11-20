@@ -1,5 +1,5 @@
 
-FROM ARG_FROM
+FROM scratch
 
 LABEL maintainer="Erno Aapa <erno.aapa@gmail.com>"
 

@@ -33,20 +33,8 @@ type DeviceInfo struct {
 	// Device operating system. One of 386, amd64, arm, s390x, and so on.
 	Arch string
 
-	// device operating system. One of darwin, freebsd, linux, and so on
+	// device operating system. One of darwin, freebsd, linux, windows, and so on
 	OS string
-
-	// Device kernel e.g. "Linux"
-	Kernel string
-
-	// Device core version e.g. "3.13.0-27-generic"
-	Core string
-
-	// Device platform e.g. x86_64
-	Platform string
-
-	// Number of CPUs
-	CPUs int
 }
 
 // DeviceState describes current state of the device

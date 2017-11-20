@@ -48,3 +48,9 @@ func fromFiles(filePaths []string) func() string {
 		return ""
 	}
 }
+
+func static(value string) func() string {
+	return func() string {
+		return value
+	}
+}
