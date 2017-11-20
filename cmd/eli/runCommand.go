@@ -119,13 +119,15 @@ var runCommand = cli.Command{
 		)
 
 		if image == "" {
+			var projectType string
 			log := log.NewLine().Loading("Resolve image for the project...")
-			projectType, image, err := resolve.Image(cmd.GetCurrentDirectory())
+			projectType, image, err = resolve.Image(cmd.GetCurrentDirectory())
 			if err != nil {
 				log.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
 			}
 			log.Donef("Detected %s project, use image: %s", projectType, image)
 		}
+
 		image = utils.ExpandToFQIN(image)
 
 		if name == "" {

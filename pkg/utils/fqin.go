@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -14,6 +15,10 @@ var (
 // ExpandToFQIN converts partial image name to "Fully Qualified Image Name"
 // E.g. eaapa/hello-world -> docker.io/eaapa/hello-world:latest
 func ExpandToFQIN(source string) string {
+	if source == "" {
+		log.Fatal("Empty image ref to expand FQIN (Fully Qualified Image Name")
+		return ""
+	}
 	registry := defaultRegistry
 	username := defaultUsername
 	tag := defaultTag
