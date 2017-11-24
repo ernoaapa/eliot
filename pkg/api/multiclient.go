@@ -6,9 +6,9 @@ import (
 
 	"golang.org/x/net/context"
 
-	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/config"
-	"github.com/ernoaapa/elliot/pkg/progress"
+	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/config"
+	"github.com/ernoaapa/eliot/pkg/progress"
 )
 
 // MultiDirectClient connects directly to multiples devices RPC API

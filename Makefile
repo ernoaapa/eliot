@@ -3,13 +3,13 @@
 # https://github.com/thockin/go-build-template
 
 # The binary to build (just the basename).
-BIN ?= elliotd
+BIN ?= eliotd
 
 # This repo's root import path (under GOPATH).
-PKG := github.com/ernoaapa/elliot
+PKG := github.com/ernoaapa/eliot
 
 # Where to push the docker image.
-REGISTRY ?= eaapa
+REGISTRY ?= ernoaapa
 
 # Which architecture to build
 ARCH ?= amd64

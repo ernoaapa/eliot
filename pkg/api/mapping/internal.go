@@ -1,10 +1,10 @@
 package mapping
 
 import (
-	core "github.com/ernoaapa/elliot/pkg/api/core"
-	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/model"
+	core "github.com/ernoaapa/eliot/pkg/api/core"
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/model"
 )
 
 // MapPodsToAPIModel maps list of internal pod models to API model

@@ -3,9 +3,9 @@ package printers
 import (
 	"io"
 
-	pb "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/config"
-	"github.com/ernoaapa/elliot/pkg/model"
+	pb "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/config"
+	"github.com/ernoaapa/eliot/pkg/model"
 )
 
 // ResourcePrinter is an interface that knows how to print runtime objects.

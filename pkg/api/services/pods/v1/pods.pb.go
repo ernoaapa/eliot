@@ -28,8 +28,8 @@ package pods
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import cand_core "github.com/ernoaapa/elliot/pkg/api/core"
-import cand_services_containers_v1 "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
+import cand_core "github.com/ernoaapa/eliot/pkg/api/core"
+import cand_services_containers_v1 "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
 
 import (
 	context "golang.org/x/net/context"

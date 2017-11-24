@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ernoaapa/elliot/pkg/converter"
-	"github.com/ernoaapa/elliot/pkg/fs"
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/converter"
+	"github.com/ernoaapa/eliot/pkg/fs"
+	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )

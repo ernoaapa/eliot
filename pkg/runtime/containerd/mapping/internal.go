@@ -1,8 +1,8 @@
 package mapping
 
 import (
-	"github.com/ernoaapa/elliot/pkg/model"
-	"github.com/ernoaapa/elliot/pkg/runtime/containerd/extensions"
+	"github.com/ernoaapa/eliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/runtime/containerd/extensions"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 

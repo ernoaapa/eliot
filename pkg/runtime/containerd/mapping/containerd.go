@@ -8,8 +8,8 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/containers"
-	"github.com/ernoaapa/elliot/pkg/model"
-	"github.com/ernoaapa/elliot/pkg/runtime/containerd/extensions"
+	"github.com/ernoaapa/eliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/runtime/containerd/extensions"
 )
 
 // GetPodName resolves pod name where the container belongs
@@ -17,7 +17,7 @@ func GetPodName(container containers.Container) string {
 	labels := ContainerLabels(container.Labels)
 	podName := labels.getPodName()
 	if podName == "" {
-		// container is not elliot managed container so add it under 'system' pod in namespace 'default'
+		// container is not eliot managed container so add it under 'system' pod in namespace 'default'
 		podName = "system"
 	}
 	return podName

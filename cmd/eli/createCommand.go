@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/elliot/cmd"
-	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/cmd/log"
-	"github.com/ernoaapa/elliot/pkg/printers"
-	"github.com/ernoaapa/elliot/pkg/progress"
-	"github.com/ernoaapa/elliot/pkg/resolve"
+	"github.com/ernoaapa/eliot/cmd"
+	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/cmd/log"
+	"github.com/ernoaapa/eliot/pkg/printers"
+	"github.com/ernoaapa/eliot/pkg/progress"
+	"github.com/ernoaapa/eliot/pkg/resolve"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )

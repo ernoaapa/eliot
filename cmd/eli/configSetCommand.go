@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ernoaapa/elliot/cmd"
+	"github.com/ernoaapa/eliot/cmd"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )

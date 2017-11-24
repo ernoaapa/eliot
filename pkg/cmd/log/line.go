@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ernoaapa/elliot/pkg/cmd/log/terminal"
+	"github.com/ernoaapa/eliot/pkg/cmd/log/terminal"
 	"github.com/fatih/color"
 	"github.com/willf/pad"
 )

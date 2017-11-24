@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/elliot/cmd"
-	"github.com/ernoaapa/elliot/pkg/version"
+	"github.com/ernoaapa/eliot/cmd"
+	"github.com/ernoaapa/eliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -12,7 +12,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "eli"
-	app.Usage = `commandline interface for managing elliot`
+	app.Usage = `commandline interface for managing eliot`
 	app.UsageText = `eli [global options] command [command options] [arguments...]
 
 	 # Detect devices

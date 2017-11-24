@@ -4,7 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/model"
 )
 
 // GetInfo resolves information about the device

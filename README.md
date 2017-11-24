@@ -1,21 +1,21 @@
-# Elliot
+# Eliot
 > Note: this is early alpha version! There's not all features yet implemented and code might get large breaking changes until the first release.
 
-Elliot is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity and security.
+Eliot is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity and security.
 
-Docker and Kubernetes have inspired heavily and if you're familiar with those, you find really easy to get started with Elliot.
+Docker and Kubernetes have inspired heavily and if you're familiar with those, you find really easy to get started with Eliot.
 
-<sub>Built with ❤︎ by [Erno Aapa](https://github.com/ernoaapa) and [contributors](https://github.com/ernoaapa/elliot/contributors)</sub>
+<sub>Built with ❤︎ by [Erno Aapa](https://github.com/ernoaapa) and [contributors](https://github.com/ernoaapa/eliot/contributors)</sub>
 
 ## Usage
 ![architecture](design/architecture.png)
 
-Elliot is based on top of the [containerd](https://github.com/containerd/containerd) to provide simple API for managing containers. 
+Eliot is based on top of the [containerd](https://github.com/containerd/containerd) to provide simple API for managing containers. 
 
-Elliot is built from following components
+Eliot is built from following components
 - `eli` - Command line tool for managing the device
-- `elliotd` - GRPC API for client to manage containers
-- `elliot-discovery` - _(Optional)_ component to make device automatically discoverable by the `eli` client
+- `eliotd` - GRPC API for client to manage containers
+- `eliot-discovery` - _(Optional)_ component to make device automatically discoverable by the `eli` client
 
 ### What is pod?
 A _Pod_ is a group of one or more containers what are tightly coupled to each other to build the service. Often the _pod_ contains only one container but sometimes you need some external service, for example in-memory database, addition to your process. In this case, both containers should be in the same pod.
@@ -65,8 +65,8 @@ eli describe pod <pod name>
 - [runc](https://github.com/opencontainers/runc) (required by containerd)
 
 ### Install
-`elliotd` is just single binary what you can download from releases or build as described below.
-By default `elliotd` uses `/run/containerd/containerd.sock` socket file to connect containerd.
+`eliotd` is just single binary what you can download from releases or build as described below.
+By default `eliotd` uses `/run/containerd/containerd.sock` socket file to connect containerd.
 If you have the file somewhere else, please provide `--containerd` flag.
 
 ### Install from releases
@@ -75,7 +75,7 @@ TODO
 ### Build from the sources
 Install Go 1.9.x and clone the repository to your `$GOPATH`
 ```
-BIN=elliotd make build
+BIN=eliotd make build
 BIN=eli make build
 ```
 

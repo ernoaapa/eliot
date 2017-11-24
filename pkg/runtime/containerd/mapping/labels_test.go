@@ -3,7 +3,7 @@ package mapping
 import (
 	"testing"
 
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,5 +19,5 @@ func TestNewContainerLabels(t *testing.T) {
 	}
 	result := NewLabels(pod, container)
 
-	assert.Equal(t, "my-pod", result["io.elliot.pod.name"])
+	assert.Equal(t, "my-pod", result["io.eliot.pod.name"])
 }

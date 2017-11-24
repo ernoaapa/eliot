@@ -1,9 +1,9 @@
 syntax = "proto3";
-package elliot.services.pods.v1;
+package eliot.services.pods.v1;
 import "core/metadata.proto";
 import "services/containers/v1/containers.proto";
 
-option go_package = "github.com/ernoaapa/elliot/pkg/api/services/pods/v1;pods";
+option go_package = "github.com/ernoaapa/eliot/pkg/api/services/pods/v1;pods";
 
 // Pods service provides visibility to the pods.
 service Pods {
@@ -65,19 +65,19 @@ message ListPodsResponse {
 }
 
 message Pod {
-	elliot.core.ResourceMetadata metadata = 1;
+	eliot.core.ResourceMetadata metadata = 1;
 	PodSpec spec = 2;
 	PodStatus status = 3;
 }
 
 message PodSpec {
-	repeated elliot.services.containers.v1.Container containers = 1;
+	repeated eliot.services.containers.v1.Container containers = 1;
 	bool hostNetwork = 2;
 	bool hostPID = 3;
 	string restartPolicy = 4;
 }
 
 message PodStatus {
-	repeated elliot.services.containers.v1.ContainerStatus containerStatuses = 1;
+	repeated eliot.services.containers.v1.ContainerStatus containerStatuses = 1;
 	string hostname = 2;
 }

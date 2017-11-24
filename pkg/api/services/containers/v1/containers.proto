@@ -1,7 +1,7 @@
 syntax = "proto3";
-package elliot.services.containers.v1;
+package eliot.services.containers.v1;
 
-option go_package = "github.com/ernoaapa/elliot/pkg/api/services/containers/v1;containers";
+option go_package = "github.com/ernoaapa/eliot/pkg/api/services/containers/v1;containers";
 
 // Containers service provides access to containers in pods
 service Containers {

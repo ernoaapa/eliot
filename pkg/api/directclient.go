@@ -10,12 +10,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/ernoaapa/elliot/pkg/api/mapping"
-	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/api/stream"
-	"github.com/ernoaapa/elliot/pkg/config"
-	"github.com/ernoaapa/elliot/pkg/progress"
+	"github.com/ernoaapa/eliot/pkg/api/mapping"
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/api/stream"
+	"github.com/ernoaapa/eliot/pkg/config"
+	"github.com/ernoaapa/eliot/pkg/progress"
 )
 
 // DirectClient connects directly to device RPC API

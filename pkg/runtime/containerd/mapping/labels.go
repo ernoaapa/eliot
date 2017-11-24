@@ -3,11 +3,11 @@ package mapping
 import (
 	"fmt"
 
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/model"
 )
 
 var (
-	labelPrefix        = "io.elliot"
+	labelPrefix        = "io.eliot"
 	podNameLabel       = "pod.name"
 	containerNameLabel = "container.name"
 )

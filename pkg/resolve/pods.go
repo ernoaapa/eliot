@@ -7,11 +7,11 @@ import (
 	"net/url"
 	"path/filepath"
 
-	core "github.com/ernoaapa/elliot/pkg/api/core"
-	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/fs"
-	"github.com/ernoaapa/elliot/pkg/utils"
+	core "github.com/ernoaapa/eliot/pkg/api/core"
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/fs"
+	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
 )
 

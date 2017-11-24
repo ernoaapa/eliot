@@ -6,16 +6,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/model"
 
 	"golang.org/x/net/context"
 
-	"github.com/ernoaapa/elliot/pkg/api/mapping"
-	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/api/stream"
-	"github.com/ernoaapa/elliot/pkg/progress"
-	"github.com/ernoaapa/elliot/pkg/runtime"
+	"github.com/ernoaapa/eliot/pkg/api/mapping"
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/api/stream"
+	"github.com/ernoaapa/eliot/pkg/progress"
+	"github.com/ernoaapa/eliot/pkg/runtime"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

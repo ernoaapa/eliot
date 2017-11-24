@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/ernoaapa/elliot/pkg/device"
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/device"
+	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

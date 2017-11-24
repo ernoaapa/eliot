@@ -3,26 +3,26 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/elliot/cmd"
-	"github.com/ernoaapa/elliot/pkg/api"
-	"github.com/ernoaapa/elliot/pkg/controller"
-	"github.com/ernoaapa/elliot/pkg/device"
-	"github.com/ernoaapa/elliot/pkg/version"
+	"github.com/ernoaapa/eliot/cmd"
+	"github.com/ernoaapa/eliot/pkg/api"
+	"github.com/ernoaapa/eliot/pkg/controller"
+	"github.com/ernoaapa/eliot/pkg/device"
+	"github.com/ernoaapa/eliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "elliotd"
-	app.Usage = "Daemon which contains all Elliot, for example GRPC API for the CLI client"
-	app.UsageText = `elliotd [arguments...]
+	app.Name = "eliotd"
+	app.Usage = "Daemon which contains all Eliot, for example GRPC API for the CLI client"
+	app.UsageText = `eliotd [arguments...]
 
 	 # By default listen port 5000
-	 elliotd
+	 eliotd
 	
 	 # Listen custom port
-	 elliotd --listen 0.0.0.0:5001`
+	 eliotd --listen 0.0.0.0:5001`
 	app.Description = `API for create/update/delete the containers and a way to connect into the containers.`
 	app.Flags = append([]cli.Flag{
 		cli.StringFlag{

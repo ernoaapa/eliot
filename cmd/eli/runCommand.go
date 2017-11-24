@@ -8,20 +8,20 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ernoaapa/elliot/cmd"
-	"github.com/ernoaapa/elliot/pkg/api"
-	"github.com/ernoaapa/elliot/pkg/api/core"
-	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
-	pods "github.com/ernoaapa/elliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/elliot/pkg/cmd/log"
-	"github.com/ernoaapa/elliot/pkg/config"
-	"github.com/ernoaapa/elliot/pkg/model"
-	"github.com/ernoaapa/elliot/pkg/printers"
-	"github.com/ernoaapa/elliot/pkg/progress"
-	"github.com/ernoaapa/elliot/pkg/resolve"
-	"github.com/ernoaapa/elliot/pkg/sync"
-	"github.com/ernoaapa/elliot/pkg/term"
-	"github.com/ernoaapa/elliot/pkg/utils"
+	"github.com/ernoaapa/eliot/cmd"
+	"github.com/ernoaapa/eliot/pkg/api"
+	"github.com/ernoaapa/eliot/pkg/api/core"
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
+	"github.com/ernoaapa/eliot/pkg/cmd/log"
+	"github.com/ernoaapa/eliot/pkg/config"
+	"github.com/ernoaapa/eliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/printers"
+	"github.com/ernoaapa/eliot/pkg/progress"
+	"github.com/ernoaapa/eliot/pkg/resolve"
+	"github.com/ernoaapa/eliot/pkg/sync"
+	"github.com/ernoaapa/eliot/pkg/term"
+	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
@@ -99,7 +99,7 @@ var runCommand = cli.Command{
 	Action: func(clicontext *cli.Context) (err error) {
 
 		var (
-			projectConfig = config.ReadProjectConfig("./.elliot.yml")
+			projectConfig = config.ReadProjectConfig("./.eliot.yml")
 			name          = projectConfig.NameOrElse(clicontext.String("name"))
 			image         = projectConfig.ImageOrElse(clicontext.String("image"))
 			detach        = clicontext.Bool("detach")

@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ernoaapa/elliot/pkg/device"
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/device"
+	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,7 +53,7 @@ func TestFileSource(t *testing.T) {
 		assert.Equal(t, 2, len(pods[0].Spec.Containers), "Should have one container spec")
 
 		assert.Equal(t, "my-namespace", pods[0].Metadata.Namespace, "Should set default namespace")
-		assert.Equal(t, "elliot", pods[1].Metadata.Namespace, "Should set default namespace")
+		assert.Equal(t, "eliot", pods[1].Metadata.Namespace, "Should set default namespace")
 	case <-time.After(200 * time.Millisecond):
 		assert.FailNow(t, "Didn't receive update in two second")
 	}

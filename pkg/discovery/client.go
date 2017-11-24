@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ernoaapa/elliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/grandcat/zeroconf"
 	"github.com/pkg/errors"
 )

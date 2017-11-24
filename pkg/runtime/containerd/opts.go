@@ -6,8 +6,8 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/containers"
-	"github.com/ernoaapa/elliot/pkg/model"
-	"github.com/ernoaapa/elliot/pkg/runtime/containerd/mapping"
+	"github.com/ernoaapa/eliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/runtime/containerd/mapping"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/errdefs"
-	"github.com/ernoaapa/elliot/pkg/progress"
+	"github.com/ernoaapa/eliot/pkg/progress"
 	digest "github.com/opencontainers/go-digest"
 	log "github.com/sirupsen/logrus"
 )

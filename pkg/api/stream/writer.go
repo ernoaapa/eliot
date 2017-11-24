@@ -1,7 +1,7 @@
 package stream
 
 import (
-	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
 )
 
 // Writer is io.Writer implementation what writes stdout/stderr bytes to RPC stream

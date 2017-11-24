@@ -1,8 +1,8 @@
 package pods
 
 import (
-	containers "github.com/ernoaapa/elliot/pkg/api/services/containers/v1"
-	"github.com/ernoaapa/elliot/pkg/model"
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	"github.com/ernoaapa/eliot/pkg/model"
 )
 
 // Defaults set default values to pod definitions

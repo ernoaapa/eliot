@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/ernoaapa/elliot/cmd"
-	"github.com/ernoaapa/elliot/pkg/printers"
+	"github.com/ernoaapa/eliot/cmd"
+	"github.com/ernoaapa/eliot/pkg/printers"
 	"github.com/urfave/cli"
 )
 

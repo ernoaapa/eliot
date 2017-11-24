@@ -1,4 +1,4 @@
 package discovery
 
-// ZeroConfServiceName is the service name for discovering the elliotd
-var ZeroConfServiceName = "_elliot._tcp"
+// ZeroConfServiceName is the service name for discovering the eliotd
+var ZeroConfServiceName = "_eliot._tcp"
