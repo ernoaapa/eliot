@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
-	"net/textproto"
 	"net/url"
 	"path"
 	"strconv"
@@ -297,7 +297,7 @@ func (r *dockerBase) authorize(req *http.Request) {
 
 func (r *dockerBase) doRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
 	ctx = log.WithLogger(ctx, log.G(ctx).WithField("url", req.URL.String()))
-	log.G(ctx).WithField("request.headers", req.Header).WithField("request.method", req.Method).Debug("Do request")
+	log.G(ctx).WithField("request.headers", req.Header).WithField("request.method", req.Method).Debug("do request")
 	r.authorize(req)
 	resp, err := ctxhttp.Do(ctx, r.client, req)
 	if err != nil {
@@ -404,22 +404,6 @@ func copyRequest(req *http.Request) (*http.Request, error) {
 	return &ireq, nil
 }
 
-func isManifestAccept(h http.Header) bool {
-	for _, ah := range h[textproto.CanonicalMIMEHeaderKey("Accept")] {
-		switch ah {
-		case images.MediaTypeDockerSchema2Manifest:
-			fallthrough
-		case images.MediaTypeDockerSchema2ManifestList:
-			fallthrough
-		case ocispec.MediaTypeImageManifest:
-			fallthrough
-		case ocispec.MediaTypeImageIndex:
-			return true
-		}
-	}
-	return false
-}
-
 func (r *dockerBase) setTokenAuth(ctx context.Context, params map[string]string) error {
 	realm, ok := params["realm"]
 	if !ok {
@@ -498,7 +482,7 @@ func (r *dockerBase) fetchTokenWithOAuth(ctx context.Context, to tokenOptions) (
 	if (resp.StatusCode == 405 && r.username != "") || resp.StatusCode == 404 {
 		return r.getToken(ctx, to)
 	} else if resp.StatusCode < 200 || resp.StatusCode >= 400 {
-		b, _ := ioutil.ReadAll(resp.Body)
+		b, _ := ioutil.ReadAll(io.LimitReader(resp.Body, 64000)) // 64KB
 		log.G(ctx).WithFields(logrus.Fields{
 			"status": resp.Status,
 			"body":   string(b),

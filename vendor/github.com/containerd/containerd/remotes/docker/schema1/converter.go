@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"strings"
 	"sync"
 	"time"
@@ -26,9 +27,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	mediaTypeManifest = "application/vnd.docker.distribution.manifest.v1+json"
-)
+const manifestSizeLimit = 8e6 // 8MB
 
 type blobState struct {
 	diffID digest.Digest
@@ -84,6 +83,7 @@ func (c *Converter) Handle(ctx context.Context, desc ocispec.Descriptor) ([]ocis
 						{
 							MediaType: images.MediaTypeDockerSchema2LayerGzip,
 							Digest:    c.pulledManifest.FSLayers[i].BlobSum,
+							Size:      -1,
 						},
 					}, descs...)
 				}
@@ -132,11 +132,6 @@ func (c *Converter) Convert(ctx context.Context) (ocispec.Descriptor, error) {
 		Size:      int64(len(b)),
 	}
 
-	ref := remotes.MakeRefKey(ctx, config)
-	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(b), config.Size, config.Digest); err != nil {
-		return ocispec.Descriptor{}, errors.Wrap(err, "failed to write config")
-	}
-
 	layers := make([]ocispec.Descriptor, len(diffIDs))
 	for i, diffID := range diffIDs {
 		layers[i] = c.layerBlobs[diffID]
@@ -150,19 +145,30 @@ func (c *Converter) Convert(ctx context.Context) (ocispec.Descriptor, error) {
 		Layers: layers,
 	}
 
-	b, err = json.Marshal(manifest)
+	mb, err := json.Marshal(manifest)
 	if err != nil {
 		return ocispec.Descriptor{}, errors.Wrap(err, "failed to marshal image")
 	}
 
 	desc := ocispec.Descriptor{
 		MediaType: ocispec.MediaTypeImageManifest,
-		Digest:    digest.Canonical.FromBytes(b),
-		Size:      int64(len(b)),
+		Digest:    digest.Canonical.FromBytes(mb),
+		Size:      int64(len(mb)),
 	}
 
-	ref = remotes.MakeRefKey(ctx, desc)
-	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(b), desc.Size, desc.Digest); err != nil {
+	labels := map[string]string{}
+	labels["containerd.io/gc.ref.content.0"] = manifest.Config.Digest.String()
+	for i, ch := range manifest.Layers {
+		labels[fmt.Sprintf("containerd.io/gc.ref.content.%d", i+1)] = ch.Digest.String()
+	}
+
+	ref := remotes.MakeRefKey(ctx, desc)
+	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(mb), desc.Size, desc.Digest, content.WithLabels(labels)); err != nil {
+		return ocispec.Descriptor{}, errors.Wrap(err, "failed to write config")
+	}
+
+	ref = remotes.MakeRefKey(ctx, config)
+	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(b), config.Size, config.Digest); err != nil {
 		return ocispec.Descriptor{}, errors.Wrap(err, "failed to write config")
 	}
 
@@ -177,7 +183,7 @@ func (c *Converter) fetchManifest(ctx context.Context, desc ocispec.Descriptor) 
 		return err
 	}
 
-	b, err := ioutil.ReadAll(rc)
+	b, err := ioutil.ReadAll(io.LimitReader(rc, manifestSizeLimit)) // limit to 8MB
 	rc.Close()
 	if err != nil {
 		return err
@@ -200,13 +206,32 @@ func (c *Converter) fetchManifest(ctx context.Context, desc ocispec.Descriptor) 
 func (c *Converter) fetchBlob(ctx context.Context, desc ocispec.Descriptor) error {
 	log.G(ctx).Debug("fetch blob")
 
-	ref := remotes.MakeRefKey(ctx, desc)
+	var (
+		ref   = remotes.MakeRefKey(ctx, desc)
+		calc  = newBlobStateCalculator()
+		retry = 16
+		size  = desc.Size
+	)
 
-	calc := newBlobStateCalculator()
+	// size may be unknown, set to zero for content ingest
+	if size == -1 {
+		size = 0
+	}
 
-	cw, err := c.contentStore.Writer(ctx, ref, desc.Size, desc.Digest)
+tryit:
+	cw, err := c.contentStore.Writer(ctx, ref, size, desc.Digest)
 	if err != nil {
-		if !errdefs.IsAlreadyExists(err) {
+		if errdefs.IsUnavailable(err) {
+			select {
+			case <-time.After(time.Millisecond * time.Duration(rand.Intn(retry))):
+				if retry < 2048 {
+					retry = retry << 1
+				}
+				goto tryit
+			case <-ctx.Done():
+				return err
+			}
+		} else if !errdefs.IsAlreadyExists(err) {
 			return err
 		}
 
@@ -255,17 +280,16 @@ func (c *Converter) fetchBlob(ctx context.Context, desc ocispec.Descriptor) erro
 
 		eg.Go(func() error {
 			defer pw.Close()
-			return content.Copy(ctx, cw, io.TeeReader(rc, pw), desc.Size, desc.Digest)
+
+			return content.Copy(ctx, cw, io.TeeReader(rc, pw), size, desc.Digest)
 		})
 
 		if err := eg.Wait(); err != nil {
 			return err
 		}
-
-		// TODO: Label blob
 	}
 
-	if desc.Size == 0 {
+	if desc.Size == -1 {
 		info, err := c.contentStore.Info(ctx, desc.Digest)
 		if err != nil {
 			return errors.Wrap(err, "failed to get blob info")

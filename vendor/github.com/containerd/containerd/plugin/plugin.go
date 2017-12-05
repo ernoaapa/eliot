@@ -54,13 +54,19 @@ const (
 	MetadataPlugin Type = "io.containerd.metadata.v1"
 	// ContentPlugin implements a content store
 	ContentPlugin Type = "io.containerd.content.v1"
+	// GCPlugin implements garbage collection policy
+	GCPlugin Type = "io.containerd.gc.v1"
 )
 
 // Registration contains information for registering a plugin
 type Registration struct {
-	Type     Type
-	ID       string
-	Config   interface{}
+	// Type of the plugin
+	Type Type
+	// ID of the plugin
+	ID string
+	// Config specific to the plugin
+	Config interface{}
+	// Requires is a list of plugins that the registered plugin requires to be available
 	Requires []Type
 
 	// InitFn is called when initializing a plugin. The registration and
@@ -69,6 +75,7 @@ type Registration struct {
 	InitFn func(*InitContext) (interface{}, error)
 }
 
+// Init the registered plugin
 func (r *Registration) Init(ic *InitContext) *Plugin {
 	p, err := r.InitFn(ic)
 	return &Plugin{

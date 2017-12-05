@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/containerd/containerd"
+	"github.com/containerd/containerd/cio"
 	"github.com/containerd/fifo"
 	"github.com/pkg/errors"
 )
@@ -63,13 +63,13 @@ type DirectIO struct {
 }
 
 // IOCreate returns IO avaliable for use with task creation
-func (f *DirectIO) IOCreate(id string) (containerd.IO, error) {
+func (f *DirectIO) IOCreate(id string) (cio.IO, error) {
 	return f, nil
 }
 
 // Config returns the IOConfig
-func (f *DirectIO) Config() containerd.IOConfig {
-	return containerd.IOConfig{
+func (f *DirectIO) Config() cio.Config {
+	return cio.Config{
 		Terminal: f.terminal,
 		Stdin:    f.stdin,
 		Stdout:   f.stdout,

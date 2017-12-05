@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"time"
 
 	"github.com/containerd/containerd/content"
@@ -84,7 +85,7 @@ func fetch(ctx context.Context, ingester content.Ingester, fetcher Fetcher, desc
 			// of writer and abort if not updated recently.
 
 			select {
-			case <-time.After(time.Millisecond * time.Duration(retry)):
+			case <-time.After(time.Millisecond * time.Duration(rand.Intn(retry))):
 				if retry < 2048 {
 					retry = retry << 1
 				}
@@ -113,6 +114,7 @@ func fetch(ctx context.Context, ingester content.Ingester, fetcher Fetcher, desc
 func commitOpts(desc ocispec.Descriptor, r io.Reader) (io.Reader, []content.Opt) {
 	var childrenF func(r io.Reader) ([]ocispec.Descriptor, error)
 
+	// TODO(AkihiroSuda): use images/oci.GetChildrenDescriptors?
 	switch desc.MediaType {
 	case images.MediaTypeDockerSchema2Manifest, ocispec.MediaTypeImageManifest:
 		childrenF = func(r io.Reader) ([]ocispec.Descriptor, error) {

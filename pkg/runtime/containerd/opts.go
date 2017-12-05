@@ -4,16 +4,16 @@ import (
 	"context"
 	"strings"
 
-	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/containers"
+	"github.com/containerd/containerd/oci"
 	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/ernoaapa/eliot/pkg/runtime/containerd/mapping"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
 // WithCwd spets the container current working directory (cwd)
-func WithCwd(cwd string) containerd.SpecOpts {
-	return func(_ context.Context, _ *containerd.Client, _ *containers.Container, s *specs.Spec) error {
+func WithCwd(cwd string) oci.SpecOpts {
+	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
 		s.Process.Cwd = cwd
 		return nil
 	}
@@ -21,8 +21,8 @@ func WithCwd(cwd string) containerd.SpecOpts {
 
 // WithEnv you can add or override process environment variables
 // overrides should be list of strings in format 'KEY=value'
-func WithEnv(overrides []string) containerd.SpecOpts {
-	return func(_ context.Context, _ *containerd.Client, _ *containers.Container, s *specs.Spec) error {
+func WithEnv(overrides []string) oci.SpecOpts {
+	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
 		if len(overrides) > 0 {
 			s.Process.Env = replaceOrAppendEnvValues(s.Process.Env, overrides)
 		}
@@ -69,8 +69,8 @@ func replaceOrAppendEnvValues(defaults, overrides []string) []string {
 }
 
 // WithMounts you can add mount points to the container
-func WithMounts(mounts []model.Mount) containerd.SpecOpts {
-	return func(_ context.Context, _ *containerd.Client, _ *containers.Container, s *specs.Spec) error {
+func WithMounts(mounts []model.Mount) oci.SpecOpts {
+	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
 		for _, mount := range mounts {
 			s.Mounts = append(s.Mounts, mapping.MapMountToContainerdModel(mount))
 		}

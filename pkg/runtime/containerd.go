@@ -7,11 +7,12 @@ import (
 	"time"
 
 	"github.com/containerd/containerd"
-	namespaces "github.com/containerd/containerd/api/services/namespaces/v1"
 	tasks "github.com/containerd/containerd/api/services/tasks/v1"
+	"github.com/containerd/containerd/cio"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
 	namespaceutils "github.com/containerd/containerd/namespaces"
+	"github.com/containerd/containerd/oci"
 	"github.com/containerd/containerd/plugin"
 	"github.com/containerd/containerd/remotes"
 	"github.com/ernoaapa/eliot/pkg/model"
@@ -158,16 +159,16 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		return status, imageErr
 	}
 
-	specOpts := []containerd.SpecOpts{
-		containerd.WithImageConfig(image),
+	specOpts := []oci.SpecOpts{
+		oci.WithImageConfig(image),
 	}
 
 	if len(container.Args) > 0 {
-		specOpts = append(specOpts, containerd.WithProcessArgs(container.Args...))
+		specOpts = append(specOpts, oci.WithProcessArgs(container.Args...))
 	}
 
 	if container.Tty {
-		specOpts = append(specOpts, containerd.WithTTY)
+		specOpts = append(specOpts, oci.WithTTY)
 	}
 
 	if container.WorkingDir != "" {
@@ -190,14 +191,14 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 
 	if pod.Spec.HostNetwork {
 		specOpts = append(specOpts,
-			containerd.WithHostNamespace(specs.NetworkNamespace),
-			containerd.WithHostHostsFile,
-			containerd.WithHostResolvconf,
+			oci.WithHostNamespace(specs.NetworkNamespace),
+			oci.WithHostHostsFile,
+			oci.WithHostResolvconf,
 		)
 	}
 
 	if pod.Spec.HostPID {
-		specOpts = append(specOpts, containerd.WithHostNamespace(specs.PIDNamespace))
+		specOpts = append(specOpts, oci.WithHostNamespace(specs.PIDNamespace))
 	}
 
 	id := xid.New()
@@ -408,18 +409,18 @@ func (c *ContainerdClient) GetNamespaces() ([]string, error) {
 		return nil, connErr
 	}
 
-	resp, err := client.NamespaceService().List(ctx, &namespaces.ListNamespacesRequest{})
+	resp, err := client.NamespaceService().List(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return getNamespaces(resp.Namespaces), nil
+	return getNamespaces(resp), nil
 }
 
-func getNamespaces(namespaces []namespaces.Namespace) (result []string) {
+func getNamespaces(namespaces []string) (result []string) {
 	for _, namespace := range namespaces {
-		if namespace.Name != "default" {
-			result = append(result, namespace.Name)
+		if namespace != "default" {
+			result = append(result, namespace)
 		}
 	}
 	return result
@@ -487,7 +488,7 @@ func (c *ContainerdClient) Attach(namespace, name string, io AttachIO) error {
 		return errors.Wrapf(err, "Cannot return container logs for container [%s] in namespace [%s]", name, namespace)
 	}
 
-	task, taskErr := container.Task(ctx, containerd.WithAttach(io.Stdin, io.Stdout, io.Stderr))
+	task, taskErr := container.Task(ctx, cio.WithAttach(io.Stdin, io.Stdout, io.Stderr))
 	if taskErr != nil {
 		return taskErr
 	}
