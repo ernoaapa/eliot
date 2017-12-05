@@ -55,7 +55,7 @@ func ReadProjectConfig(path string) (result *ProjectConfig) {
 	config := &ProjectConfig{
 		path: path,
 		Sync: SyncConfig{
-			Image:  "docker.io/stefda/rsync:latest",
+			Image:  "docker.io/ernoaapa/rsync:1940a6c",
 			Target: "/volume",
 		},
 	}

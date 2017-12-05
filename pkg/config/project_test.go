@@ -22,7 +22,7 @@ image: someproject/foobar:latest
 
 	assert.Equal(t, "foobar", config.NameOrElse("should-not-return"))
 	assert.Equal(t, "someproject/foobar:latest", config.ImageOrElse("should-not-return"))
-	assert.Equal(t, "docker.io/stefda/rsync:latest", config.Sync.Image, "sync.image should have default value")
+	assert.Equal(t, "docker.io/ernoaapa/rsync:1940a6c", config.Sync.Image, "sync.image should have default value")
 }
 
 func TestGetProjectSyncConfig(t *testing.T) {
