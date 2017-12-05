@@ -1,14 +1,13 @@
 # Eliot
-> Note: this is early alpha version! There's not all features yet implemented and code might get large breaking changes until the first release.
+> This is early alpha version! Might be buggy, there's not all features yet implemented and code might get large breaking changes until the first release.
 
-Eliot is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity and security.
+Eliot is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity, security and stability. Eliot gives simplified app delivery, isolation and additional security to traditional installations.
 
 Docker and Kubernetes have inspired heavily and if you're familiar with those, you find really easy to get started with Eliot.
 
 <sub>Built with ❤︎ by [Erno Aapa](https://github.com/ernoaapa) and [contributors](https://github.com/ernoaapa/eliot/contributors)</sub>
 
 ## Usage
-![architecture](design/architecture.png)
 
 Eliot is based on top of the [containerd](https://github.com/containerd/containerd) to provide simple API for managing containers. 
 
