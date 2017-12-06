@@ -162,3 +162,6 @@ container-clean:
 
 bin-clean:
 	rm -rf .go bin
+
+publish-docs:
+	./build/docs.sh

@@ -5,6 +5,8 @@ Eliot is a open source system for managing containerized applications on top of 
 
 Docker and Kubernetes have inspired heavily and if you're familiar with those, you find really easy to get started with Eliot.
 
+You can find documentation from [http://docs.eliot.run](docs.eliot.run)
+
 <sub>Built with ❤︎ by [Erno Aapa](https://github.com/ernoaapa) and [contributors](https://github.com/ernoaapa/eliot/contributors)</sub>
 
 ## Usage
