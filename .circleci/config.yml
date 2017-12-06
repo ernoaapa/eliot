@@ -1,0 +1,82 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/ernoaapa/eliot
+    steps:
+      - checkout
+
+      - run: "! go fmt -l pkg cmd 2>&1 | read"
+      - run: go vet ./...
+      - run: go test -v ./...
+  
+  build:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/ernoaapa/eliot
+    steps:
+      - checkout
+
+      - run:
+          name: Install tools
+          command: go get github.com/mitchellh/gox
+
+      - run:
+          name: Build binaries
+          command: |
+            VERSION=$(git describe --tags --always --dirty)
+            gox -osarch="darwin/amd64 linux/amd64 linux/arm64" -ldflags "-X github.com/ernoaapa/eliot/pkg/version.VERSION=${VERSION}" -output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}" ./cmd/...
+
+      - save_cache:
+          key: binaries-{{ .Revision }}
+          paths:
+            - dist
+
+  publish:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/ernoaapa/eliot
+    steps:
+
+      - restore_cache:
+          key: binaries-{{ .Revision }}
+
+      - run:
+          name: Install tools
+          command: go get github.com/tcnksm/ghr
+
+      - run:
+          name: Push binaries to GitHub
+          command: |
+            ghr -token $GITHUB_TOKEN -username $CIRCLE_PROJECT_USERNAME -repository $CIRCLE_PROJECT_REPONAME $CIRCLE_BRANCH dist/
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.*/
+              
+      - build:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+
+      - publish:
+          requires:
+            - test
+            - build
+          
+          # Don't run when branches updates, only when tags get created
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only:
+                - /v.*/
+                
