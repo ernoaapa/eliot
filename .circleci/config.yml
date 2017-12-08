@@ -33,7 +33,7 @@ jobs:
           paths:
             - dist
 
-  publish:
+  publish-binaries:
     docker:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/ernoaapa/eliot
@@ -51,6 +51,30 @@ jobs:
           command: |
             ghr -token $GITHUB_TOKEN -username $CIRCLE_PROJECT_USERNAME -repository $CIRCLE_PROJECT_REPONAME $CIRCLE_BRANCH dist/
 
+  publish-images:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/ernoaapa/eliot
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - restore_cache:
+          key: binaries-{{ .Revision }}
+
+      - run:
+          name: Install tools
+          command: go get github.com/estesp/manifest-tool
+      
+      - run:
+          name: Login Docker hub
+          command: echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin
+
+      - run:
+          name: Build images
+          command: ./.circleci/scripts/docker-build.sh
+
 workflows:
   version: 2
   build_and_test:
@@ -67,7 +91,7 @@ workflows:
             tags:
               only: /.*/
 
-      - publish:
+      - publish-binaries:
           requires:
             - test
             - build
@@ -79,4 +103,16 @@ workflows:
             tags:
               only:
                 - /v.*/
-                
+
+      - publish-images:
+          requires:
+            - test
+            - build
+          
+          # Don't run when branches updates, only when tags get created
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only:
+                - /v.*/

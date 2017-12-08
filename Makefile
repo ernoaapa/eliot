@@ -126,8 +126,8 @@ push-name:
 
 push-manifest:
 	manifest-tool \
-		--username $(username) \
-		--password $(password) \
+		--username $(DOCKER_USER) \
+		--password $(DOCKER_PASS) \
 		push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template $(IMAGE):$(GIT_HASH)-ARCH \
