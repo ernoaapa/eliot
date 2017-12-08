@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Push binaries to GitHub
           command: |
-            ghr -token $GITHUB_TOKEN -username $CIRCLE_PROJECT_USERNAME -repository $CIRCLE_PROJECT_REPONAME $CIRCLE_BRANCH dist/
+            ghr -token $GITHUB_TOKEN -username $CIRCLE_PROJECT_USERNAME -repository $CIRCLE_PROJECT_REPONAME $CIRCLE_TAG dist/
 
   publish-images:
     docker:
