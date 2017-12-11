@@ -19,28 +19,14 @@ type ProjectConfig struct {
 	Sync  SyncConfig `yaml:"sync"`
 }
 
+// SyncConfig represents sync related configurations
 type SyncConfig struct {
 	Image  string `yaml:"image"`
 	Target string `yaml:"target"`
 }
 
-// NameOrElse return 'name' from the project configuration or defaults to given value
-func (p ProjectConfig) NameOrElse(val string) string {
-	if p.Name != "" {
-		return p.Name
-	}
-	return val
-}
-
-// ImageOrElse return 'name' from the project configuration or defaults to given value
-func (p ProjectConfig) ImageOrElse(val string) string {
-	if p.Image != "" {
-		return p.Image
-	}
-	return val
-}
-
-//
+// EnvWith return list of environment variable definitions from project configs
+// with values appended to end of the list.
 func (p ProjectConfig) EnvWith(values []string) (result []string) {
 	result = append(result, p.Env...)
 	result = append(result, values...)

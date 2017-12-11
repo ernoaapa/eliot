@@ -378,3 +378,13 @@ func GetCurrentDirectory() string {
 	log.NewLine().Fatal("Failed to resolve current directory")
 	return ""
 }
+
+// First return first non empty "" string or empty ""
+func First(values ...string) string {
+	for _, str := range values {
+		if str != "" {
+			return str
+		}
+	}
+	return ""
+}

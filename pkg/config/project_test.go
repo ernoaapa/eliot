@@ -20,8 +20,8 @@ image: someproject/foobar:latest
 
 	config := ReadProjectConfig(file.Name())
 
-	assert.Equal(t, "foobar", config.NameOrElse("should-not-return"))
-	assert.Equal(t, "someproject/foobar:latest", config.ImageOrElse("should-not-return"))
+	assert.Equal(t, "foobar", config.Name)
+	assert.Equal(t, "someproject/foobar:latest", config.Image)
 	assert.Equal(t, "docker.io/ernoaapa/rsync:1940a6c", config.Sync.Image, "sync.image should have default value")
 }
 
@@ -39,15 +39,7 @@ sync:
 
 	config := ReadProjectConfig(file.Name())
 
-	assert.Equal(t, "foobar", config.NameOrElse("should-not-return"))
-	assert.Equal(t, "someproject/foobar:latest", config.ImageOrElse("should-not-return"))
+	assert.Equal(t, "foobar", config.Name)
+	assert.Equal(t, "someproject/foobar:latest", config.Image)
 	assert.Equal(t, "myproject/custom:v1", config.Sync.Image)
-}
-
-func TestProjectDefaulting(t *testing.T) {
-	config := ProjectConfig{}
-
-	assert.Equal(t, "the-default", config.NameOrElse("the-default"))
-	assert.Equal(t, "the-default", config.ImageOrElse("the-default"))
-	assert.Equal(t, []string{"one", "two"}, config.EnvWith([]string{"one", "two"}))
 }

@@ -100,8 +100,8 @@ var runCommand = cli.Command{
 
 		var (
 			projectConfig = config.ReadProjectConfig("./.eliot.yml")
-			name          = projectConfig.NameOrElse(clicontext.String("name"))
-			image         = projectConfig.ImageOrElse(clicontext.String("image"))
+			name          = cmd.First(clicontext.String("name"), projectConfig.Name)
+			image         = cmd.First(clicontext.String("image"), projectConfig.Image)
 			detach        = clicontext.Bool("detach")
 			rm            = clicontext.Bool("rm")
 			tty           = clicontext.Bool("tty")
