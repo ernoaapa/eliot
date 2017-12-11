@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"net/url"
 	"os"
 	"os/signal"
 	"os/user"
@@ -23,13 +22,8 @@ import (
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
-	"github.com/ernoaapa/eliot/pkg/device"
 	"github.com/ernoaapa/eliot/pkg/fs"
-	"github.com/ernoaapa/eliot/pkg/manifest"
-	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/ernoaapa/eliot/pkg/runtime"
-	"github.com/ernoaapa/eliot/pkg/state"
-	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
 
@@ -167,57 +161,6 @@ func GetRuntimeClient(clicontext *cli.Context, hostname string) runtime.Client {
 		clicontext.GlobalString("containerd"),
 		hostname,
 	)
-}
-
-// GetManifestSource initialises new manifest source based on CLI parameters
-func GetManifestSource(clicontext *cli.Context, resolver *device.Resolver, out chan<- []model.Pod) (manifest.Source, error) {
-	if !clicontext.IsSet("manifest") {
-		return nil, fmt.Errorf("You must define --manifest parameter")
-	}
-	manifestParam := clicontext.String("manifest")
-
-	interval := clicontext.Duration("manifest-update-interval")
-
-	if fileExists(manifestParam) {
-		return manifest.NewFileManifestSource(manifestParam, interval, resolver, out), nil
-	}
-
-	manifestURL, err := url.Parse(manifestParam)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Error while parsing --manifest parameter [%s]", manifestParam)
-	}
-
-	switch scheme := manifestURL.Scheme; scheme {
-	case "file":
-		return manifest.NewFileManifestSource(manifestURL.Path, interval, resolver, out), nil
-	case "http", "https":
-		return manifest.NewURLManifestSource(manifestParam, interval, resolver, out), nil
-	}
-	return nil, fmt.Errorf("You must define manifest source. E.g. --manifest path/to/file.yml")
-}
-
-// GetStateReporter initialises new state reporter based on CLI parameters
-func GetStateReporter(clicontext *cli.Context, resolver *device.Resolver, in <-chan []model.Pod) (state.Reporter, error) {
-	if !clicontext.IsSet("report") {
-		return nil, fmt.Errorf("You must define --report parameter. E.g. 'console' or some url")
-	}
-	reportParam := clicontext.String("report")
-	if reportParam == "console" {
-		return state.NewConsoleStateReporter(
-			resolver,
-			in,
-		), nil
-	}
-	_, err := url.Parse(reportParam)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Error while parsing --report parameter [%s]", reportParam)
-	}
-
-	return state.NewURLStateReporter(
-		resolver,
-		in,
-		reportParam,
-	), nil
 }
 
 // GetPrinter returns printer for formating resources output
@@ -376,5 +319,15 @@ func GetCurrentDirectory() string {
 	}
 
 	log.NewLine().Fatal("Failed to resolve current directory")
+	return ""
+}
+
+// First return first non empty "" string or empty ""
+func First(values ...string) string {
+	for _, str := range values {
+		if str != "" {
+			return str
+		}
+	}
 	return ""
 }
