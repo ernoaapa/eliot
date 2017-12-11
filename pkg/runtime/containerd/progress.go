@@ -33,7 +33,6 @@ func UpdateFetchProgress(done <-chan struct{}, client *containerd.Client, progre
 
 			for _, active := range active {
 				activeDownloads = append(activeDownloads, active.Ref)
-				log.Printf("Update %s to %d %d", active.Ref, active.Offset, active.Total)
 				progress.SetToDownloading(active.Ref, active.Offset, active.Total)
 			}
 
