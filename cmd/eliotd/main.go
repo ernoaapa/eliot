@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 
 	"github.com/ernoaapa/eliot/cmd"
@@ -21,21 +22,34 @@ func main() {
 
 	 # By default listen port 5000
 	 eliotd
-	
+
 	 # Listen custom port
-	 eliotd --listen 0.0.0.0:5001`
+	 eliotd --gprc-listen 0.0.0.0:5001
+	 
+	 # Disable lifecycle controller and enable only the GRPC API
+	 eliotd  --grpc=true --lifecycle-controller=false`
 	app.Description = `API for create/update/delete the containers and a way to connect into the containers.`
 	app.Flags = append([]cli.Flag{
 		cli.StringFlag{
 			Name:   "containerd",
 			Usage:  "containerd socket path for containerd's GRPC server",
-			EnvVar: "ELLIOT_CONTAINERD",
+			EnvVar: "ELIOT_CONTAINERD",
 			Value:  "/run/containerd/containerd.sock",
 		},
+		cli.BoolTFlag{
+			Name:   "lifecycle-controller",
+			Usage:  "Enable container lifecycle controller",
+			EnvVar: "ELIOT_LIFECYCLE_CONTROLLER",
+		},
+		cli.BoolTFlag{
+			Name:   "grpc-api",
+			Usage:  "Enable GRPC API server",
+			EnvVar: "ELIOT_GRPC_API",
+		},
 		cli.StringFlag{
-			Name:   "listen",
+			Name:   "grpc-api-listen",
 			Usage:  "GRPC host:port what to listen for client connections",
-			EnvVar: "ELLIOT_LISTEN",
+			EnvVar: "ELIOT_GRPC_API_LISTEN",
 			Value:  "localhost:5000",
 		},
 	}, cmd.GlobalFlags...)
@@ -46,11 +60,23 @@ func main() {
 		resolver := device.NewResolver(cmd.GetLabels(clicontext))
 		device := resolver.GetInfo()
 		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
-		listen := clicontext.String("listen")
+		listen := clicontext.String("grpc-api-listen")
 
 		supervisor := suture.NewSimple("eliotd")
-		supervisor.Add(api.NewServer(listen, client))
-		supervisor.Add(controller.NewLifecycle(client))
+
+		if clicontext.Bool("grpc-api") {
+			log.Infoln("grpc-api enabled")
+			supervisor.Add(api.NewServer(listen, client))
+		}
+
+		if clicontext.Bool("lifecycle-controller") {
+			log.Infoln("lifecycle-controller enabled")
+			supervisor.Add(controller.NewLifecycle(client))
+		}
+
+		if len(supervisor.Services()) == 0 {
+			return errors.New("Nothing to run. You should enable one of [grpc-api, lifecycle-controller]")
+		}
 
 		supervisor.Serve()
 
