@@ -2,16 +2,16 @@ package discovery
 
 import (
 	"github.com/grandcat/zeroconf"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 // Server is zeroconf discovery server
 type Server struct {
-	Name   string
-	Domain string
-	Port   int
-	server *zeroconf.Server
+	Name     string
+	Domain   string
+	Port     int
+	server   *zeroconf.Server
+	shutdown chan bool
 }
 
 // NewServer creates new discovery server
@@ -23,18 +23,25 @@ func NewServer(name string, port int) *Server {
 	}
 }
 
-// Start server to be discoverable
-func (s *Server) Start() error {
+// Serve starts the discovery server
+func (s *Server) Serve() {
+	log.Infof("Start discovery server...")
 	log.Debugf("Exposing %s in port %d", s.Name, s.Port)
 	server, err := zeroconf.Register(s.Name, ZeroConfServiceName, s.Domain, s.Port, []string{"txtv=0", "lo=1", "la=2"}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to create zeroconf server")
+		log.Fatalf("Failed to create zeroconf server: %s", err)
 	}
+
 	s.server = server
-	return nil
+
+	select {
+	case <-s.shutdown:
+		s.server.Shutdown()
+	}
 }
 
 // Stop server to be discoverable
 func (s *Server) Stop() {
-	defer s.server.Shutdown()
+	log.Infof("Stop discovery server...")
+	s.shutdown <- true
 }

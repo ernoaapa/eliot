@@ -3,11 +3,14 @@ package main
 import (
 	"errors"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/ernoaapa/eliot/cmd"
 	"github.com/ernoaapa/eliot/pkg/api"
 	"github.com/ernoaapa/eliot/pkg/controller"
 	"github.com/ernoaapa/eliot/pkg/device"
+	"github.com/ernoaapa/eliot/pkg/discovery"
 	"github.com/ernoaapa/eliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/thejerf/suture"
@@ -17,7 +20,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "eliotd"
-	app.Usage = "Daemon which contains all Eliot, for example GRPC API for the CLI client"
+	app.Usage = "Daemon for the device to enable Eliot"
 	app.UsageText = `eliotd [arguments...]
 
 	 # By default listen port 5000
@@ -52,6 +55,11 @@ func main() {
 			EnvVar: "ELIOT_GRPC_API_LISTEN",
 			Value:  "localhost:5000",
 		},
+		cli.BoolTFlag{
+			Name:   "discovery",
+			Usage:  "Enable discover GRPC server over zeroconf",
+			EnvVar: "ELIOT_DISCOVERY",
+		},
 	}, cmd.GlobalFlags...)
 	app.Version = version.VERSION
 	app.Before = cmd.GlobalBefore
@@ -60,22 +68,32 @@ func main() {
 		resolver := device.NewResolver(cmd.GetLabels(clicontext))
 		device := resolver.GetInfo()
 		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
-		listen := clicontext.String("grpc-api-listen")
+		grpcListen := clicontext.String("grpc-api-listen")
 
 		supervisor := suture.NewSimple("eliotd")
+		serviceCount := 0
 
 		if clicontext.Bool("grpc-api") {
 			log.Infoln("grpc-api enabled")
-			supervisor.Add(api.NewServer(listen, client))
+			supervisor.Add(api.NewServer(grpcListen, client))
+			serviceCount++
 		}
 
 		if clicontext.Bool("lifecycle-controller") {
 			log.Infoln("lifecycle-controller enabled")
 			supervisor.Add(controller.NewLifecycle(client))
+			serviceCount++
 		}
 
-		if len(supervisor.Services()) == 0 {
-			return errors.New("Nothing to run. You should enable one of [grpc-api, lifecycle-controller]")
+		if clicontext.Bool("grpc-api") && clicontext.Bool("discovery") {
+			log.Infoln("grpc discovery over zeroconf enabled")
+			port := parseGrpcPort(grpcListen)
+			supervisor.Add(discovery.NewServer(device.Hostname, port))
+			serviceCount++
+		}
+
+		if serviceCount == 0 {
+			return errors.New("Nothing to run. You should enable one of [grpc-api, lifecycle-controller, discovery]")
 		}
 
 		supervisor.Serve()
@@ -86,4 +104,17 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func parseGrpcPort(addr string) int {
+	parts := strings.Split(addr, ":")
+	if len(parts) != 2 {
+		log.Panicf("Invalid formated grpc address [%s]", addr)
+	}
+
+	port, err := strconv.Atoi(parts[1])
+	if err != nil {
+		log.Panicf("Unable to parse grpc port: %s", err)
+	}
+	return port
 }
