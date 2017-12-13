@@ -15,6 +15,7 @@ import (
 type Lifecycle struct {
 	client   runtime.Client
 	interval time.Duration
+	serving  bool
 }
 
 // NewLifecycle creates new Lifecycle controller instance
@@ -25,19 +26,31 @@ func NewLifecycle(client runtime.Client) *Lifecycle {
 	}
 }
 
-// Run starts the controller to monitor containers
+// Serve starts the controller to monitor containers
 // Run until faces such fatal error that cannot recover and will return the error
-func (l *Lifecycle) Run() error {
+func (l *Lifecycle) Serve() {
+	log.Infof("Start lifecycle controller...")
+	l.serving = true
+
 	ticker := time.NewTicker(l.interval)
 	defer ticker.Stop()
 
 	for range ticker.C {
+		if !l.serving {
+			return
+		}
+
 		err := l.checkAll()
 		if err != nil {
-			return err
+			log.Panicf("Lifecycle controller stopped with fatal error: %s", err)
 		}
 	}
-	return nil
+}
+
+// Stop the lifecycle running
+func (l *Lifecycle) Stop() {
+	log.Infof("Stop lifecycle controller...")
+	l.serving = false
 }
 
 func (l *Lifecycle) checkAll() error {

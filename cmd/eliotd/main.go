@@ -9,6 +9,7 @@ import (
 	"github.com/ernoaapa/eliot/pkg/device"
 	"github.com/ernoaapa/eliot/pkg/version"
 	log "github.com/sirupsen/logrus"
+	"github.com/thejerf/suture"
 	"github.com/urfave/cli"
 )
 
@@ -46,17 +47,14 @@ func main() {
 		device := resolver.GetInfo()
 		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
 		listen := clicontext.String("listen")
-		server := api.NewServer(listen, client)
 
-		go func() {
-			controller := controller.NewLifecycle(client)
-			log.Infof("Start lifecycle controller...")
-			err := controller.Run()
-			log.Panicf("Lifecycle controller stopped with fatal error: %s", err)
-		}()
+		supervisor := suture.NewSimple("eliotd")
+		supervisor.Add(api.NewServer(listen, client))
+		supervisor.Add(controller.NewLifecycle(client))
 
-		log.Infof("Start to listen %s....", listen)
-		return server.Serve()
+		supervisor.Serve()
+
+		return nil
 	}
 
 	if err := app.Run(os.Args); err != nil {
