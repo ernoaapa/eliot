@@ -5,7 +5,7 @@ PLATFORMS="linux/amd64,linux/arm64"
 GIT_HASH=$(git describe --tags --always --dirty)
 
 
-for bin in eliot-discovery eliotd; do
+for bin in eliotd; do
   image="${REGISTRY}/${bin}"
   
   for osarch in ${PLATFORMS//,/ }; do

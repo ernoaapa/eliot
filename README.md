@@ -18,7 +18,6 @@ Eliot is based on top of the [containerd](https://github.com/containerd/containe
 Eliot is built from following components
 - `eli` - Command line tool for managing the device
 - `eliotd` - Daemon for the device to manage containers
-- `eliot-discovery` - _(Optional)_ component to make device automatically discoverable by the `eli` client
 
 ### Features
 - Manage running containers in the device

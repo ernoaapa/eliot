@@ -42,4 +42,4 @@ Open [http://localhost:4000]()
 ## Debugging
 
 ### Log file locations
-If you use [EliotOS](eliotos.md), eliotd and eliot-discovery logs you can find from `/var/log` directory.
+If you use [EliotOS](eliotos.md), you can find `eliotd` logs from `/var/log` directory.
