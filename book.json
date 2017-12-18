@@ -1,4 +1,12 @@
 {
   "gitbook": ">= 3.2.3",
-  "root": "./docs"
+  "root": "./docs",
+  "plugins": [
+    "insert-logo"
+  ],
+  "pluginsConfig": {
+    "insert-logo": {
+      "url": "https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-small.png"
+    }
+  }
 }

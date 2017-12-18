@@ -1,4 +1,4 @@
-# Eliot
+![Eliot](https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-medium.png)
 > This is early alpha version! Might be buggy, there's not all features yet implemented and code might get large breaking changes until the first release.
 
 [Eliot](https://github.com/ernoaapa/eliot) is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity, security and stability. Eliot gives simplified app delivery, isolation and additional security to traditional installations.
