@@ -6,7 +6,8 @@
 /.dockerfile-*
 
 node_modules
-
+# Ignore because just used with gitbook
+package-lock.json
 
 # Output of documentation
 _book

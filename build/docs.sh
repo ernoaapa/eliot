@@ -3,6 +3,8 @@
 # Small script to build and update documentation to GitHub Pages
 # 
 
+npm install gitbook-plugin-insert-logo
+
 rm -rf _book
 gitbook install
 gitbook build
