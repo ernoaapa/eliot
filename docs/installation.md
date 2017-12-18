@@ -3,7 +3,7 @@ At the moment Eliot is tested only on RaspberryPI 3b with [EliotOS](eliotos.md) 
 
 - Install [runc](https://github.com/opencontainers/runc)
 - Install [containerd](https://github.com/containerd/containerd)
-- Install [eliotd + eliot-discovery](https://github.com/ernoaapa/eliot)
+- Install [eliotd](https://github.com/ernoaapa/eliot)
 
 And that's it! ☺
 

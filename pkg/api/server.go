@@ -243,10 +243,20 @@ func NewServer(listen string, client runtime.Client) *Server {
 }
 
 // Serve starts the server to serve GRPC server
-func (s *Server) Serve() error {
+func (s *Server) Serve() {
+	log.Println("Start GRPC server...")
 	lis, err := net.Listen("tcp", s.listen)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to start API server to listen [%s]", s.listen)
+		log.Panicf("Failed to start API server to listen [%s]: %s", s.listen, err)
 	}
-	return s.grpc.Serve(lis)
+
+	if err := s.grpc.Serve(lis); err != nil {
+		log.Panicf("GRPC server stopped with error: %s", err)
+	}
+}
+
+// Stop the GRPC server
+func (s *Server) Stop() {
+	log.Infof("Stop GRPC server...")
+	s.grpc.Stop()
 }
