@@ -60,6 +60,11 @@ func main() {
 			Usage:  "Enable discover GRPC server over zeroconf",
 			EnvVar: "ELIOT_DISCOVERY",
 		},
+		cli.StringFlag{
+			Name:   "labels",
+			Usage:  "Comma separated list of device labels. E.g. --labels device=rpi3,location=home,environment=testing",
+			EnvVar: "ELIOT_LABELS",
+		},
 	}, cmd.GlobalFlags...)
 	app.Version = version.VERSION
 	app.Before = cmd.GlobalBefore

@@ -165,7 +165,7 @@ var runCommand = cli.Command{
 				cmd.MustParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:%s:rw,rshared", name, syncTargetPath)),
 			))
 
-			if !clicontext.IsSet("workdir") {
+			if !clicontext.IsSet("workdir") && !clicontext.IsSet("w") {
 				opts = append(opts, api.WithWorkingDir(syncTargetPath))
 			}
 		}
