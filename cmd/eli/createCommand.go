@@ -25,7 +25,8 @@ var createCommand = cli.Command{
 `,
 	Flags: []cli.Flag{
 		cli.StringSliceFlag{
-			Name:  "file,f",
+			Name: "file, f",
+
 			Usage: "Filename, directory, or URL to files to use to create the resource",
 		},
 		cli.StringSliceFlag{
@@ -35,12 +36,12 @@ var createCommand = cli.Command{
 	},
 	Action: func(clicontext *cli.Context) (err error) {
 		pods := []*pods.Pod{}
-		if clicontext.IsSet("file") && len(clicontext.StringSlice("file")) > 0 {
+		if len(clicontext.StringSlice("file")) > 0 {
 			pods, err = resolve.Pods(clicontext.StringSlice("file"))
 			if err != nil {
 				return err
 			}
-		} else if clicontext.IsSet("image") && len(clicontext.StringSlice("image")) > 0 {
+		} else if len(clicontext.StringSlice("image")) > 0 {
 			pods = resolve.BuildPods(clicontext.StringSlice("image"))
 		} else {
 			return errors.New("You need to give either --file or --image flag")
