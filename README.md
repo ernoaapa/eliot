@@ -1,5 +1,6 @@
 
-![Eliot](docs/eliot-logo-medium.png)
+![Eliot](docs/eliot-logo-medium.png) [![Gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/eliot-run)
+
 > This is early alpha version! Might be buggy, there's not all features yet implemented and code might get large breaking changes until the first release.
 
 Eliot is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity, security and stability. Eliot gives simplified app delivery, isolation and additional security to traditional installations.
