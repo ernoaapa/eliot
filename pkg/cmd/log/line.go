@@ -9,6 +9,10 @@ import (
 	"github.com/willf/pad"
 )
 
+type Updater interface {
+	Update()
+}
+
 // State of the line
 type State int
 
@@ -27,7 +31,7 @@ const (
 
 // Line is single text line in the terminal output what you can change afterward
 type Line struct {
-	terminal     *Terminal
+	updater      Updater
 	state        State
 	Text         string
 	showProgress bool
@@ -160,5 +164,5 @@ func (r *Line) render() string {
 
 // Update triggers re-rendering
 func (r *Line) Update() {
-	r.terminal.Update()
+	r.updater.Update()
 }
