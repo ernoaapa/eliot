@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/ernoaapa/eliot/pkg/cmd"
 	"github.com/ernoaapa/eliot/pkg/cmd/log"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -44,6 +45,11 @@ var deviceBuildCommand = cli.Command{
 			if err != nil {
 				log.Errorf("Failed to read Linuxkit file: %s", err)
 				return err
+			}
+		} else if cmd.IsPipingIn() {
+			linuxkit, err = cmd.ReadAllStdin()
+			if err != nil {
+				log.Errorf("Failed to read Linuxkit config from stdin: %s", err)
 			}
 		} else {
 			log.Errorf("You must define --file and give path to Linuxkit config file!")
