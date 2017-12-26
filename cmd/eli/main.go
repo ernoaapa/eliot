@@ -33,23 +33,23 @@ func main() {
 		cli.StringFlag{
 			Name:   "config, c",
 			Usage:  "Client configuration",
-			EnvVar: "ELLIOT_CONFIG",
+			EnvVar: "ELIOT_CONFIG",
 			Value:  "~/.eli/config",
 		},
 		cli.StringFlag{
 			Name:   "namespace",
 			Usage:  "Namespace to use with commands. By default reads from config.",
-			EnvVar: "ELLIOT_NAMESPACE",
+			EnvVar: "ELIOT_NAMESPACE",
 		},
 		cli.StringFlag{
 			Name:   "endpoint",
 			Usage:  "Use specific device endpoint. E.g. '192.168.1.101:5000'",
-			EnvVar: "ELLIOT_ENDPOINT",
+			EnvVar: "ELIOT_ENDPOINT",
 		},
 		cli.StringFlag{
 			Name:   "device",
 			Usage:  "Use specific device by name. E.g. 'somehost.local'",
-			EnvVar: "ELLIOT_DEVICE",
+			EnvVar: "ELIOT_DEVICE",
 		},
 	}, cmd.GlobalFlags...)
 	app.Version = version.VERSION
