@@ -60,7 +60,9 @@ var deviceBuildCommand = cli.Command{
 			serverURL  = clicontext.String("build-server")
 			outputFile = clicontext.String("output")
 			outputType = clicontext.String("type")
-			linuxkit   []byte
+
+			linuxkit []byte
+			output   io.Writer
 		)
 
 		if file != "" {
@@ -75,7 +77,7 @@ var deviceBuildCommand = cli.Command{
 				log.Errorf("Failed to read Linuxkit config from stdin: %s", err)
 			}
 		} else {
-			log.Errorf("You must define --file and give path to Linuxkit config file!")
+			log.Errorf("You must give path to Linuxkit config file with --file or pipe it to stdin!")
 			return errors.New("No Linuxkit config defined")
 		}
 
@@ -84,6 +86,21 @@ var deviceBuildCommand = cli.Command{
 		}
 
 		log.Infof("Resolved Linuxkit config!")
+
+		if outputFile != "" {
+			outFile, err := os.Create(outputFile)
+			if err != nil {
+				log.Errorf("Error, cannot create target output file %s", outputFile)
+				return fmt.Errorf("Cannot create target output file %s", outputFile)
+			}
+			defer outFile.Close()
+			output = outFile
+		} else if cmd.IsPipingOut() {
+			output = os.Stdout
+		} else {
+			log.Errorf("You must give target path with --output or pipe output!")
+			return errors.New("No output defined")
+		}
 
 		if dryRun {
 			fmt.Println(string(linuxkit))
@@ -97,17 +114,10 @@ var deviceBuildCommand = cli.Command{
 		}
 		defer res.Body.Close()
 
-		outFile, err := os.Create(outputFile)
-		defer outFile.Close()
-		if err != nil {
-			log.Errorf("Error, cannot create target output file %s", outputFile)
-			return fmt.Errorf("Cannot create target output file %s", outputFile)
-		}
-
 		log.Loadingf("Write Linuxkit image to target file...")
-		_, err = io.Copy(outFile, res.Body)
+		_, err = io.Copy(output, res.Body)
 		if err != nil {
-			log.Errorf("Error while copying image to file [%s]: %s", outFile.Name(), err)
+			log.Errorf("Error while writing output: %s", err)
 			return errors.New("Unable to copy image to output file")
 		}
 
