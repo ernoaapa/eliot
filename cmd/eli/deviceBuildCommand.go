@@ -26,7 +26,12 @@ var deviceBuildCommand = cli.Command{
 	 
 	 # Create Linuxkit file but don't build it
 	 eli device build --dry-run
-	 eli device build --dry-run > linuxkit.yml`,
+	 eli device build --dry-run > custom-linuxkit.yml
+	 
+	 # Build from custom config and unpack to directory
+	 mkdir dist
+	 eli device build custom-linuxkit.yml | tar xv -C dist
+	 `,
 	Flags: []cli.Flag{
 		cli.BoolFlag{
 			Name:  "dry-run",
