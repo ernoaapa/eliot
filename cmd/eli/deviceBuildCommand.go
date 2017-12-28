@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"os"
 
 	"github.com/ernoaapa/eliot/pkg/cmd"
+	"github.com/ernoaapa/eliot/pkg/cmd/build"
 	"github.com/ernoaapa/eliot/pkg/cmd/log"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -67,39 +64,11 @@ var deviceBuildCommand = cli.Command{
 			output   io.Writer
 		)
 
-		if source == "" {
-			// Default to default rpi3 Linuxkit config
-			source = "https://raw.githubusercontent.com/ernoaapa/eliot-os/master/rpi3.yml"
+		linuxkit, err = build.ResolveLinuxkitConfig(source)
+		if err != nil {
+			log.Errorf("Failed to resolve Linuxkit config: %s", err)
+			return errors.Wrap(err, "Cannot resolve Linuxkit config")
 		}
-
-		if isValidURL(source) {
-			linuxkit, err = getContent(source)
-			if err != nil {
-				log.Errorf("Failed to fetch Linuxkit config: %s", err)
-				return errors.Wrap(err, "Failed to fetch Linuxkit config")
-			}
-		} else if isValidFile(source) {
-			linuxkit, err = ioutil.ReadFile(source)
-			if err != nil {
-				log.Errorf("Failed to read Linuxkit file: %s", err)
-				return errors.Wrap(err, "Failed to read Linuxkit file")
-			}
-		} else if cmd.IsPipingIn() {
-			linuxkit, err = cmd.ReadAllStdin()
-			if err != nil {
-				log.Errorf("Failed to read Linuxkit config from stdin: %s", err)
-				return errors.Wrap(err, "Failed to read Linuxkit config from stdin")
-			}
-		} else {
-			log.Errorf("Invalid source. You must give path or url to Linuxkit config file or pipe it to stdin!")
-			return errors.New("No Linuxkit config defined")
-		}
-
-		if len(linuxkit) == 0 {
-			log.Errorf("Invalid Linuxkit config!")
-			return errors.New("Invalid Linuxkit config")
-		}
-
 		log.Infof("Resolved Linuxkit config!")
 
 		if outputFile != "" {
@@ -123,14 +92,14 @@ var deviceBuildCommand = cli.Command{
 		}
 
 		log.Loadingf("Building RaspberryPI3 Linuxkit image in remote build server...")
-		res, err := http.Post(fmt.Sprintf("%s/linuxkit/%s/build/%s", serverURL, "eli-cli", outputType), "application/yml", bytes.NewReader(linuxkit))
+		image, err := build.BuildImage(serverURL, outputType, linuxkit)
 		if err != nil {
-			return errors.Wrap(err, "Error while making request to Linuxkit build server")
+			log.Errorf("Failed to build Linuxkit image: %s", err)
+			return errors.Wrap(err, "Failed to build Linuxkit image")
 		}
-		defer res.Body.Close()
 
 		log.Loadingf("Write Linuxkit image to output...")
-		_, err = io.Copy(output, res.Body)
+		_, err = io.Copy(output, image)
 		if err != nil {
 			log.Errorf("Error while writing output: %s", err)
 			return errors.New("Unable to copy image to output")
@@ -139,34 +108,4 @@ var deviceBuildCommand = cli.Command{
 		log.Donef("Build complete!")
 		return nil
 	},
-}
-
-// isValidURL tests a string to determine if it is a url or not.
-func isValidURL(toTest string) bool {
-	if _, err := url.ParseRequestURI(toTest); err != nil {
-		return false
-	}
-	return true
-}
-
-// getContent fetch url and returns all content
-func getContent(url string) ([]byte, error) {
-	res, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	content, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	return content, nil
-}
-
-// isValidFile
-func isValidFile(filePath string) bool {
-	if _, err := os.Stat(filePath); err == nil {
-		return true
-	}
-	return false
 }
