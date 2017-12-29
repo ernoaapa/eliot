@@ -72,30 +72,30 @@ When you develop your software, often you need to have access to the device to c
 eli run --bind /dev:/dev /bin/bash
 ```
 
-## `eli device build`
+## `eli build device`
 Easiest way to run Eliot in your device is to use [EliotOS](https://github.com/ernoaapa/eliot-os) which is minimal Operating System where's just minimal components installed to run Eliot and everything else run on top of the Eliot.
 
-With `eli device build` command you can build EliotOS image what you can flash to your device.
+With `eli build device` command you can build EliotOS image what you can flash to your device.
 
 > Note: At the moment we support only RaspberryPi 3b, for other devices [see installation guide](installation.md)
 
 ```shell
 # Build default EliotOS
-eli device build > my-image.tar
+eli build device > my-image.tar
 
 # You can view the underlying Linuxkit configuration
-eli device build --dry-run
+eli build device --dry-run
 ```
 
 If you want to customise the Linuxkit configuration before building
 
 ```shell
-eli device build --dry-run > custom-linuxkit.yml
+eli build device --dry-run > custom-linuxkit.yml
 
 # Edit the my-custom-linuxkit.yml -file...
 
 # Build from the custom file
-eli device build custom-linuxkit.yml > custom-image.tar
+eli build device custom-linuxkit.yml > custom-image.tar
 ```
 
 The build command supports shell piping; you can pipe-in the Linuxkit config and pipe-out the result image tar file, to some other command. This is really handy specially if you wan't to make updating the device easy.
@@ -121,7 +121,7 @@ files:
 ```shell
 # Tested on Os X...
 sed -e "s/\MY-HOSTNAME/eliot-$(date +%s)/" custom-linuxkit.yml \
-  | eli device build \
+  | eli build device \
   | tar xv -C /Volumes/raspberrypi3 \
   | diskutil unmount /Volumes/raspberrypi3
 ```
@@ -130,6 +130,6 @@ _Pretty handy, ain't it? :D_
 
 ### How it works?
 Linuxkit doesn't support building arm images on x86, but RaspberryPi is arm based computer.
-For building images, Eliot hosts [Linuxkit build server](https://github.com/ernoaapa/linuxkit-server) and when you execute `eli device build`, it sends the config to `build.eliot.run` server, which builds the image on arm server and send it back as tar package.
+For building images, Eliot hosts [Linuxkit build server](https://github.com/ernoaapa/linuxkit-server) and when you execute `eli build device`, it sends the config to `build.eliot.run` server, which builds the image on arm server and send it back as tar package.
 
 If you want to host and use your own build server, see the [Linuxkit build server documentation](https://github.com/ernoaapa/linuxkit-server) and pass `--build-server http://my-custom-build-server.com` flag to build the image in your own server.

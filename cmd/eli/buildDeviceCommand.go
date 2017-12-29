@@ -12,22 +12,22 @@ import (
 	"github.com/urfave/cli"
 )
 
-var deviceBuildCommand = cli.Command{
-	Name:    "build",
-	Aliases: []string{"b"},
+var buildDeviceCommand = cli.Command{
+	Name:    "device",
+	Aliases: []string{"dev", "devices"},
 	Usage:   "Build device image",
-	UsageText: `eli device build [options] [FILE | URL]
+	UsageText: `eli build device [options] [FILE | URL]
 	
 	 # Build default device image
-	 eli device build
+	 eli build device
 	 
 	 # Create Linuxkit file but don't build it
-	 eli device build --dry-run
-	 eli device build --dry-run > custom-linuxkit.yml
+	 eli build device --dry-run
+	 eli build device --dry-run > custom-linuxkit.yml
 	 
 	 # Build from custom config and unpack to directory
 	 mkdir dist
-	 eli device build custom-linuxkit.yml | tar xv -C dist
+	 eli build device custom-linuxkit.yml | tar xv -C dist
 	 `,
 	Flags: []cli.Flag{
 		cli.BoolFlag{

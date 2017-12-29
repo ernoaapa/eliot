@@ -63,7 +63,7 @@ func main() {
 		runCommand,
 		createCommand,
 		configCommand,
-		deviceCommand,
+		buildCommand,
 	}
 
 	err := app.Run(os.Args)
