@@ -23,7 +23,6 @@ func ResolveLinuxkitConfig(source string) (linuxkit []byte, err error) {
 	}
 
 	if isValidFile(source) {
-		fmt.Println("is file")
 		linuxkit, err = ioutil.ReadFile(source)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to read Linuxkit file")

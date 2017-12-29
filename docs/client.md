@@ -130,6 +130,6 @@ _Pretty handy, ain't it? :D_
 
 ### How it works?
 Linuxkit doesn't support building arm images on x86, but RaspberryPi is arm based computer.
-For building images, Eliot hosts [Linuxkit build server](https://github.com/ernoaapa/linuxkit-server) and when you execute `eli device build`, command line sends the config to `build.eliot.run` which builds the image on arm server and send it back as tar package.
+For building images, Eliot hosts [Linuxkit build server](https://github.com/ernoaapa/linuxkit-server) and when you execute `eli device build`, it sends the config to `build.eliot.run` server, which builds the image on arm server and send it back as tar package.
 
 If you want to host and use your own build server, see the [Linuxkit build server documentation](https://github.com/ernoaapa/linuxkit-server) and pass `--build-server http://my-custom-build-server.com` flag to build the image in your own server.

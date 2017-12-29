@@ -25,11 +25,14 @@ func TestResolveDefaultLinuxkitConfig(t *testing.T) {
 }
 
 func TestResolveUrlLinuxkitConfig(t *testing.T) {
-	// Warning, requires github.com/linuxkit/linuxkit access
-	config, err := ResolveLinuxkitConfig("https://raw.githubusercontent.com/linuxkit/linuxkit/master/examples/minimal.yml")
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(exampleLinuxkitConfig)
+	}))
+	defer ts.Close()
+	config, err := ResolveLinuxkitConfig(ts.URL)
 	assert.NoError(t, err)
 
-	assert.True(t, len(config) > 0, "Should fetch config from url")
+	assert.Equal(t, exampleLinuxkitConfig, config, "Should fetch config from url")
 }
 
 func TestResolveFileLinuxkitConfig(t *testing.T) {
@@ -43,7 +46,7 @@ func TestResolveFileLinuxkitConfig(t *testing.T) {
 
 	config, err := ResolveLinuxkitConfig(tmpfile.Name())
 	assert.NoError(t, err)
-	fmt.Println(string(config))
+
 	assert.Equal(t, exampleLinuxkitConfig, config, "Should read config from file")
 }
 
