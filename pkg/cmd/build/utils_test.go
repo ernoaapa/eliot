@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,4 +64,15 @@ func TestBuildImage(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, tar, []byte("fake image tar content"))
+}
+
+func TestBuildImageReturnErrorMessage(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(500)
+		fmt.Fprint(w, "This is the error")
+	}))
+	defer ts.Close()
+
+	_, err := BuildImage(ts.URL, "rpi3", exampleLinuxkitConfig)
+	assert.True(t, strings.Contains(err.Error(), "This is the error"))
 }

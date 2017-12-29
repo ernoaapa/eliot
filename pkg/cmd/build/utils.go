@@ -55,7 +55,15 @@ func BuildImage(serverURL, outputType string, config []byte) (io.ReadCloser, err
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while making request to Linuxkit build server")
 	}
-	return res.Body, nil
+	if res.StatusCode >= 200 && res.StatusCode <= 299 {
+		return res.Body, nil
+	}
+
+	errmsg, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to read build error response")
+	}
+	return nil, fmt.Errorf("Build failed: %s", errmsg)
 }
 
 // isValidURL tests a string to determine if it is a url or not.
