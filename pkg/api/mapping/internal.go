@@ -39,9 +39,25 @@ func MapPodToAPIModel(pod model.Pod) *pods.Pod {
 func MapContainersToAPIModel(source []model.Container) (result []*containers.Container) {
 	for _, container := range source {
 		result = append(result, &containers.Container{
-			Name:  container.Name,
-			Image: container.Image,
-			Pipe:  mapPipeToAPIModel(container.Pipe),
+			Name:       container.Name,
+			Image:      container.Image,
+			WorkingDir: container.WorkingDir,
+			Args:       container.Args,
+			Env:        container.Env,
+			Mounts:     mapMountsToAPIModel(container.Mounts),
+			Pipe:       mapPipeToAPIModel(container.Pipe),
+		})
+	}
+	return result
+}
+
+func mapMountsToAPIModel(mounts []model.Mount) (result []*containers.Mount) {
+	for _, mount := range mounts {
+		result = append(result, &containers.Mount{
+			Type:        mount.Type,
+			Source:      mount.Source,
+			Destination: mount.Destination,
+			Options:     mount.Options,
 		})
 	}
 	return result
