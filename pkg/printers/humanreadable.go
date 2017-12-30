@@ -97,6 +97,7 @@ func (p *HumanReadablePrinter) PrintPodDetails(pod *pods.Pod, writer io.Writer) 
 			}
 			return nil
 		},
+		"StringsJoin": strings.Join,
 	})
 	t, err := t.Parse(humanreadable.PodDetailsTemplate)
 	if err != nil {

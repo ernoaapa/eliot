@@ -24,9 +24,7 @@ Containers:{{range .Pod.Spec.Containers}}
 			- {{.}}
 		{{- end}}
 		Mounts:{{range .Mounts}}
-			Type:	{{.Type}}
-			Source:	{{.Source}}
-			Destination:	{{.Destination}}
+			- type={{.Type}},source={{.Source}},destination={{.Destination}},options={{StringsJoin .Options ":"}}
 		{{- end}}
     {{- if .Pipe}}
 		Pipe:
