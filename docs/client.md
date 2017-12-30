@@ -73,9 +73,9 @@ eli run --bind /dev:/dev /bin/bash
 ```
 
 ## `eli build device`
-Easiest way to run Eliot in your device is to use [EliotOS](https://github.com/ernoaapa/eliot-os) which is minimal Operating System where's just minimal components installed to run Eliot and everything else run on top of the Eliot.
+Easiest way to run Eliot in your device is to use [EliotOS](https://github.com/ernoaapa/eliot-os) which is minimal Operating System where's just minimal components installed to run Eliot and everything else run on top of the Eliot in containers.
 
-With `eli build device` command you can build EliotOS image what you can flash to your device.
+With `eli build device` command you can build EliotOS image what you can just unpack to your device sdcard.
 
 > Note: At the moment we support only RaspberryPi 3b, for other devices [see installation guide](installation.md)
 
@@ -100,11 +100,11 @@ eli build device custom-linuxkit.yml > custom-image.tar
 
 The build command supports shell piping; you can pipe-in the Linuxkit config and pipe-out the result image tar file, to some other command. This is really handy specially if you wan't to make updating the device easy.
 
+#### Piping example
 For example, you want to:
 - Change the hostname in Linuxkit config to include creation timestamp
-- Build image for rpi3
+- Build image for RaspberryPi3
 - Unpack the package to sdcard in path `/Volumes/raspberrypi3`
-- Unmount the sdcard
 
 The `custom-linuxkit.yml` includes:
 ```
@@ -119,12 +119,13 @@ files:
 ```
 
 ```shell
-# Tested on Os X...
+# Tested on OS X...
 sed -e "s/\MY-HOSTNAME/eliot-$(date +%s)/" custom-linuxkit.yml \
   | eli build device \
-  | tar xv -C /Volumes/raspberrypi3 \
-  | diskutil unmount /Volumes/raspberrypi3
+  | tar xv -C /Volumes/raspberrypi3
 ```
+
+There's plenty of options how you can template the linuxkit file, for example [envtpl](https://github.com/subfuzion/envtpl). Use your  favourite.
 
 _Pretty handy, ain't it? :D_
 

@@ -92,7 +92,7 @@ var buildDeviceCommand = cli.Command{
 			return nil
 		}
 
-		logline = log.NewLine().Loadingf("Building RaspberryPI3 Linuxkit image in remote build server...")
+		logline = log.NewLine().Loadingf("Building Linuxkit image in remote build server...")
 		image, err := build.BuildImage(serverURL, outputType, linuxkit)
 		if err != nil {
 			logline.Errorf("Failed to build Linuxkit image: %s", err)
