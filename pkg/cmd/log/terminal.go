@@ -9,25 +9,6 @@ import (
 	"github.com/apoorvam/goterminal"
 )
 
-var (
-	output = NewTerminal()
-)
-
-// Start starts the logging output
-func Start() {
-	output.Start()
-}
-
-// Stop halts updating the output
-func Stop() {
-	output.Stop()
-}
-
-// NewLine creates new updateable output Line
-func NewLine() *Line {
-	return output.NewLine()
-}
-
 // Terminal is tracks the Lines and updates all of them when needed
 type Terminal struct {
 	running bool
@@ -87,7 +68,7 @@ func (t *Terminal) NewLine() *Line {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	row := &Line{terminal: t}
+	row := &Line{updater: t}
 	t.rows = append(t.rows, row)
 	return row
 }

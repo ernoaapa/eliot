@@ -23,12 +23,12 @@ Easiest way to get started with Eliot is to run [EliotOS](eliotos.md) in Raspber
 [EliotOS](eliotos.md) is minimal Linux Operating System, built with [linuxkit](https://github.com/linuxkit/linuxkit), which contains only minimal components to run Eliot which are Linux kernel, `runc`, `containerd` and `eliotd` daemon. Check the [EliotOS](eliotos.md) section for more info.
 
 1. Install [Etcher CLI](https://etcher.io/cli/)
-2. Download EliotOS image
-3. Flash the EliotOS image to SD card
-```shell
-etcher eliotos.img
-```
-4. Connect RaspberryPI to network and power on!
+1. Format sdcard as you would normally
+2. Mount it to for example `/Volumes/rpi3`
+3. Build image and unpack it to the directory `eli build device | tar xv -C /Volumes/rpi3`
+4. Unmount the disk
+5. Install sdcard to RaspberryPI, connect with ethernet cable to same network with your laptop and power on!
+6. In less than 10s you should see the device with command `eli get devices`
 
 For more details and other installation options, see the [Installation](installation.md) section.
 

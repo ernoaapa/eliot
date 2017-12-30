@@ -7,4 +7,6 @@ EliotOS is minimal Linux Operating System, built with [Linuxkit](https://github.
 - `runc` - Run containers based on OCI specification
 - `eliotd` - Primary node agent which manages containers based on specs
 
-There's more info in [project GitHub page](https://github.com/ernoaapa/eliot-os) and pre-built images available in [releases page](https://github.com/ernoaapa/eliot-os/releases).
+There's more info in [project GitHub page](https://github.com/ernoaapa/eliot-os).
+
+See [installation](installation.md#install-eliot-os) for info how to easily install it to RaspberryPI!
