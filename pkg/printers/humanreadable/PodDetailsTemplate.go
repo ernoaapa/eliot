@@ -15,6 +15,13 @@ Containers:{{range .Pod.Spec.Containers}}
 		ContainerID:	{{$status.ContainerID}}
 		State:	{{$status.State}}
 		Restart Count:	{{$status.RestartCount}}
+		Working Dir:	{{.WorkingDir}}
+		{{- end}}
+		Args:{{range .Args}}
+			- {{.}}
+		{{- end}}
+		Env:{{range .Env}}
+			- {{.}}
 		{{- end}}
 		Mounts:{{range .Mounts}}
 			Type:	{{.Type}}

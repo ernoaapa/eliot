@@ -50,11 +50,14 @@ func MapContainersToInternalModel(containers []containers.Container) (result []m
 func MapContainerToInternalModel(container containers.Container) model.Container {
 	labels := ContainerLabels(container.Labels)
 	return model.Container{
-		Name:   labels.getContainerName(),
-		Image:  container.Image,
-		Tty:    RequireTty(container),
-		Pipe:   mapPipeToInternalModel(container),
-		Mounts: mapMountsToInternalModel(container),
+		Name:       labels.getContainerName(),
+		Image:      container.Image,
+		Tty:        RequireTty(container),
+		Args:       processArgs(container),
+		Env:        processEnv(container),
+		WorkingDir: processWorkingDir(container),
+		Pipe:       mapPipeToInternalModel(container),
+		Mounts:     mapMountsToInternalModel(container),
 	}
 }
 
@@ -93,6 +96,36 @@ func mapPipeToInternalModel(container containers.Container) *model.PipeSet {
 			},
 		},
 	}
+}
+
+func processArgs(container containers.Container) []string {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve process args: %s", err)
+		return nil
+	}
+
+	return spec.Process.Args
+}
+
+func processEnv(container containers.Container) []string {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve process environment variables: %s", err)
+		return nil
+	}
+
+	return spec.Process.Env
+}
+
+func processWorkingDir(container containers.Container) string {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve process current working directory: %s", err)
+		return ""
+	}
+
+	return spec.Process.Cwd
 }
 
 func mapMountsToInternalModel(container containers.Container) (result []model.Mount) {
