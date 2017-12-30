@@ -73,7 +73,10 @@ var buildDeviceCommand = cli.Command{
 		logline.Done("Resolved Linuxkit config!")
 
 		logline = log.NewLine().Loading("Resolve output...")
-		if outputFile != "" {
+		if cmd.IsPipingOut() {
+			output = os.Stdout
+			logline.Done("Resolved output to stdout!")
+		} else {
 			outFile, err := os.Create(outputFile)
 			if err != nil {
 				logline.Errorf("Error, cannot create target output file %s", outputFile)
@@ -81,13 +84,8 @@ var buildDeviceCommand = cli.Command{
 			}
 			defer outFile.Close()
 			output = outFile
-		} else if cmd.IsPipingOut() {
-			output = os.Stdout
-		} else {
-			logline.Errorf("You must give target path with --output or pipe output!")
-			return errors.New("No output defined")
+			logline.Donef("Resolved output: %s!", outFile.Name())
 		}
-		logline.Done("Resolved output!")
 
 		if dryRun {
 			fmt.Println(string(linuxkit))
