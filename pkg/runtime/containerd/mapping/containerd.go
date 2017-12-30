@@ -50,10 +50,11 @@ func MapContainersToInternalModel(containers []containers.Container) (result []m
 func MapContainerToInternalModel(container containers.Container) model.Container {
 	labels := ContainerLabels(container.Labels)
 	return model.Container{
-		Name:  labels.getContainerName(),
-		Image: container.Image,
-		Tty:   RequireTty(container),
-		Pipe:  mapPipeToInternalModel(container),
+		Name:   labels.getContainerName(),
+		Image:  container.Image,
+		Tty:    RequireTty(container),
+		Pipe:   mapPipeToInternalModel(container),
+		Mounts: mapMountsToInternalModel(container),
 	}
 }
 
@@ -92,6 +93,24 @@ func mapPipeToInternalModel(container containers.Container) *model.PipeSet {
 			},
 		},
 	}
+}
+
+func mapMountsToInternalModel(container containers.Container) (result []model.Mount) {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve container mounts: %s", err)
+		return result
+	}
+
+	for _, mount := range spec.Mounts {
+		result = append(result, model.Mount{
+			Type:        mount.Type,
+			Source:      mount.Source,
+			Destination: mount.Destination,
+			Options:     mount.Options,
+		})
+	}
+	return result
 }
 
 // MapContainerStatusToInternalModel maps containerd model to internal container status model

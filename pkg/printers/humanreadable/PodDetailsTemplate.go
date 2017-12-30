@@ -15,7 +15,12 @@ Containers:{{range .Pod.Spec.Containers}}
 		ContainerID:	{{$status.ContainerID}}
 		State:	{{$status.State}}
 		Restart Count:	{{$status.RestartCount}}
-    {{- end}}
+		{{- end}}
+		Mounts:{{range .Mounts}}
+			Type:	{{.Type}}
+			Source:	{{.Source}}
+			Destination:	{{.Destination}}
+		{{- end}}
     {{- if .Pipe}}
 		Pipe:
 			stdout -> stdin: {{.Pipe.Stdout.Stdin.Name}}
