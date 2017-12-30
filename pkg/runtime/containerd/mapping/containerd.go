@@ -29,6 +29,8 @@ func InitialisePodModel(container containers.Container, namespace, name, hostnam
 		Metadata: model.NewMetadata(namespace, name),
 		Spec: model.PodSpec{
 			Containers:    []model.Container{},
+			HostNetwork:   !haveNamespace(container, specs.NetworkNamespace),
+			HostPID:       !haveNamespace(container, specs.PIDNamespace),
 			RestartPolicy: getRestartPolicy(container),
 		},
 		Status: model.PodStatus{
@@ -168,6 +170,21 @@ func getRestartCount(container containers.Container) int {
 		return 0
 	}
 	return lifecycle.StartCount - 1
+}
+
+func haveNamespace(container containers.Container, namespace specs.LinuxNamespaceType) bool {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve namespace %s: %s", namespace, err)
+		return false
+	}
+
+	for _, ns := range spec.Linux.Namespaces {
+		if ns.Type == namespace {
+			return true
+		}
+	}
+	return false
 }
 
 func getRestartPolicy(container containers.Container) string {

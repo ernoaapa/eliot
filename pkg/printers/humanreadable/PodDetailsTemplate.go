@@ -7,6 +7,8 @@ Namespace:	{{.Pod.Metadata.Namespace}}
 Device:	{{.Pod.Status.Hostname}}
 State:	{{.Status}}
 Restart Policy:	{{.Pod.Spec.RestartPolicy}}
+Host Network:	{{.Pod.Spec.HostNetwork}}
+Host PID:	{{.Pod.Spec.HostPID}}
 Containers:{{range .Pod.Spec.Containers}}
   {{- $status := GetStatus $pod .Name}}
 	{{.Name}}:
