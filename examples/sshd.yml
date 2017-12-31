@@ -1,0 +1,85 @@
+metadata:
+  name: "sshd"
+spec:
+  hostNetwork: true
+  containers:
+    - name: "sshd"
+      image: "docker.io/linuxkit/sshd:ac5e8364e2e9aa8717a3295c51eb60b8c57373d5"
+      mounts:
+        - type: bind
+          source: /root/.ssh
+          destination: /root/.ssh
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /etc/resolv.conf
+          destination: /etc/resolv.conf
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /run
+          destination: /run
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /tmp
+          destination: /tmp
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /etc
+          destination: /hostroot/etc
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /usr/bin/ctr
+          destination: /usr/bin/ctr
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /usr/bin/runc
+          destination: /usr/bin/runc
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /containers
+          destination: /containers
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /var/log
+          destination: /var/log
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /dev
+          destination: /dev
+          options:
+            - rw
+            - rbind
+            - rprivate
+        - type: bind
+          source: /sys
+          destination: /sys
+          options:
+            - rw
+            - rbind
+            - rprivate
