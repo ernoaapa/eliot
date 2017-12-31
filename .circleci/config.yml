@@ -28,6 +28,11 @@ jobs:
             VERSION=$(git describe --tags --always --dirty)
             gox -osarch="darwin/amd64 linux/amd64 linux/arm64" -ldflags "-X github.com/ernoaapa/eliot/pkg/version.VERSION=${VERSION}" -output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}" ./cmd/...
 
+      - run:
+          name: Verify binaries
+          command: |
+            ./dist/eliotd_linux_amd64 -h
+
       - save_cache:
           key: binaries-{{ .Revision }}
           paths:
