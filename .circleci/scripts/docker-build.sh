@@ -27,6 +27,14 @@ for bin in eliotd; do
     echo "----------------Dockerfile end----------------------"
 
     docker build -t ${tag} -f .dockerfile-${arch} .
+    
+    # Test spin up amd64 container because running in circleCI
+    if [ $arch == "amd64" ]; then
+      echo "Test running the container by printing help text"
+      docker run -it ${tag} -h
+    fi
+    
+    echo "Push image to repository"
     docker push ${tag}
   done
 
