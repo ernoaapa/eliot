@@ -11,7 +11,9 @@ for bin in eliotd; do
   for osarch in ${PLATFORMS//,/ }; do
     os="${osarch%%/*}"
     arch="${osarch#*/}"
-    echo "Building container for: $bin $os $arch"
+    version="${GIT_HASH}-${arch}"
+    tag="${image}:${version}"
+    echo "Building container for: $bin $os $arch, tag: ${tag}"
 
     if [ ! -f "./dist/${bin}_${os}_${arch}" ]; then
       echo "Missing binary dist/${bin}_${os}_${arch}!"
@@ -31,8 +33,6 @@ for bin in eliotd; do
 			-e "s|ARG_ARCH|${arch}|g" \
 	    Dockerfile.tmpl > .dockerfile-${arch}
 
-    version="${GIT_HASH}-${arch}"
-    tag="${image}:${version}"
     echo "Build docker image ${tag}:"
     echo "---------------Dockerfile start---------------------"
     cat .dockerfile-${arch}

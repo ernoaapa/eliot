@@ -11,7 +11,9 @@ for bin in eliotd; do
   for osarch in ${PLATFORMS//,/ }; do
     os="${osarch%%/*}"
     arch="${osarch#*/}"
-    echo "Pushing container for: $bin $os $arch, tag: ${tag}"
+    version="${GIT_HASH}-${arch}"
+    tag="${image}:${version}"
+    echo "Building container for: $bin $os $arch, tag: ${tag}"
 
     docker push ${tag}
   done
