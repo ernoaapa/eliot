@@ -13,6 +13,18 @@ for bin in eliotd; do
     arch="${osarch#*/}"
     echo "Building container for: $bin $os $arch"
 
+    if [ ! -f "./dist/${bin}_${os}_${arch}" ]; then
+      echo "Missing binary dist/${bin}_${os}_${arch}!"
+      exit 1
+    else
+      chmod +x "./dist/${bin}_${os}_${arch}"
+
+      if [ $arch == "amd64" ]; then
+        echo "Test running the binary by printing help text"
+        ./dist/${bin}_${os}_${arch} -h
+      fi
+    fi
+
     sed \
 	    -e "s|ARG_BIN|${bin}|g" \
 			-e "s|ARG_OS|${os}|g" \
@@ -33,16 +45,5 @@ for bin in eliotd; do
       echo "Test running the container by printing help text"
       docker run -it ${tag} -h
     fi
-    
-    echo "Push image to repository"
-    docker push ${tag}
   done
-
-	manifest-tool \
-		--username ${DOCKER_USER} \
-		--password ${DOCKER_PASS} \
-		push from-args \
-    --platforms $PLATFORMS \
-    --template ${image}:${GIT_HASH}-ARCH \
-    --target ${image}:${GIT_HASH}
 done
