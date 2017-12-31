@@ -33,16 +33,5 @@ for bin in eliotd; do
       echo "Test running the container by printing help text"
       docker run -it ${tag} -h
     fi
-    
-    echo "Push image to repository"
-    docker push ${tag}
   done
-
-	manifest-tool \
-		--username ${DOCKER_USER} \
-		--password ${DOCKER_PASS} \
-		push from-args \
-    --platforms $PLATFORMS \
-    --template ${image}:${GIT_HASH}-ARCH \
-    --target ${image}:${GIT_HASH}
 done

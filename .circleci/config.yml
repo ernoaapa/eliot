@@ -10,13 +10,15 @@ jobs:
       - run: "! go fmt -l pkg cmd 2>&1 | read"
       - run: go vet ./...
       - run: go test -v ./...
-  
+
   build:
     docker:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/ernoaapa/eliot
     steps:
       - checkout
+
+      - setup_remote_docker
 
       - run:
           name: Install tools
@@ -32,6 +34,10 @@ jobs:
           name: Verify binaries
           command: |
             ./dist/eliotd_linux_amd64 -h
+
+      - run:
+          name: Build images
+          command: ./.circleci/scripts/docker-build.sh
 
       - save_cache:
           key: binaries-{{ .Revision }}
@@ -79,6 +85,10 @@ jobs:
       - run:
           name: Build images
           command: ./.circleci/scripts/docker-build.sh
+
+      - run:
+          name: Push images
+          command: ./.circleci/scripts/docker-push.sh
 
 workflows:
   version: 2
