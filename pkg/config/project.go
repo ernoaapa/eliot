@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/ernoaapa/eliot/pkg/fs"
+	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // ProjectConfig represents configuration in project directory

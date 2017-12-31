@@ -29,6 +29,8 @@ func InitialisePodModel(container containers.Container, namespace, name, hostnam
 		Metadata: model.NewMetadata(namespace, name),
 		Spec: model.PodSpec{
 			Containers:    []model.Container{},
+			HostNetwork:   !haveNamespace(container, specs.NetworkNamespace),
+			HostPID:       !haveNamespace(container, specs.PIDNamespace),
 			RestartPolicy: getRestartPolicy(container),
 		},
 		Status: model.PodStatus{
@@ -50,10 +52,14 @@ func MapContainersToInternalModel(containers []containers.Container) (result []m
 func MapContainerToInternalModel(container containers.Container) model.Container {
 	labels := ContainerLabels(container.Labels)
 	return model.Container{
-		Name:  labels.getContainerName(),
-		Image: container.Image,
-		Tty:   RequireTty(container),
-		Pipe:  mapPipeToInternalModel(container),
+		Name:       labels.getContainerName(),
+		Image:      container.Image,
+		Tty:        RequireTty(container),
+		Args:       processArgs(container),
+		Env:        processEnv(container),
+		WorkingDir: processWorkingDir(container),
+		Pipe:       mapPipeToInternalModel(container),
+		Mounts:     mapMountsToInternalModel(container),
 	}
 }
 
@@ -94,6 +100,54 @@ func mapPipeToInternalModel(container containers.Container) *model.PipeSet {
 	}
 }
 
+func processArgs(container containers.Container) []string {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve process args: %s", err)
+		return nil
+	}
+
+	return spec.Process.Args
+}
+
+func processEnv(container containers.Container) []string {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve process environment variables: %s", err)
+		return nil
+	}
+
+	return spec.Process.Env
+}
+
+func processWorkingDir(container containers.Container) string {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve process current working directory: %s", err)
+		return ""
+	}
+
+	return spec.Process.Cwd
+}
+
+func mapMountsToInternalModel(container containers.Container) (result []model.Mount) {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve container mounts: %s", err)
+		return result
+	}
+
+	for _, mount := range spec.Mounts {
+		result = append(result, model.Mount{
+			Type:        mount.Type,
+			Source:      mount.Source,
+			Destination: mount.Destination,
+			Options:     mount.Options,
+		})
+	}
+	return result
+}
+
 // MapContainerStatusToInternalModel maps containerd model to internal container status model
 func MapContainerStatusToInternalModel(container containers.Container, status containerd.Status) model.ContainerStatus {
 	labels := ContainerLabels(container.Labels)
@@ -116,6 +170,21 @@ func getRestartCount(container containers.Container) int {
 		return 0
 	}
 	return lifecycle.StartCount - 1
+}
+
+func haveNamespace(container containers.Container, namespace specs.LinuxNamespaceType) bool {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve namespace %s: %s", namespace, err)
+		return false
+	}
+
+	for _, ns := range spec.Linux.Namespaces {
+		if ns.Type == namespace {
+			return true
+		}
+	}
+	return false
 }
 
 func getRestartPolicy(container containers.Container) string {

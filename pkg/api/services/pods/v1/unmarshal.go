@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 
 	utils "github.com/ernoaapa/eliot/pkg/utils/yaml"
+	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // UnmarshalYaml reads v1 Pods data in YAML format and unmarshals it to v1 api model

@@ -8,8 +8,8 @@ import (
 	"github.com/ernoaapa/eliot/pkg/converter"
 	"github.com/ernoaapa/eliot/pkg/fs"
 	"github.com/ernoaapa/eliot/pkg/model"
+	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // Config is struct for configuration for CLI client
