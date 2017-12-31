@@ -13,6 +13,18 @@ for bin in eliotd; do
     arch="${osarch#*/}"
     echo "Building container for: $bin $os $arch"
 
+    if [ ! -f "./dist/${bin}_${os}_${arch}" ]; then
+      echo "Missing binary dist/${bin}_${os}_${arch}!"
+      exit 1
+    else
+      chmod +x "./dist/${bin}_${os}_${arch}"
+
+      if [ $arch == "amd64" ]; then
+        echo "Test running the binary by printing help text"
+        ./dist/${bin}_${os}_${arch} -h
+      fi
+    fi
+
     sed \
 	    -e "s|ARG_BIN|${bin}|g" \
 			-e "s|ARG_OS|${os}|g" \

@@ -27,7 +27,8 @@ jobs:
       - run:
           name: Build binaries
           command: |
-            VERSION=$(git describe --tags --always --dirty)
+            export VERSION=$(git describe --tags --always --dirty)
+            export CGO_ENABLED=0
             gox -osarch="darwin/amd64 linux/amd64 linux/arm64" -ldflags "-X github.com/ernoaapa/eliot/pkg/version.VERSION=${VERSION}" -output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}" ./cmd/...
 
       - run:
