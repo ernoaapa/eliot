@@ -12,6 +12,7 @@ import (
 
 	"github.com/ernoaapa/eliot/pkg/api/mapping"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/api/stream"
 	"github.com/ernoaapa/eliot/pkg/config"
@@ -32,6 +33,23 @@ func NewClient(namespace string, endpoint config.Endpoint) *Client {
 		endpoint,
 		context.Background(),
 	}
+}
+
+// GetInfo calls server and get device info
+func (c *Client) GetInfo() (*device.Info, error) {
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := device.NewDeviceClient(conn)
+	resp, err := client.Info(c.ctx, &device.InfoRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetInfo(), nil
 }
 
 // GetPods calls server and fetches all pods information

@@ -1,11 +1,44 @@
 package mapping
 
 import (
+	"net"
+
 	core "github.com/ernoaapa/eliot/pkg/api/core"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/model"
 )
+
+// MapInfoToAPIModel maps internal device info model to API model
+func MapInfoToAPIModel(info *model.DeviceInfo) *device.Info {
+	return &device.Info{
+		Labels:     mapLabelsToAPIModel(info.Labels),
+		Hostname:   info.Hostname,
+		Addresses:  addressesToString(info.Addresses),
+		GrpcPort:   int64(info.GrpcPort),
+		MachineID:  info.MachineID,
+		SystemUUID: info.SystemUUID,
+		BootID:     info.BootID,
+		Arch:       info.Arch,
+		Os:         info.OS,
+		Version:    info.Version,
+	}
+}
+
+func mapLabelsToAPIModel(labels map[string]string) (result []*device.Label) {
+	for key, value := range labels {
+		result = append(result, &device.Label{Key: key, Value: value})
+	}
+	return result
+}
+
+func addressesToString(addresses []net.IP) (result []string) {
+	for _, ip := range addresses {
+		result = append(result, ip.String())
+	}
+	return result
+}
 
 // MapPodsToAPIModel maps list of internal pod models to API model
 func MapPodsToAPIModel(pods []model.Pod) (result []*pods.Pod) {

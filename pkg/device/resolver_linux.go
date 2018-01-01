@@ -5,16 +5,20 @@ import (
 	"runtime"
 
 	"github.com/ernoaapa/eliot/pkg/model"
+	"github.com/ernoaapa/eliot/pkg/version"
 )
 
 // GetInfo resolves information about the device
-func (r *Resolver) GetInfo() *model.DeviceInfo {
+func (r *Resolver) GetInfo(grpcPort int) *model.DeviceInfo {
 	hostname, _ := os.Hostname()
 	return &model.DeviceInfo{
-		Labels:   r.labels,
-		Arch:     runtime.GOARCH,
-		OS:       runtime.GOOS,
-		Hostname: hostname,
+		Version:   version.VERSION,
+		Labels:    r.labels,
+		Arch:      runtime.GOARCH,
+		OS:        runtime.GOOS,
+		Hostname:  hostname,
+		Addresses: getAddresses(),
+		GrpcPort:  grpcPort,
 
 		MachineID: resolveFirst(
 			"MachineID",

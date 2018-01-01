@@ -11,10 +11,11 @@ func TestGetInfo(t *testing.T) {
 		"foo": "bar",
 	}
 
-	info := NewResolver(labels).GetInfo()
+	info := NewResolver(labels).GetInfo(5000)
 
 	assert.NotEmpty(t, info.BootID, "should resolve BootID")
 	assert.NotEmpty(t, info.MachineID, "should resolve MachineID")
 	assert.NotEmpty(t, info.SystemUUID, "should resolve SystemUUID")
 	assert.Equal(t, labels, info.Labels, "should have given device labels")
+	assert.Equal(t, 5000, info.GrpcPort, "should have given device grpc port")
 }

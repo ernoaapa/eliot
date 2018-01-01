@@ -1,0 +1,54 @@
+syntax = "proto3";
+package eliot.services.containers.v1;
+
+option go_package = "github.com/ernoaapa/eliot/pkg/api/services/device/v1;device";
+
+// Device service provides access to device it self
+service Device {
+	rpc Info(InfoRequest) returns (InfoResponse);
+}
+
+message InfoRequest {}
+
+message InfoResponse {
+	Info info = 1;
+}
+
+message Info {
+	// Labels for the device
+	repeated Label labels = 1;
+
+	// Device hostname
+	string hostname = 2;
+
+	// IP addresses
+	repeated string addresses = 3;
+
+	// Port
+	int64 grpcPort = 4;
+
+	// The machine id is an ID identifying a specific Linux/Unix installation.
+	// It does not change if hardware is replaced.
+	string machineID = 5;
+
+	// The system uuid is the main board product UUID,
+	// as set by the board manufacturer and encoded in the BIOS DMI information
+	string systemUUID = 6;
+
+	// A random ID that is regenerated on each boot
+	string bootID = 7;
+
+	// Device operating system. One of 386, amd64, arm, s390x, and so on.
+	string arch = 8;
+
+	// device operating system. One of darwin, freebsd, linux, windows, and so on
+	string os = 9;
+
+	// Server version
+	string version = 10;
+}
+
+message Label {
+	string key = 1;
+	string value = 2;
+}

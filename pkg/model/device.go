@@ -35,6 +35,9 @@ type DeviceInfo struct {
 
 	// device operating system. One of darwin, freebsd, linux, windows, and so on
 	OS string
+
+	// Server version
+	Version string
 }
 
 // DeviceState describes current state of the device
