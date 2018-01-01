@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
 	"github.com/ernoaapa/eliot/pkg/model"
@@ -83,7 +84,20 @@ func (p *HumanReadablePrinter) PrintDevicesTable(devices []model.DeviceInfo, wri
 	return nil
 }
 
-// PrintPodDetails writes list of pods in human readable detailed format to the writer
+// PrintDeviceDetails writes a dvice in human readable detailed format to the writer
+func (p *HumanReadablePrinter) PrintDeviceDetails(info *device.Info, writer io.Writer) error {
+	t := template.New("device-details")
+	t, err := t.Parse(humanreadable.DeviceDetailsTemplate)
+	if err != nil {
+		log.Fatalf("Invalid pod template: %s", err)
+	}
+	if err := t.Execute(writer, info); err != nil {
+		return err
+	}
+	return nil
+}
+
+// PrintPodDetails writes a pod in human readable detailed format to the writer
 func (p *HumanReadablePrinter) PrintPodDetails(pod *pods.Pod, writer io.Writer) error {
 	t := template.New("pod-details").Funcs(template.FuncMap{
 		"GetStatus": func(pod pods.Pod, name string) *containers.ContainerStatus {

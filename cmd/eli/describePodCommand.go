@@ -12,7 +12,7 @@ var describePodCommand = cli.Command{
 	Name:    "pod",
 	Aliases: []string{"pods"},
 	Usage:   "Return details of pod",
-	UsageText: `eli describe RESOURCE [options] [POD NAME]
+	UsageText: `eli describe pod [options] [NAME]
 	
 	# Describe a pod
 	eli describe pod my-pod-name

@@ -6,11 +6,37 @@ import (
 
 	"github.com/ernoaapa/eliot/pkg/api/core"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestPrintDeviceDetails(t *testing.T) {
+	log.SetLevel(log.DebugLevel)
+	var buffer bytes.Buffer
+	printer := NewHumanReadablePrinter()
+
+	data := &device.Info{
+		Labels:     []*device.Label{&device.Label{Key: "foo", Value: "bar"}},
+		Hostname:   "foo-bar",
+		Addresses:  []string{"1.2.3.4"},
+		GrpcPort:   5000,
+		MachineID:  "1234-5678",
+		SystemUUID: "asdf-jklö",
+		BootID:     "12334345345",
+		Arch:       "amd64",
+		Os:         "linux",
+	}
+
+	err := printer.PrintDeviceDetails(data, &buffer)
+	assert.NoError(t, err, "Printing pod details should not return error")
+
+	result := buffer.String()
+
+	assert.True(t, len(result) > 0, "Should write something to the writer")
+}
 
 func TestPrintTable(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
@@ -40,7 +66,7 @@ func TestPrintTable(t *testing.T) {
 	assert.True(t, len(result) > 0, "Should write something to the writer")
 }
 
-func TestPrintDetails(t *testing.T) {
+func TestPrintPodDetails(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	var buffer bytes.Buffer
 	printer := NewHumanReadablePrinter()
