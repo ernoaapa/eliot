@@ -80,7 +80,7 @@ func main() {
 
 		if clicontext.Bool("grpc-api") {
 			log.Infoln("grpc-api enabled")
-			supervisor.Add(api.NewServer(grpcListen, client))
+			supervisor.Add(api.NewServer(grpcListen, client, device))
 			serviceCount++
 		}
 
