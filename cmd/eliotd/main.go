@@ -70,10 +70,14 @@ func main() {
 	app.Before = cmd.GlobalBefore
 
 	app.Action = func(clicontext *cli.Context) error {
+		var (
+			grpcListen = clicontext.String("grpc-api-listen")
+			grpcPort   = parseGrpcPort(grpcListen)
+		)
+
 		resolver := device.NewResolver(cmd.GetLabels(clicontext))
-		device := resolver.GetInfo()
+		device := resolver.GetInfo(grpcPort)
 		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
-		grpcListen := clicontext.String("grpc-api-listen")
 
 		supervisor := suture.NewSimple("eliotd")
 		serviceCount := 0
@@ -92,8 +96,7 @@ func main() {
 
 		if clicontext.Bool("grpc-api") && clicontext.Bool("discovery") {
 			log.Infoln("grpc discovery over zeroconf enabled")
-			port := parseGrpcPort(grpcListen)
-			supervisor.Add(discovery.NewServer(device.Hostname, port))
+			supervisor.Add(discovery.NewServer(device.Hostname, grpcPort))
 			serviceCount++
 		}
 

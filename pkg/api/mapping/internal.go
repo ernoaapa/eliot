@@ -22,6 +22,7 @@ func MapInfoToAPIModel(info *model.DeviceInfo) *device.Info {
 		BootID:     info.BootID,
 		Arch:       info.Arch,
 		Os:         info.OS,
+		Version:    info.Version,
 	}
 }
 

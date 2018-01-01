@@ -43,6 +43,9 @@ message Info {
 
 	// device operating system. One of darwin, freebsd, linux, windows, and so on
 	string os = 9;
+
+	// Server version
+	string version = 10;
 }
 
 message Label {
