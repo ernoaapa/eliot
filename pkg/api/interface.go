@@ -2,23 +2,10 @@ package api
 
 import (
 	"io"
-	"syscall"
 
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
-	"github.com/ernoaapa/eliot/pkg/progress"
 )
-
-// Client interface for all API clients
-type Client interface {
-	GetPods() ([]*pods.Pod, error)
-	GetPod(podName string) (*pods.Pod, error)
-	CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, opts ...PodOpts) error
-	StartPod(name string) (*pods.Pod, error)
-	DeletePod(pod *pods.Pod) (*pods.Pod, error)
-	Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error)
-	Signal(containerID string, signal syscall.Signal) (err error)
-}
 
 // PodOpts adds more information to the Pod going to be created
 type PodOpts func(pod *pods.Pod) error

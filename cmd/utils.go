@@ -46,7 +46,7 @@ func GlobalBefore(context *cli.Context) error {
 }
 
 // GetClient creates new cloud API client
-func GetClient(config *config.Provider) api.Client {
+func GetClient(config *config.Provider) *api.Client {
 	log := log.NewLine()
 
 	endpoints := config.GetEndpoints()
@@ -56,10 +56,10 @@ func GetClient(config *config.Provider) api.Client {
 		return nil
 	case 1:
 		log.Infof("Connect to %s (%s)", endpoints[0].Name, endpoints[0].URL)
-		return api.NewDirectClient(config.GetNamespace(), endpoints[0])
+		return api.NewClient(config.GetNamespace(), endpoints[0])
 	default:
-		log.Infof("Connect to %d devices", len(endpoints))
-		return api.NewMultiDirectClient(config.GetNamespace(), endpoints)
+		log.Fatalf("%d devices found. You must give target device. E.g. --endpoint=192.168.1.2", len(endpoints))
+		return nil
 	}
 }
 

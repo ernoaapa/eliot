@@ -18,16 +18,16 @@ import (
 	"github.com/ernoaapa/eliot/pkg/progress"
 )
 
-// DirectClient connects directly to device RPC API
-type DirectClient struct {
+// Client connects directly to device RPC API
+type Client struct {
 	Namespace string
 	Endpoint  config.Endpoint
 	ctx       context.Context
 }
 
-// NewDirectClient creates new RPC server client
-func NewDirectClient(namespace string, endpoint config.Endpoint) *DirectClient {
-	return &DirectClient{
+// NewClient creates new RPC server client
+func NewClient(namespace string, endpoint config.Endpoint) *Client {
+	return &Client{
 		namespace,
 		endpoint,
 		context.Background(),
@@ -35,7 +35,7 @@ func NewDirectClient(namespace string, endpoint config.Endpoint) *DirectClient {
 }
 
 // GetPods calls server and fetches all pods information
-func (c *DirectClient) GetPods() ([]*pods.Pod, error) {
+func (c *Client) GetPods() ([]*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (c *DirectClient) GetPods() ([]*pods.Pod, error) {
 }
 
 // GetPod return Pod by name
-func (c *DirectClient) GetPod(podName string) (*pods.Pod, error) {
+func (c *Client) GetPod(podName string) (*pods.Pod, error) {
 	pods, err := c.GetPods()
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (c *DirectClient) GetPod(podName string) (*pods.Pod, error) {
 }
 
 // CreatePod creates new pod to the target server
-func (c *DirectClient) CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, opts ...PodOpts) error {
+func (c *Client) CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, opts ...PodOpts) error {
 	for _, o := range opts {
 		err := o(pod)
 		if err != nil {
@@ -106,7 +106,7 @@ func (c *DirectClient) CreatePod(status chan<- []*progress.ImageFetch, pod *pods
 }
 
 // StartPod creates new pod to the target server
-func (c *DirectClient) StartPod(name string) (*pods.Pod, error) {
+func (c *Client) StartPod(name string) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (c *DirectClient) StartPod(name string) (*pods.Pod, error) {
 }
 
 // DeletePod creates new pod to the target server
-func (c *DirectClient) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
+func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (c *DirectClient) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 }
 
 // Attach calls server and fetches pod logs
-func (c *DirectClient) Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error) {
+func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error) {
 	done := make(chan struct{})
 	errc := make(chan error)
 
@@ -192,7 +192,7 @@ func (c *DirectClient) Attach(containerID string, attachIO AttachIO, hooks ...At
 }
 
 // Signal sends kill signal to container process
-func (c *DirectClient) Signal(containerID string, signal syscall.Signal) (err error) {
+func (c *Client) Signal(containerID string, signal syscall.Signal) (err error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return err
