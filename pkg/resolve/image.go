@@ -30,6 +30,15 @@ func Image(arch string, projectDir string) (projectType, image string, err error
 		default:
 			return "", "", fmt.Errorf("Unsupported Golang project in architecture [%s]", arch)
 		}
+	} else if isPythonProject(projectDir) {
+		switch arch {
+		case "amd64":
+			return "python", "docker.io/library/python:latest", nil
+		case "arm64":
+			return "python", "docker.io/arm64v8/python:latest", nil
+		default:
+			return "", "", fmt.Errorf("Unsupported Golang project in architecture [%s]", arch)
+		}
 	}
 
 	return "", "", fmt.Errorf("Unable to resolve container image for project in directory [%s]", projectDir)
@@ -49,6 +58,15 @@ var golangDirs = []string{".", "pkg", "cmd"}
 func isGolangProject(projectDir string) bool {
 	for _, goDir := range golangDirs {
 		if containsFiles(filepath.Join(projectDir, goDir), ".go") {
+			return true
+		}
+	}
+	return false
+}
+
+func isPythonProject(projectDir string) bool {
+	for _, goDir := range golangDirs {
+		if containsFiles(filepath.Join(projectDir, goDir), ".py") {
 			return true
 		}
 	}
