@@ -2,8 +2,7 @@
 
 REGISTRY=ernoaapa
 PLATFORMS="linux/amd64,linux/arm64"
-GIT_HASH=$(git describe --tags --always --dirty)
-
+GIT_HASH=$(git describe --contains --always --dirty)
 
 for bin in eliotd; do
   image="${REGISTRY}/${bin}"

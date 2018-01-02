@@ -16,11 +16,9 @@ ARCH ?= amd64
 OS ?= linux
 
 # This version-strategy uses git tags to set the version string
-GIT_HASH ?= $(shell git describe --tags --always --dirty)
+# Use tag if current commit is tag otherise git hash and include -dirty if uncommited files
+GIT_HASH ?= $(shell git describe --contains --always --dirty)
 VERSION := $(GIT_HASH)-$(ARCH)
-#
-# This version-strategy uses a manual value to set the version string
-#VERSION := 1.2.3
 
 ###
 ### These variables should not need tweaking.
