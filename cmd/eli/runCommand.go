@@ -118,14 +118,22 @@ var runCommand = cli.Command{
 			stderr = os.Stderr
 		)
 
+		conf := cmd.GetConfigProvider(clicontext)
+		client := cmd.GetClient(conf)
+
 		if image == "" {
-			var projectType string
 			log := log.NewLine().Loading("Resolve image for the project...")
-			projectType, image, err = resolve.Image(cmd.GetCurrentDirectory())
+			info, err := client.GetInfo()
+			if err != nil {
+				log.Fatalf("Unable to resolve image for the project. Failed to get target device architecture: %s", err)
+			}
+
+			var projectType string
+			projectType, image, err = resolve.Image(info.Arch, cmd.GetCurrentDirectory())
 			if err != nil {
 				log.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
 			}
-			log.Donef("Detected %s project, use image: %s", projectType, image)
+			log.Donef("Detected %s project, use image: %s (arch %s)", projectType, image, info.Arch)
 		}
 
 		image = utils.ExpandToFQIN(image)
@@ -144,9 +152,6 @@ var runCommand = cli.Command{
 				return fmt.Errorf("Invalid --env value [%s], must be in format KEY=value. E.g. --env FOO=bar", variable)
 			}
 		}
-
-		conf := cmd.GetConfigProvider(clicontext)
-		client := cmd.GetClient(conf)
 
 		opts := []api.PodOpts{}
 
