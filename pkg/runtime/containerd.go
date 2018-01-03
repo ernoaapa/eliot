@@ -488,7 +488,7 @@ func (c *ContainerdClient) Attach(namespace, name string, io AttachIO) error {
 		return errors.Wrapf(err, "Cannot return container logs for container [%s] in namespace [%s]", name, namespace)
 	}
 
-	task, taskErr := container.Task(ctx, cio.WithAttach(io.Stdin, io.Stdout, io.Stderr))
+	task, taskErr := container.Task(ctx, cio.NewAttach(cio.WithStreams(io.Stdin, io.Stdout, io.Stderr)))
 	if taskErr != nil {
 		return taskErr
 	}
