@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	"io"
+	"strconv"
+	"strings"
 	"syscall"
 
 	log "github.com/sirupsen/logrus"
@@ -17,6 +19,7 @@ import (
 	"github.com/ernoaapa/eliot/pkg/api/stream"
 	"github.com/ernoaapa/eliot/pkg/config"
 	"github.com/ernoaapa/eliot/pkg/progress"
+	"github.com/rs/xid"
 )
 
 // Client connects directly to device RPC API
@@ -184,6 +187,55 @@ func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHo
 	client := containers.NewContainersClient(conn)
 	log.Debugf("Open stream connection to server to get logs")
 	s, err := client.Attach(ctx)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		errc <- stream.PipeStdout(s, attachIO.Stdout, attachIO.Stderr)
+	}()
+
+	if attachIO.Stdin != nil {
+		go func() {
+			errc <- stream.PipeStdin(s, attachIO.Stdin)
+		}()
+	}
+
+	for _, hook := range hooks {
+		go hook(c.Endpoint, done)
+	}
+
+	for {
+		err := <-errc
+		close(done)
+		return err
+	}
+}
+
+// Exec calls server and fetches pod logs
+func (c *Client) Exec(containerID string, args []string, tty bool, attachIO AttachIO, hooks ...AttachHooks) (err error) {
+	done := make(chan struct{})
+	errc := make(chan error)
+
+	md := metadata.Pairs(
+		"namespace", c.Namespace,
+		"container", containerID,
+		"execid", xid.New().String(),
+		"args", strings.Join(args, " "),
+		"tty", strconv.FormatBool(tty),
+	)
+	ctx, cancel := context.WithCancel(metadata.NewOutgoingContext(c.ctx, md))
+	defer cancel()
+
+	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	client := containers.NewContainersClient(conn)
+	log.Debugf("Open stream connection to server to get logs")
+	s, err := client.Exec(ctx)
 	if err != nil {
 		return err
 	}

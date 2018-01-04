@@ -6,6 +6,7 @@ option go_package = "github.com/ernoaapa/eliot/pkg/api/services/containers/v1;co
 // Containers service provides access to containers in pods
 service Containers {
 	rpc Attach(stream StdinStreamRequest) returns (stream StdoutStreamResponse);
+	rpc Exec(stream StdinStreamRequest) returns (stream StdoutStreamResponse);
 	rpc Signal(SignalRequest) returns (SignalResponse);
 }
 

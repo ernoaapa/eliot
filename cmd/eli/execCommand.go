@@ -12,27 +12,35 @@ import (
 	"github.com/urfave/cli"
 )
 
-var attachCommand = cli.Command{
-	Name:        "attach",
-	HelpName:    "attach",
-	Usage:       "Attach to container stdout and stderr output",
-	Description: "You can use this command to get connection to container process and receive stdout and stderr output",
-	UsageText: `eli attach [options] POD_NAME
+var execCommand = cli.Command{
+	Name:        "exec",
+	HelpName:    "exec",
+	Usage:       "Execute a command in a running container",
+	Description: "You can use this command to run command in container process",
+	UsageText: `eli exec [options] POD_NAME
 
-	 # View pod attach
-	 eli attach my-pod
+	 # Run 'date' in my-pod
+	 eli exec my-pod date
 
 	 # If pod contains multiple containers, you must define container id
-	 eli attach --container some-id my-pod
+	 eli exec --container some-id my-pod date
+
+	 # If you have parameters with command, add double dash (--) to separate
+	 # command from the eli command
+	 eli exec --container some-id my-pod -- ls -lt /usr
 `,
 	Flags: []cli.Flag{
-		cli.BoolTFlag{
+		cli.BoolFlag{
+			Name:  "tty, t",
+			Usage: "Allocate TTY for each container in the pod",
+		},
+		cli.BoolFlag{
 			Name:  "stdin, i",
-			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached (default: true)",
+			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached",
 		},
 		cli.StringFlag{
 			Name:  "container, c",
-			Usage: "Print logs of this container",
+			Usage: "Container name. If omitted, the first container in the pod will be chosen",
 		},
 	},
 	Action: func(clicontext *cli.Context) error {
@@ -40,6 +48,11 @@ var attachCommand = cli.Command{
 			stdin  = os.Stdin
 			stdout = os.Stdout
 			stderr = os.Stderr
+
+			tty           = clicontext.Bool("tty")
+			podName       = clicontext.Args().First()
+			containerName = clicontext.String("container")
+			args          = cmd.DropDoubleDash(clicontext.Args().Tail())
 		)
 
 		config := cmd.GetConfigProvider(clicontext)
@@ -48,8 +61,6 @@ var attachCommand = cli.Command{
 		if clicontext.NArg() == 0 || clicontext.Args().First() == "" {
 			return fmt.Errorf("You must give Pod name as first argument")
 		}
-		podName := clicontext.Args().First()
-		containerName := clicontext.String("container")
 
 		pod, err := client.GetPod(podName)
 		if err != nil {
@@ -75,7 +86,7 @@ var attachCommand = cli.Command{
 		defer log.Start()
 
 		return term.Safe(func() error {
-			return client.Attach(containerID, api.NewAttachIO(term.In, term.Out, stderr))
+			return client.Exec(containerID, args, tty, api.NewAttachIO(term.In, term.Out, stderr))
 		})
 	},
 }

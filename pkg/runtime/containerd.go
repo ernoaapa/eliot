@@ -11,6 +11,7 @@ import (
 	"github.com/containerd/containerd/cio"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
+	"github.com/containerd/containerd/namespaces"
 	namespaceutils "github.com/containerd/containerd/namespaces"
 	"github.com/containerd/containerd/oci"
 	"github.com/containerd/containerd/plugin"
@@ -473,19 +474,76 @@ func (c *ContainerdClient) GetContainerTaskStatus(namespace, name string) string
 	return resp.Process.Status.String()
 }
 
-// Attach returns pod logs
+// Exec run command in container and hook IO to the new process
+func (c *ContainerdClient) Exec(namespace, name, id string, args []string, tty bool, io AttachIO) error {
+	ctx, cancel := c.getContext()
+	defer cancel()
+	ctx = namespaces.WithNamespace(ctx, namespace)
+
+	client, err := c.getConnection(namespace)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to get connection to execute command")
+	}
+
+	container, err := client.LoadContainer(ctx, name)
+	if err != nil {
+		return errors.Wrapf(err, "Cannot execute command in container [%s] in namespace [%s]", name, namespace)
+	}
+
+	spec, err := container.Spec(ctx)
+	if err != nil {
+		return err
+	}
+
+	task, taskErr := container.Task(ctx, nil)
+	if taskErr != nil {
+		return taskErr
+	}
+
+	pspec := spec.Process
+	pspec.Terminal = tty
+	pspec.Args = args
+
+	ioOpts := []cio.Opt{
+		cio.WithStreams(io.Stdin, io.Stdout, io.Stderr),
+	}
+
+	if tty {
+		ioOpts = append(ioOpts, cio.WithTerminal)
+	}
+
+	process, err := task.Exec(ctx, id, pspec, cio.NewCreator(ioOpts...))
+	if err != nil {
+		return err
+	}
+	defer process.Delete(ctx)
+
+	status, err := process.Wait(ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := process.Start(ctx); err != nil {
+		return err
+	}
+
+	exitStatus := <-status
+	return exitStatus.Error()
+}
+
+// Attach hook IO to container main process
 func (c *ContainerdClient) Attach(namespace, name string, io AttachIO) error {
 	ctx, cancel := c.getContext()
 	defer cancel()
 
 	client, err := c.getConnection(namespace)
 	if err != nil {
-		return errors.Wrapf(err, "Unable to get connection for streaming logs")
+		return errors.Wrapf(err, "Unable to get connection to attach into container")
 	}
 
 	container, err := client.LoadContainer(ctx, name)
 	if err != nil {
-		return errors.Wrapf(err, "Cannot return container logs for container [%s] in namespace [%s]", name, namespace)
+		return errors.Wrapf(err, "Cannot attach to container [%s] in namespace [%s]", name, namespace)
 	}
 
 	task, taskErr := container.Task(ctx, cio.NewAttach(cio.WithStreams(io.Stdin, io.Stdout, io.Stderr)))

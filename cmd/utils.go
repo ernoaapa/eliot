@@ -331,3 +331,37 @@ func First(values ...string) string {
 	}
 	return ""
 }
+
+// DropDoubleDash search for double dash (--) and if found
+// return arguments after it, otherwise return all arguments
+func DropDoubleDash(args []string) []string {
+	for index, arg := range args {
+		if arg == "--" {
+			return args[index+1:]
+		}
+	}
+	return args
+}
+
+// ResolveContainerID resolves ContainerID from list of containers.
+// If multiple containers, you must define containerName, otherwise it's optional.
+func ResolveContainerID(containers []*containers.ContainerStatus, containerName string) (string, error) {
+	containerCount := len(containers)
+	if containerCount == 0 {
+		return "", fmt.Errorf("Pod don't have any containers")
+	} else if containerCount == 1 {
+		return containers[0].ContainerID, nil
+	} else {
+		if containerName == "" {
+			return "", fmt.Errorf("Pod contains %d containers, you must define container name", containerCount)
+		}
+
+		for _, status := range containers {
+			if status.Name == containerName {
+				return status.ContainerID, nil
+			}
+		}
+
+		return "", fmt.Errorf("Pod contains %d containers, you must define container name", containerCount)
+	}
+}
