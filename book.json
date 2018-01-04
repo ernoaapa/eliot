@@ -2,11 +2,15 @@
   "gitbook": ">= 3.2.3",
   "root": "./docs",
   "plugins": [
-    "insert-logo"
+    "insert-logo",
+    "analytics"
   ],
   "pluginsConfig": {
     "insert-logo": {
       "url": "https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-small.png"
+    },
+    "analytics": {
+      "google": "UA-111964531-1"
     }
   }
 }

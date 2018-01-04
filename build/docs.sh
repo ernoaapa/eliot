@@ -4,6 +4,7 @@
 # 
 
 npm install gitbook-plugin-insert-logo
+npm install gitbook-plugin-analytics
 
 rm -rf _book
 gitbook install
