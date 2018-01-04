@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	"net"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -190,6 +192,49 @@ func (s *Server) List(context context.Context, req *pods.ListPodsRequest) (*pods
 	}, nil
 }
 
+// Exec connects to process in container and streams stdout and stderr outputs to client
+func (s *Server) Exec(server containers.Containers_ExecServer) error {
+	md, ok := metadata.FromIncomingContext(server.Context())
+	if !ok {
+		return fmt.Errorf("Incoming Exec request don't have metadata. You must provide 'namespace', 'container', 'execid' and 'command' through metadata")
+	}
+	log.Debugf("Received metadata: %s", md)
+	var (
+		execID      = getMetadataValue(md, "execid")
+		namespace   = getMetadataValue(md, "namespace")
+		containerID = getMetadataValue(md, "container")
+		args        = strings.Split(getMetadataValue(md, "args"), " ")
+		tty         = false
+	)
+	tty, _ = strconv.ParseBool(getMetadataValue(md, "tty"))
+
+	if namespace == "" {
+		return fmt.Errorf("You must define 'namespace' metadata")
+	}
+
+	if containerID == "" {
+		return fmt.Errorf("You must define 'container' metadata")
+	}
+
+	if len(args) == 0 {
+		return fmt.Errorf("You must define 'args' metadata")
+	}
+
+	log.Debugf("Execute command [%s](tty: %s) in container [%s] in namespace [%s]", strings.Join(args, " "), tty, containerID, namespace)
+	return s.client.Exec(
+		namespace,
+		containerID,
+		execID,
+		args,
+		tty,
+		runtime.AttachIO{
+			Stdin:  stream.NewReader(server),
+			Stdout: stream.NewWriter(server, false),
+			Stderr: stream.NewWriter(server, true),
+		},
+	)
+}
+
 // Attach connects to process in container and streams stdout and stderr outputs to client
 func (s *Server) Attach(server containers.Containers_AttachServer) error {
 	md, ok := metadata.FromIncomingContext(server.Context())
@@ -210,7 +255,7 @@ func (s *Server) Attach(server containers.Containers_AttachServer) error {
 		return fmt.Errorf("You must define 'container' metadata")
 	}
 
-	log.Debugf("Get logs for container [%s] in namespace [%s]", containerID, namespace)
+	log.Debugf("Attach to container [%s] in namespace [%s]", containerID, namespace)
 	return s.client.Attach(
 		namespace, containerID,
 		runtime.AttachIO{

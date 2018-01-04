@@ -61,6 +61,7 @@ func main() {
 		deleteCommand,
 		attachCommand,
 		runCommand,
+		execCommand,
 		createCommand,
 		configCommand,
 		buildCommand,

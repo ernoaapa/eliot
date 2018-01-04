@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
 )
@@ -83,4 +84,42 @@ func TestParseBindFlag(t *testing.T) {
 
 func TestGetCurrentDirectory(t *testing.T) {
 	assert.NotEmpty(t, GetCurrentDirectory())
+}
+
+func TestDropDoubleDash(t *testing.T) {
+	assert.Equal(t, []string{"bash", "-il"}, DropDoubleDash([]string{"--", "bash", "-il"}))
+	assert.Equal(t, []string{"bash", "-il"}, DropDoubleDash([]string{"foo", "--", "bash", "-il"}))
+	assert.Equal(t, []string{"bash", "-il"}, DropDoubleDash([]string{"bash", "-il"}))
+	assert.Equal(t, []string{}, DropDoubleDash([]string{"--"}))
+	assert.Equal(t, []string{}, DropDoubleDash([]string{}))
+}
+
+func TestResolveSingleContainerID(t *testing.T) {
+	containerID, err := ResolveContainerID([]*containers.ContainerStatus{
+		{ContainerID: "1", Name: "foo"},
+	}, "")
+	assert.NoError(t, err)
+	assert.Equal(t, "1", containerID)
+}
+
+func TestMultiResolveContainerID(t *testing.T) {
+	containerID, err := ResolveContainerID([]*containers.ContainerStatus{
+		{ContainerID: "1", Name: "foo"},
+		{ContainerID: "2", Name: "bar"},
+	}, "bar")
+	assert.NoError(t, err)
+	assert.Equal(t, "2", containerID)
+}
+
+func TestMultiResolveContainerIDFail(t *testing.T) {
+	_, err := ResolveContainerID([]*containers.ContainerStatus{
+		{ContainerID: "1", Name: "foo"},
+		{ContainerID: "2", Name: "bar"},
+	}, "")
+	assert.Error(t, err)
+}
+
+func TestEmptyResolveContainerIDFail(t *testing.T) {
+	_, err := ResolveContainerID([]*containers.ContainerStatus{}, "")
+	assert.Error(t, err)
 }

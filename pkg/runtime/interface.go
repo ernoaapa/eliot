@@ -19,6 +19,7 @@ type Client interface {
 	GetNamespaces() ([]string, error)
 	IsContainerRunning(namespace, name string) (bool, error)
 	GetContainerTaskStatus(namespace, name string) string
+	Exec(namespace, podName, execID string, args []string, tty bool, attach AttachIO) error
 	Attach(namespace, podName string, attach AttachIO) error
 	Signal(namespace, name string, signal syscall.Signal) error
 }
