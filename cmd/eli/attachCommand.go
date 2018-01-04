@@ -26,7 +26,7 @@ var attachCommand = cli.Command{
 	 eli attach --container some-id my-pod
 `,
 	Flags: []cli.Flag{
-		cli.BoolTFlag{
+		cli.BoolFlag{
 			Name:  "stdin, i",
 			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached (default: true)",
 		},

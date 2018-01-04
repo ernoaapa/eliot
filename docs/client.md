@@ -9,12 +9,20 @@ eli get devices
 ```
 
 ## `eli create`
-It's a good practice to store Pod definitions in version control and deploy exactly same deployment to each device.
+It's a good practice to store _Pod_ definitions in version control and deploy exactly same deployment to each device.
 You can write definition in `yaml` file which follows the [yaml specification](configuration.md#pod-specification) and use `create` command to create all resources.
 
 ```shell
 eli create -f <file.yml>
 ```
+
+## `eli create pod`
+Sometimes you want to create a _Pod_ and making [yaml specification](configuration.md#pod-specification) is just overhead, you can use `eli create pod` to create a _Pod_ to the device.
+
+```shell
+eli create pod --image <image ref> <pod name>
+```
+You can have `--image` multiple times to add multiple containers into the _Pod_.
 
 ## `eli get pods`
 You can get list of all running Pods with `get pods`.
@@ -30,32 +38,51 @@ eli get pods --device <device name>
 ```
 
 ## `eli describe pod`
-To view Pod details like container image(s), statuses, etc., use command `describe pod <pod name>`.
+To view _Pod_ details like container image(s), statuses, etc., use command `describe pod <pod name>`.
 
 ```shell
 eli describe pod <pod name>
 ```
 
 ## `eli delete pod`
-To stop and clean up Pod from device give Pod name to `delete pod <pod name>` command.
+To stop and clean up _Pod_ from device give _Pod_ name to `delete pod <pod name>` command.
 
 ```shell
 eli delete pod <pod name>
 ```
 After this, Eliot will stop and remove all container(s) from the device and free the used resources.
 
+## `eli exec`
+Sometimes you want to execute command inside the container to for example to debug some problem.
+
+```shell
+eli exec <pod name> -- <command>
+
+# Or if Pod contains multiple containers
+eli exec --container <container id> <pod name> -- <command>
+```
+> Note: separate the eli command from target command with `--`
+
+With `eli exec` you can also open terminal session and enter into the container:
+```shell
+eli exec -i -t <pod name> -- /bin/sh
+```
+> Note: If you have minimal container, it might not include the /bin/sh and you get error `/bin/sh: no such file or directory`
+
 ## `eli attach`
-Sometimes you want to view output of your process, you can give pod name to the `attach` command.
+Sometimes you want to hook up to the process, you can give pod name to the `attach` command.
 
 ```shell
 eli attach <pod name>
 ```
 
-If Pod contains multiple containers, you must pass containerID with `--container` flag.
+If _Pod_ contains multiple containers, you must pass containerID with `--container` flag.
 
 ```shell
 eli attach --container <containerID> <pod name>
 ```
+
+You can also give `-i` flag to hook up your stdin into the container, but watch out, if you for example press ^C (ctrl+c) to exit, you actually send kill signal to the process in the container which will stop the container.
 
 ## `eli run`
 When you develop your software, often you need to have access to the device to connect your software to some hardware sensor. To make development as easy as possible, Eliot have `run` command.
