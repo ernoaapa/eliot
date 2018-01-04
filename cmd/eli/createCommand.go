@@ -29,10 +29,9 @@ var createCommand = cli.Command{
 
 			Usage: "Filename, directory, or URL to files to use to create the resource",
 		},
-		cli.StringSliceFlag{
-			Name:  "image",
-			Usage: "The container image to run",
-		},
+	},
+	Subcommands: []cli.Command{
+		createPodCommand,
 	},
 	Action: func(clicontext *cli.Context) (err error) {
 		pods := []*pods.Pod{}
@@ -41,10 +40,8 @@ var createCommand = cli.Command{
 			if err != nil {
 				return err
 			}
-		} else if len(clicontext.StringSlice("image")) > 0 {
-			pods = resolve.BuildPods(clicontext.StringSlice("image"))
 		} else {
-			return errors.New("You need to give either --file or --image flag")
+			return errors.New("You need to give --file flag")
 		}
 
 		config := cmd.GetConfigProvider(clicontext)

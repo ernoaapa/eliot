@@ -16,8 +16,10 @@ func TestExpandToFQIN(t *testing.T) {
 
 func TestGetFQINImage(t *testing.T) {
 	assert.Equal(t, "hello-world", GetFQINImage("docker.io/eaapa/hello-world"))
+	assert.Equal(t, "hello-world", GetFQINImage("docker.io/eaapa/hello-world:latest"))
 }
 
 func TestGetFQINUsername(t *testing.T) {
 	assert.Equal(t, "eaapa", GetFQINUsername("docker.io/eaapa/hello-world"))
+	assert.Equal(t, "eaapa", GetFQINUsername("docker.io/eaapa/hello-world:latest"))
 }
