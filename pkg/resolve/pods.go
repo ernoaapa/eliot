@@ -80,21 +80,36 @@ func validURL(u string) bool {
 	return err == nil
 }
 
-// BuildPods creates Pod specification from container images
-func BuildPods(images []string) (result []*pods.Pod) {
+// BuildPod creates Pod specification from container images
+func BuildPod(name string, images []string) *pods.Pod {
+	pod := &pods.Pod{
+		Metadata: &core.ResourceMetadata{
+			Name: name,
+		},
+		Spec: &pods.PodSpec{
+			Containers: []*containers.Container{},
+		},
+	}
+
+	names := make(map[string]int)
+
 	for _, image := range images {
 		fqin := utils.ExpandToFQIN(image)
 		name := fmt.Sprintf("%s-%s", utils.GetFQINUsername(fqin), utils.GetFQINImage(fqin))
-		result = append(result, &pods.Pod{
-			Metadata: &core.ResourceMetadata{
-				Name: name,
-			},
-			Spec: &pods.PodSpec{
-				Containers: []*containers.Container{
-					{Name: name, Image: fqin},
-				},
-			},
+
+		// If using same image multiple times, add count number as suffix
+		if count, found := names[name]; found {
+			names[name] = count + 1
+			name = fmt.Sprintf("%s-%d", name, count)
+		} else {
+			names[name] = 1
+		}
+
+		pod.Spec.Containers = append(pod.Spec.Containers, &containers.Container{
+			Name:  name,
+			Image: fqin,
 		})
 	}
-	return pods.Defaults(result)
+
+	return pods.Default(pod)
 }

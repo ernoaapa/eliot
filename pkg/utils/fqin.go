@@ -47,7 +47,9 @@ func ExpandToFQIN(source string) string {
 // E.g. docker.io/eaapa/hello-world:latest -> hello-world
 func GetFQINImage(fqin string) string {
 	parts := strings.SplitN(fqin, "/", 3)
-	return parts[2]
+	image := parts[2]
+	imageParts := strings.SplitN(image, ":", 2)
+	return imageParts[0]
 }
 
 // GetFQINUsername returns username part from FQIN
