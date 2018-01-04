@@ -32,7 +32,7 @@ var attachCommand = cli.Command{
 		},
 		cli.StringFlag{
 			Name:  "container, c",
-			Usage: "Print logs of this container",
+			Usage: "Target container in the pod",
 		},
 	},
 	Action: func(clicontext *cli.Context) error {

@@ -89,7 +89,7 @@ func (c *Client) GetPod(podName string) (*pods.Pod, error) {
 	return nil, fmt.Errorf("Pod with name [%s] not found", podName)
 }
 
-// CreatePod creates new pod to the target server
+// CreatePod creates new pod to the device
 func (c *Client) CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, opts ...PodOpts) error {
 	for _, o := range opts {
 		err := o(pod)
@@ -126,7 +126,7 @@ func (c *Client) CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, 
 	}
 }
 
-// StartPod creates new pod to the target server
+// StartPod starts created pod in device
 func (c *Client) StartPod(name string) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
@@ -146,7 +146,7 @@ func (c *Client) StartPod(name string) (*pods.Pod, error) {
 	return resp.GetPod(), nil
 }
 
-// DeletePod creates new pod to the target server
+// DeletePod removes pod from the device
 func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
@@ -166,7 +166,7 @@ func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	return resp.GetPod(), nil
 }
 
-// Attach calls server and fetches pod logs
+// Attach hooks to container main process stdin/stout
 func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHooks) (err error) {
 	done := make(chan struct{})
 	errc := make(chan error)
@@ -185,7 +185,7 @@ func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHo
 	defer conn.Close()
 
 	client := containers.NewContainersClient(conn)
-	log.Debugf("Open stream connection to server to get logs")
+	log.Debugf("Open connection to server to start stdin/stdout streaming")
 	s, err := client.Attach(ctx)
 	if err != nil {
 		return err
@@ -212,7 +212,7 @@ func (c *Client) Attach(containerID string, attachIO AttachIO, hooks ...AttachHo
 	}
 }
 
-// Exec calls server and fetches pod logs
+// Exec executes command inside some container
 func (c *Client) Exec(containerID string, args []string, tty bool, attachIO AttachIO, hooks ...AttachHooks) (err error) {
 	done := make(chan struct{})
 	errc := make(chan error)
@@ -234,7 +234,7 @@ func (c *Client) Exec(containerID string, args []string, tty bool, attachIO Atta
 	defer conn.Close()
 
 	client := containers.NewContainersClient(conn)
-	log.Debugf("Open stream connection to server to get logs")
+	log.Debugf("Open connection to server to start stdin/stdout streaming")
 	s, err := client.Exec(ctx)
 	if err != nil {
 		return err
