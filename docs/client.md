@@ -17,7 +17,7 @@ If you have multiple devices, you need to give `--device` flag for all other com
 
 ```shell
 **[terminal]
-eli --device linuxkit-96165e7f48d7.local. get pods
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli --device linuxkit-96165e7f48d7.local. get pods]
 ```
 
 ## `eli create -f <file.yml>`

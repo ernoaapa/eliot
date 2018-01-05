@@ -22,7 +22,6 @@ Easiest way to get started with Eliot is to run [EliotOS](eliotos.md) in Raspber
 
 [EliotOS](eliotos.md) is minimal Linux Operating System, built with [linuxkit](https://github.com/linuxkit/linuxkit), which contains only minimal components to run Eliot which are Linux kernel, `runc`, `containerd` and `eliotd` daemon. Check the [EliotOS](eliotos.md) section for more info.
 
-1. Install [Etcher CLI](https://etcher.io/cli/)
 1. Format sdcard as you would normally
 2. Mount it to for example `/Volumes/rpi3`
 3. Build image and unpack it to the directory `eli build device | tar xv -C /Volumes/rpi3`
@@ -35,38 +34,88 @@ For more details and other installation options, see the [Installation](installa
 ## Deploy first app
 When you have connected RaspberryPI to network and power it on, first step is to check that Eliot can discover and connect to the device.
 ```shell
-eli get devices
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli get devices]
+  ✓ Discovered 1 devices from network
+
+HOSTNAME                       ENDPOINT
+linuxkit-96165e7f48d7.local.   192.168.64.79:5000
 ```
 List should contain your RaspberryPI device.
 
 There should not be anything running, you can verify it by listing all created _Pods_ in the device
 ```shell
-eli get pods
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli get pods]
+  ✓ Discovered 1 device(s) from network
+  • Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+
+NAMESPACE   NAME          CONTAINERS   STATUS
 ```
 Pod listing should be empty.
 
 Now let's deploy [eaapa/hello-world](https://hub.docker.com/eaapa/hello-world) image, what just prints _Hello World_ text.
 ```shell
-eli create --image eaapa/hello-world
+eli create pod --image eaapa/hello-world testing
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli create pod --image eaapa/hello-world testing]
+  ✓ Discovered 1 device(s) from network
+  • Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+  ⠸ Download docker.io/eaapa/hello-world:latest
+Name:             testing
+Namespace:        eliot
+Device:           linuxkit-96165e7f48d7
+State:            running(1)
+Restart Policy:   always
+Host Network:     false
+Host PID:         false
+Containers:
+          library-alpine:
+                    Image:           docker.io/eaapa/hello-world:latest
+                    ContainerID:     b97cq4r744405e9hmscg
+                    State:           running
+                    Restart Count:   0
+                    Working Dir:     /
+                    Args:
+                              - /bin/sh
+                    Env:
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                    Mounts:
+                              - type=proc,source=proc,destination=/proc,options=
+                              - type=tmpfs,source=tmpfs,destination=/dev,options=nosuid:strictatime:mode=755:size=65536k
+                              - type=devpts,source=devpts,destination=/dev/pts,options=nosuid:noexec:newinstance:ptmxmode=0666:mode=0620:gid=5
+                              - type=tmpfs,source=shm,destination=/dev/shm,options=nosuid:noexec:nodev:mode=1777:size=65536k
+                              - type=mqueue,source=mqueue,destination=/dev/mqueue,options=nosuid:noexec:nodev
+                              - type=sysfs,source=sysfs,destination=/sys,options=nosuid:noexec:nodev:ro
+                              - type=tmpfs,source=tmpfs,destination=/run,options=nosuid:strictatime:mode=755:size=65536k
 ```
 
-When create completes, you can check the output by attaching to the container.
-> Note: we pass `--stdin=false` here because we don't want that when we hit ^C, we send kill signal to the container. We only want to connect stdout to our terminal session
+When create completes, you can check the output by attaching to the container
 ```shell
-eli attach hello-world
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli attach testing]
+Hello world!
+Hello world!
+Hello world!
+^C
 ```
-You should see now _Hello World_ text printing once in a second to the terminal. Hit `CTRL/CMD + C` to close the connection.
+You should see now _Hello World_ text printing once in a second to the terminal. Hit `CTRL + C` to close the connection.
 
 Next you want to remove the Pod from the device.
 ```shell
-eli delete pod hello-world
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli delete pod testing]
+  ✓ Discovered 1 device(s) from network
+  • Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+  ✓ Fetched pods
+  ✓ Deleted pod testing
 ```
 
 Now the device is back to the initial state, clean and no any services running.
 
 This was the quick start how to deploy containers to the Eliot. 
 Next step is to learn [how you can develop your software in the device in real time](getting_started.md#development-in-device)
-
 
 ## Development in device
 When developing IoT solution, you usually need to develop software what reads data from hardware sensor and send it to the cloud. For this you need to have access to the device, connect to the sensor and be able to develop your software.
@@ -82,12 +131,14 @@ Following command will:
 6. Start syncing your local files to the container
 
 ```shell
-eli run --bind /dev:/dev /bin/bash
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli run --bind /dev:/dev /bin/bash]
+root@linuxkit-96165e7f48d7:/go/src/github.com/ernoaapa/eliot#
 ```
 
 Now you should be in the container and you can make changes in your local computer, compile and run your project in the device. 
 If you type `exit` your terminal session comes back to your local computer and Eliot removes all created containers.
 
-When you're done with development, you can create container image with your preferred tools (e.g. `docker`) and use the `create` command to deploy your software to the device.
+When you're done with development, you can create container image with your preferred tools (e.g. `docker`) and use the `create` command to deploy your software to the device permanently.
 
 Easy right! :)

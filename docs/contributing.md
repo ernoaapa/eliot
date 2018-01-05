@@ -34,8 +34,9 @@ make test
 ### Documentation
 If you want to improve the documentation, you can run locally the gitbook
 ```shell
-npm install -g gitbook
-gitbook --lrport=3001 serve
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command npm install -g gitbook]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command gitbook --lrport=3001 serve]
 ```
 Open [http://localhost:4000]()
 
