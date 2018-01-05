@@ -1,10 +1,12 @@
-#!/bin/bash
+#!/bin/bash -e
 # 
 # Small script to build and update documentation to GitHub Pages
 # 
 
 npm install gitbook-plugin-insert-logo
 npm install gitbook-plugin-analytics
+npm install gitbook-plugin-terminal
+npm install gitbook-plugin-anchors
 
 rm -rf _book
 gitbook install

@@ -3,7 +3,9 @@
   "root": "./docs",
   "plugins": [
     "insert-logo",
-    "analytics"
+    "analytics",
+    "terminal",
+    "anchors"
   ],
   "pluginsConfig": {
     "insert-logo": {
