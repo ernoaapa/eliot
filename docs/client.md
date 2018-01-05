@@ -74,10 +74,10 @@ Sometimes you want to create a _Pod_ and making [yaml specification](configurati
 
 ```shell
 **[terminal]
-**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli create pod --image docker.io/library/alpine:latest testing]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli create pod --image docker.io/arm64v8/alpine:latest testing]
   ✓ Discovered 1 device(s) from network
   • Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
-  ⠸ Download docker.io/library/alpine:latest
+  ⠸ Download docker.io/arm64v8/alpine:latest
 Name:             testing
 Namespace:        eliot
 Device:           linuxkit-96165e7f48d7
@@ -86,8 +86,8 @@ Restart Policy:   always
 Host Network:     false
 Host PID:         false
 Containers:
-          library-alpine:
-                    Image:           docker.io/library/alpine:latest
+          arm64v8-alpine:
+                    Image:           docker.io/arm64v8/alpine:latest
                     ContainerID:     b97cq4r744405e9hmscg
                     State:           running
                     Restart Count:   0

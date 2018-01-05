@@ -70,7 +70,7 @@ Restart Policy:   always
 Host Network:     false
 Host PID:         false
 Containers:
-          library-alpine:
+          eaapa-hello-world:
                     Image:           docker.io/eaapa/hello-world:latest
                     ContainerID:     b97cq4r744405e9hmscg
                     State:           running
