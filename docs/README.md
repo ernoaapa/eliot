@@ -5,4 +5,6 @@
 
 [Docker](https://www.docker.com) and [Kubernetes](https://www.kubernetes.io) have inspired heavily and if you're familiar with those, you find really easy to get started with Eliot.
 
+!INCLUDE "subscribe-form.html"
+
 <sub>Built with ❤︎ by [Erno Aapa](https://github.com/ernoaapa) and [contributors](https://github.com/ernoaapa/eliot/contributors)</sub>

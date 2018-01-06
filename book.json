@@ -6,7 +6,8 @@
     "analytics",
     "terminal",
     "anchors",
-    "github"
+    "github",
+    "include-html"
   ],
   "pluginsConfig": {
     "insert-logo": {
