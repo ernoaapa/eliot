@@ -16,22 +16,9 @@ If you're familiar with [Kubernetes definition of _Pod_](https://kubernetes.io/d
 
 A Pod wraps application container (or, in some cases, multiple containers) and gives configuration options like host network, restart policy, etc. All containers in same Pod are meant to get started, deployed, and deleted together.
 
-## Installation
-
-Easiest way to get started with Eliot is to run [EliotOS](eliotos.md) in RaspberryPI 3b.
-
-[EliotOS](eliotos.md) is minimal Linux Operating System, built with [linuxkit](https://github.com/linuxkit/linuxkit), which contains only minimal components to run Eliot which are Linux kernel, `runc`, `containerd` and `eliotd` daemon. Check the [EliotOS](eliotos.md) section for more info.
-
-1. Format sdcard as you would normally
-2. Mount it to for example `/Volumes/rpi3`
-3. Build image and unpack it to the directory `eli build device | tar xv -C /Volumes/rpi3`
-4. Unmount the disk
-5. Install sdcard to RaspberryPI, connect with ethernet cable to same network with your laptop and power on!
-6. In less than 10s you should see the device with command `eli get devices`
-
-For more details and other installation options, see the [Installation](installation.md) section.
-
 ## Deploy first app
+Assuming that you already complete installation of `eli` client and `eliot` agent. If not, check the[installation guide](installation.md) and come back after finishing it.  
+
 When you have connected RaspberryPI to network and power it on, first step is to check that Eliot can discover and connect to the device.
 ```shell
 **[terminal]
