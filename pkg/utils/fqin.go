@@ -16,7 +16,7 @@ var (
 // E.g. eaapa/hello-world -> docker.io/eaapa/hello-world:latest
 func ExpandToFQIN(source string) string {
 	if source == "" {
-		log.Fatal("Empty image ref to expand FQIN (Fully Qualified Image Name")
+		log.Fatal("Trying to expand empty image ref to FQIN (Fully Qualified Image Name)")
 		return ""
 	}
 	registry := defaultRegistry
