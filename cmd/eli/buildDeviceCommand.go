@@ -59,7 +59,7 @@ var buildDeviceCommand = cli.Command{
 			outputFile = clicontext.String("output")
 			outputType = clicontext.String("type")
 
-			logline  *log.Line
+			logline  log.Line
 			linuxkit []byte
 			output   io.Writer
 		)

@@ -49,7 +49,7 @@ var createPodCommand = cli.Command{
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)
 
-		logs := map[string]*log.Line{}
+		logs := map[string]log.Line{}
 		progressc := make(chan []*progress.ImageFetch)
 
 		go func() {

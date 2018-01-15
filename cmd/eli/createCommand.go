@@ -48,7 +48,7 @@ var createCommand = cli.Command{
 		client := cmd.GetClient(config)
 
 		for _, pod := range pods {
-			logs := map[string]*log.Line{}
+			logs := map[string]log.Line{}
 			progressc := make(chan []*progress.ImageFetch)
 
 			go func() {

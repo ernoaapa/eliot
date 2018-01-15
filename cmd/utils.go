@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ernoaapa/eliot/pkg/cmd"
 	"github.com/ernoaapa/eliot/pkg/cmd/log"
 	"github.com/ernoaapa/eliot/pkg/discovery"
 	"github.com/ernoaapa/eliot/pkg/printers"
@@ -34,14 +35,28 @@ var (
 			Name:  "debug",
 			Usage: "enable debug output in logs",
 		},
+		cli.BoolFlag{
+			Name:  "quiet",
+			Usage: "Don't print any progress output",
+		},
 	}
 )
 
 // GlobalBefore is function what get executed before any commands executes
 func GlobalBefore(context *cli.Context) error {
-	if context.GlobalBool("debug") {
+	debug := context.GlobalBool("debug")
+	if debug {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
+
+	if cmd.IsPipingOut() || context.GlobalBool("quiet") {
+		log.SetOutput(log.NewHidden())
+	} else if debug {
+		log.SetOutput(log.NewDebug())
+	} else {
+		log.SetOutput(log.NewTerminal())
+	}
+
 	return nil
 }
 
