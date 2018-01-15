@@ -1,4 +1,4 @@
-package log
+package ui
 
 // Debug is log implementation which just outputs line by line
 type Debug struct {

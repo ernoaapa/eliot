@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/ernoaapa/eliot/pkg/cmd"
-	"github.com/ernoaapa/eliot/pkg/cmd/log"
+	ui "github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/ernoaapa/eliot/pkg/discovery"
 	"github.com/ernoaapa/eliot/pkg/printers"
 
@@ -50,11 +50,11 @@ func GlobalBefore(context *cli.Context) error {
 	}
 
 	if cmd.IsPipingOut() || context.GlobalBool("quiet") {
-		log.SetOutput(log.NewHidden())
+		ui.SetOutput(ui.NewHidden())
 	} else if debug {
-		log.SetOutput(log.NewDebug())
+		ui.SetOutput(ui.NewDebug())
 	} else {
-		log.SetOutput(log.NewTerminal())
+		ui.SetOutput(ui.NewTerminal())
 	}
 
 	return nil
@@ -62,18 +62,18 @@ func GlobalBefore(context *cli.Context) error {
 
 // GetClient creates new cloud API client
 func GetClient(config *config.Provider) *api.Client {
-	log := log.NewLine()
+	uiline := ui.NewLine()
 
 	endpoints := config.GetEndpoints()
 	switch len(endpoints) {
 	case 0:
-		log.Fatal("No devices to connect. You must give device endpoint. E.g. --endpoint=192.168.1.2")
+		uiline.Fatal("No devices to connect. You must give device endpoint. E.g. --endpoint=192.168.1.2")
 		return nil
 	case 1:
-		log.Infof("Connect to %s (%s)", endpoints[0].Name, endpoints[0].URL)
+		uiline.Infof("Connect to %s (%s)", endpoints[0].Name, endpoints[0].URL)
 		return api.NewClient(config.GetNamespace(), endpoints[0])
 	default:
-		log.Fatalf("%d devices found. You must give target device. E.g. --endpoint=192.168.1.2", len(endpoints))
+		uiline.Fatalf("%d devices found. You must give target device. E.g. --endpoint=192.168.1.2", len(endpoints))
 		return nil
 	}
 }
@@ -84,7 +84,7 @@ func GetConfig(clicontext *cli.Context) *config.Config {
 	configPath := clicontext.GlobalString("config")
 	conf, err := config.GetConfig(expandTilde(configPath))
 	if err != nil {
-		log.NewLine().Fatalf("Error while reading configuration file [%s]: %s", configPath, err)
+		ui.NewLine().Fatalf("Error while reading configuration file [%s]: %s", configPath, err)
 	}
 	return conf
 }
@@ -106,15 +106,15 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 	}
 
 	if len(provider.GetEndpoints()) == 0 {
-		log := log.NewLine().Loading("Discover from network automatically...")
+		uiline := ui.NewLine().Loading("Discover from network automatically...")
 		devices, err := discovery.Devices(2 * time.Second)
 		if err != nil {
-			log.Errorf("Failed to auto-discover devices in network: %s", err)
+			uiline.Errorf("Failed to auto-discover devices in network: %s", err)
 		} else {
 			if len(devices) == 0 {
-				log.Warn("No devices discovered from network")
+				uiline.Warn("No devices discovered from network")
 			} else {
-				log.Donef("Discovered %d device(s) from network", len(devices))
+				uiline.Donef("Discovered %d device(s) from network", len(devices))
 			}
 		}
 
@@ -132,7 +132,7 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 		deviceName := clicontext.GlobalString("device")
 		endpoint, found := provider.GetEndpointByName(deviceName)
 		if !found {
-			log.NewLine().Errorf("Failed to find device with name %s", deviceName)
+			ui.NewLine().Errorf("Failed to find device with name %s", deviceName)
 		}
 		provider.OverrideEndpoints([]config.Endpoint{endpoint})
 	}
@@ -162,7 +162,7 @@ func GetLabels(clicontext *cli.Context) map[string]string {
 		if len(pair) == 2 {
 			labels[pair[0]] = pair[1]
 		} else {
-			log.NewLine().Fatalf("Invalid --labels parameter [%s]. It must be comma separated key=value list. E.g. '--labels foo=bar,one=two'", param)
+			ui.NewLine().Fatalf("Invalid --labels parameter [%s]. It must be comma separated key=value list. E.g. '--labels foo=bar,one=two'", param)
 		}
 	}
 	return labels
@@ -188,7 +188,7 @@ func GetMounts(clicontext *cli.Context) (result []*containers.Mount) {
 	for _, flag := range clicontext.StringSlice("mount") {
 		mount, err := parseMountFlag(flag)
 		if err != nil {
-			log.NewLine().Fatalf("Failed to parse --mount flag: %s", err)
+			ui.NewLine().Fatalf("Failed to parse --mount flag: %s", err)
 		}
 		result = append(result, mount)
 	}
@@ -237,7 +237,7 @@ func GetBinds(clicontext *cli.Context, extra ...string) (result []*containers.Mo
 	for _, flag := range binds {
 		bind, err := ParseBindFlag(flag)
 		if err != nil {
-			log.NewLine().Fatalf("Failed to parse --bind flag: %s", err)
+			ui.NewLine().Fatalf("Failed to parse --bind flag: %s", err)
 		}
 		result = append(result, bind)
 	}
@@ -333,7 +333,7 @@ func GetCurrentDirectory() string {
 		}
 	}
 
-	log.NewLine().Fatal("Failed to resolve current directory")
+	ui.NewLine().Fatal("Failed to resolve current directory")
 	return ""
 }
 

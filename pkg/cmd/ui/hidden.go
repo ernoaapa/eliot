@@ -1,4 +1,4 @@
-package log
+package ui
 
 // Hidden is log output implementation what doesn't output anything
 type Hidden struct {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/ernoaapa/eliot/pkg/cmd"
 	"github.com/ernoaapa/eliot/pkg/cmd/build"
-	"github.com/ernoaapa/eliot/pkg/cmd/log"
+	"github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
@@ -59,32 +59,32 @@ var buildDeviceCommand = cli.Command{
 			outputFile = clicontext.String("output")
 			outputType = clicontext.String("type")
 
-			logline  log.Line
+			uiline   ui.Line
 			linuxkit []byte
 			output   io.Writer
 		)
 
-		logline = log.NewLine().Loading("Get Linuxkit config...")
+		uiline = ui.NewLine().Loading("Get Linuxkit config...")
 		linuxkit, err = build.ResolveLinuxkitConfig(source)
 		if err != nil {
-			logline.Errorf("Failed to resolve Linuxkit config: %s", err)
+			uiline.Errorf("Failed to resolve Linuxkit config: %s", err)
 			return errors.Wrap(err, "Cannot resolve Linuxkit config")
 		}
-		logline.Done("Resolved Linuxkit config!")
+		uiline.Done("Resolved Linuxkit config!")
 
-		logline = log.NewLine().Loading("Resolve output...")
+		uiline = ui.NewLine().Loading("Resolve output...")
 		if cmd.IsPipingOut() {
 			output = os.Stdout
-			logline.Done("Resolved output to stdout!")
+			uiline.Done("Resolved output to stdout!")
 		} else {
 			outFile, err := os.Create(outputFile)
 			if err != nil {
-				logline.Errorf("Error, cannot create target output file %s", outputFile)
+				uiline.Errorf("Error, cannot create target output file %s", outputFile)
 				return fmt.Errorf("Cannot create target output file %s", outputFile)
 			}
 			defer outFile.Close()
 			output = outFile
-			logline.Donef("Resolved output: %s!", outFile.Name())
+			uiline.Donef("Resolved output: %s!", outFile.Name())
 		}
 
 		if dryRun {
@@ -92,21 +92,21 @@ var buildDeviceCommand = cli.Command{
 			return nil
 		}
 
-		logline = log.NewLine().Loadingf("Building Linuxkit image in remote build server...")
+		uiline = ui.NewLine().Loadingf("Building Linuxkit image in remote build server...")
 		image, err := build.BuildImage(serverURL, outputType, linuxkit)
 		if err != nil {
-			logline.Errorf("Failed to build Linuxkit image: %s", err)
+			uiline.Errorf("Failed to build Linuxkit image: %s", err)
 			return errors.Wrap(err, "Failed to build Linuxkit image")
 		}
 
-		logline.Loadingf("Write Linuxkit image to output...")
+		uiline.Loadingf("Write Linuxkit image to output...")
 		_, err = io.Copy(output, image)
 		if err != nil {
-			logline.Errorf("Error while writing output: %s", err)
+			uiline.Errorf("Error while writing output: %s", err)
 			return errors.New("Unable to copy image to output")
 		}
 
-		logline.Donef("Build complete!")
+		uiline.Donef("Build complete!")
 		return nil
 	},
 }

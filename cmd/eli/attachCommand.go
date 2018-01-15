@@ -6,7 +6,7 @@ import (
 
 	"github.com/ernoaapa/eliot/cmd"
 	"github.com/ernoaapa/eliot/pkg/api"
-	"github.com/ernoaapa/eliot/pkg/cmd/log"
+	"github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/ernoaapa/eliot/pkg/term"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -70,9 +70,9 @@ var attachCommand = cli.Command{
 			term.Raw = true
 		}
 
-		// Stop updating log lines, let the std piping take the terminal
-		log.Stop()
-		defer log.Start()
+		// Stop updating ui lines, let the std piping take the terminal
+		ui.Stop()
+		defer ui.Start()
 
 		return term.Safe(func() error {
 			return client.Attach(containerID, api.NewAttachIO(term.In, term.Out, stderr))

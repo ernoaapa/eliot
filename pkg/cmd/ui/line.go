@@ -1,4 +1,4 @@
-package log
+package ui
 
 type Line interface {
 	WithProgress(current, total int64) Line

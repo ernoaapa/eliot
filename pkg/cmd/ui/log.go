@@ -1,4 +1,4 @@
-package log
+package ui
 
 // Output is interface for log outputs
 type Output interface {

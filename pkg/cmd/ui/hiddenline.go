@@ -1,4 +1,4 @@
-package log
+package ui
 
 // HiddenLine is Line implementation which don't output anything
 type HiddenLine struct {

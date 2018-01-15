@@ -1,4 +1,4 @@
-package log
+package ui
 
 import (
 	log "github.com/sirupsen/logrus"

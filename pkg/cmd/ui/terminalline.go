@@ -1,10 +1,10 @@
-package log
+package ui
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/ernoaapa/eliot/pkg/cmd/log/terminal"
+	"github.com/ernoaapa/eliot/pkg/cmd/ui/terminal"
 	"github.com/fatih/color"
 	"github.com/willf/pad"
 )

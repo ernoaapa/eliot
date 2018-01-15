@@ -13,7 +13,7 @@ import (
 	"github.com/ernoaapa/eliot/pkg/api/core"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/eliot/pkg/cmd/log"
+	"github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/ernoaapa/eliot/pkg/config"
 	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/ernoaapa/eliot/pkg/printers"
@@ -122,18 +122,18 @@ var runCommand = cli.Command{
 		client := cmd.GetClient(conf)
 
 		if image == "" {
-			log := log.NewLine().Loading("Resolve image for the project...")
+			uiline := ui.NewLine().Loading("Resolve image for the project...")
 			info, err := client.GetInfo()
 			if err != nil {
-				log.Fatalf("Unable to resolve image for the project. Failed to get target device architecture: %s", err)
+				uiline.Fatalf("Unable to resolve image for the project. Failed to get target device architecture: %s", err)
 			}
 
 			var projectType string
 			projectType, image, err = resolve.Image(info.Arch, cmd.GetCurrentDirectory())
 			if err != nil {
-				log.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
+				uiline.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
 			}
-			log.Donef("Detected %s project, use image: %s (arch %s)", projectType, image, info.Arch)
+			uiline.Donef("Detected %s project, use image: %s (arch %s)", projectType, image, info.Arch)
 		}
 
 		image = utils.ExpandToFQIN(image)
@@ -196,25 +196,25 @@ var runCommand = cli.Command{
 			},
 		}
 
-		logs := map[string]log.Line{}
+		lines := map[string]ui.Line{}
 		progressc := make(chan []*progress.ImageFetch)
 
 		go func() {
 			for fetches := range progressc {
 				for _, fetch := range fetches {
-					if _, ok := logs[fetch.Image]; !ok {
-						logs[fetch.Image] = log.NewLine().Loadingf("Download %s", fetch.Image)
+					if _, ok := lines[fetch.Image]; !ok {
+						lines[fetch.Image] = ui.NewLine().Loadingf("Download %s", fetch.Image)
 					}
 
 					if fetch.IsDone() {
 						if fetch.Failed {
-							logs[fetch.Image].Errorf("Failed %s", fetch.Image)
+							lines[fetch.Image].Errorf("Failed %s", fetch.Image)
 						} else {
-							logs[fetch.Image].Donef("Downloaded %s", fetch.Image)
+							lines[fetch.Image].Donef("Downloaded %s", fetch.Image)
 						}
 					} else {
 						current, total := fetch.GetProgress()
-						logs[fetch.Image].WithProgress(current, total)
+						lines[fetch.Image].WithProgress(current, total)
 					}
 				}
 			}
@@ -232,12 +232,12 @@ var runCommand = cli.Command{
 
 		if rm {
 			defer func() {
-				log := log.NewLine().Loadingf("Delete pod %s", pod.Metadata.Name)
+				uiline := ui.NewLine().Loadingf("Delete pod %s", pod.Metadata.Name)
 				_, err := client.DeletePod(pod)
 				if err != nil {
-					log.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
+					uiline.Errorf("Error while deleting pod [%s]: %s", pod.Metadata.Name, err)
 				} else {
-					log.Donef("Deleted pod [%s]", pod.Metadata.Name)
+					uiline.Donef("Deleted pod [%s]", pod.Metadata.Name)
 				}
 			}()
 		}
@@ -276,9 +276,9 @@ var runCommand = cli.Command{
 			defer stopCatch(sigc)
 		}
 
-		// Stop updating log lines, let the std piping take the terminal
-		log.Stop()
-		defer log.Start()
+		// Stop updating ui lines, let the std piping take the terminal
+		ui.Stop()
+		defer ui.Start()
 
 		return term.Safe(func() error {
 			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr), hooks...)
