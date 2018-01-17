@@ -267,6 +267,9 @@ func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (re
 			return result, errors.Wrapf(err, "Error while resolving container task status")
 		}
 	} else {
+		if err := ensureTaskStopped(ctx, task); err != nil {
+			return result, errors.Wrapf(err, "Failed to ensure task is stopped")
+		}
 		if _, err := task.Delete(ctx); err != nil {
 			return result, errors.Wrapf(err, "Error while cleaning up old container task")
 		}
@@ -289,6 +292,18 @@ func (c *ContainerdClient) StartContainer(namespace, id string, ioSet IOSet) (re
 	}
 
 	return mapping.MapContainerStatusToInternalModel(info, resolveContainerStatus(ctx, container)), nil
+}
+
+func ensureTaskStopped(ctx context.Context, task containerd.Task) error {
+	status, err := task.Status(ctx)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to resolve task status")
+	}
+	switch status.Status {
+	case containerd.Running, containerd.Paused, containerd.Pausing:
+		return task.Kill(ctx, syscall.SIGTERM)
+	}
+	return nil
 }
 
 // StopContainer stops given container
@@ -319,6 +334,10 @@ func (c *ContainerdClient) StopContainer(namespace, name string) (result model.C
 	}
 
 	if task != nil {
+		if err := ensureTaskStopped(ctx, task); err != nil {
+			log.Warnf("Failed to kill task with SIGTERM, will next force kill. Error: %s", err)
+		}
+
 		_, taskDeleteErr := task.Delete(ctx, containerd.WithProcessKill)
 		if err != nil {
 			return result, errors.Wrapf(taskDeleteErr, "Container task deletion returned error")
