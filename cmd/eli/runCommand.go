@@ -67,7 +67,6 @@ var runCommand = cli.Command{
 		},
 	},
 	Action: func(clicontext *cli.Context) (err error) {
-
 		var (
 			name    = clicontext.String("name")
 			image   = clicontext.Args().First()
@@ -75,8 +74,8 @@ var runCommand = cli.Command{
 			tty     = clicontext.Bool("tty")
 			env     = clicontext.StringSlice("env")
 			workdir = clicontext.String("workdir")
-			mounts  = cmd.GetMounts(clicontext)
-			binds   = cmd.GetBinds(clicontext)
+			mounts  = cmd.MustParseMounts(clicontext.StringSlice("mount"))
+			binds   = cmd.MustParseBinds(clicontext.StringSlice("bind"))
 			args    = cmd.DropDoubleDash(clicontext.Args().Tail())
 
 			stdin  = os.Stdin
