@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/ernoaapa/eliot/cmd"
-	log "github.com/sirupsen/logrus"
+	"github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/urfave/cli"
 )
 
@@ -12,7 +12,7 @@ var configSetCommand = cli.Command{
 	UsageText: "eli config set NAME VALUE",
 	Action: func(clicontext *cli.Context) error {
 		if clicontext.NArg() != 2 {
-			log.Fatalf("You must give two parameters, NAME and VALUE")
+			ui.NewLine().Fatalf("You must give two parameters, NAME and VALUE")
 		}
 
 		var (

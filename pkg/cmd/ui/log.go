@@ -1,23 +1,19 @@
-package log
-
-import "github.com/ernoaapa/eliot/pkg/cmd"
+package ui
 
 // Output is interface for log outputs
 type Output interface {
 	Start()
 	Stop()
-	NewLine() *Line
+	NewLine() Line
 }
 
 var (
-	output = getOutput()
+	output Output = NewTerminal()
 )
 
-func getOutput() Output {
-	if cmd.IsPipingOut() {
-		return NewHidden()
-	}
-	return NewTerminal()
+// SetOutput updates logging output
+func SetOutput(o Output) {
+	output = o
 }
 
 // Start starts the logging output
@@ -31,6 +27,6 @@ func Stop() {
 }
 
 // NewLine creates new updateable output Line
-func NewLine() *Line {
+func NewLine() Line {
 	return output.NewLine()
 }

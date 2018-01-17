@@ -1,10 +1,10 @@
-package log
+package ui
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/ernoaapa/eliot/pkg/cmd/log/terminal"
+	"github.com/ernoaapa/eliot/pkg/cmd/ui/terminal"
 	"github.com/fatih/color"
 	"github.com/willf/pad"
 )
@@ -29,8 +29,8 @@ const (
 	ERROR
 )
 
-// Line is single text line in the terminal output what you can change afterward
-type Line struct {
+// TerminalLine is single text line in the terminal output what you can change afterward
+type TerminalLine struct {
 	updater      Updater
 	state        State
 	Text         string
@@ -45,7 +45,7 @@ var (
 )
 
 // WithProgress display progress bar when line is in loading state
-func (r *Line) WithProgress(current, total int64) *Line {
+func (r *TerminalLine) WithProgress(current, total int64) Line {
 	r.showProgress = true
 	r.current = current
 	r.total = total
@@ -53,96 +53,87 @@ func (r *Line) WithProgress(current, total int64) *Line {
 	return r
 }
 
-func (r *Line) GetProgress() (int64, int64) {
-	return r.current, r.total
-}
-
-// SetTextf updates the text according to provided format
-func (r *Line) SetTextf(format string, args ...interface{}) {
-	r.SetText(fmt.Sprintf(format, args...))
-}
-
-// SetText updates the text in the line
-func (r *Line) SetText(a ...interface{}) {
+// setText updates the text in the line
+func (r *TerminalLine) setText(a ...interface{}) {
 	r.Text = fmt.Sprint(a...)
 	r.Update()
 }
 
 // Infof mark this line to be just blank info line
-func (r *Line) Infof(format string, args ...interface{}) *Line {
+func (r *TerminalLine) Infof(format string, args ...interface{}) Line {
 	return r.Info(fmt.Sprintf(format, args...))
 }
 
 // Info mark this line to be just blank info line
-func (r *Line) Info(a ...interface{}) *Line {
+func (r *TerminalLine) Info(a ...interface{}) Line {
 	r.state = BLANK
-	r.SetText(a...)
+	r.setText(a...)
 	return r
 }
 
 // Loadingf mark this line to be loading (displays loading indicator)
-func (r *Line) Loadingf(format string, args ...interface{}) *Line {
+func (r *TerminalLine) Loadingf(format string, args ...interface{}) Line {
 	return r.Loading(fmt.Sprintf(format, args...))
 }
 
 // Loading mark this line to be loading (displays loading indicator)
-func (r *Line) Loading(a ...interface{}) *Line {
+func (r *TerminalLine) Loading(a ...interface{}) Line {
 	r.state = LOADING
-	r.SetText(a...)
+	r.setText(a...)
 	return r
 }
 
 // Donef marks this line to be done and updates the text
-func (r *Line) Donef(format string, args ...interface{}) *Line {
+func (r *TerminalLine) Donef(format string, args ...interface{}) Line {
 	return r.Done(fmt.Sprintf(format, args...))
 }
 
 // Done marks this line to be done and updates the text
-func (r *Line) Done(a ...interface{}) *Line {
+func (r *TerminalLine) Done(a ...interface{}) Line {
 	r.state = DONE
-	r.SetText(a...)
+	r.setText(a...)
 	return r
 }
 
 // Warnf mark this line to be in warning with given format
-func (r *Line) Warnf(format string, args ...interface{}) *Line {
+func (r *TerminalLine) Warnf(format string, args ...interface{}) Line {
 	return r.Warn(fmt.Sprintf(format, args...))
 }
 
 // Warn mark this line to be in warning with given message
-func (r *Line) Warn(a ...interface{}) *Line {
+func (r *TerminalLine) Warn(a ...interface{}) Line {
 	r.state = WARN
-	r.SetText(a...)
+	r.setText(a...)
 	return r
 }
 
 // Errorf mark this line to be in error with given format
-func (r *Line) Errorf(format string, args ...interface{}) *Line {
+func (r *TerminalLine) Errorf(format string, args ...interface{}) Line {
 	return r.Error(fmt.Sprintf(format, args...))
 }
 
 // Error mark this line to be in error with given message
-func (r *Line) Error(a ...interface{}) *Line {
+func (r *TerminalLine) Error(a ...interface{}) Line {
 	r.state = ERROR
-	r.SetText(a...)
+	r.setText(a...)
 	return r
 }
 
 // Fatalf mark this line to be in fatal with given format
 // Will exit(1) after rerendering the lines
-func (r *Line) Fatalf(format string, args ...interface{}) {
+func (r *TerminalLine) Fatalf(format string, args ...interface{}) {
 	r.Fatal(fmt.Sprintf(format, args...))
 }
 
 // Fatal mark this line to be in error with given message
 // Will exit(1) after rerendering the lines
-func (r *Line) Fatal(a ...interface{}) {
+func (r *TerminalLine) Fatal(a ...interface{}) {
 	r.state = ERROR
-	r.SetText(a...)
+	r.setText(a...)
 	os.Exit(1)
 }
 
-func (r *Line) render() string {
+func (r *TerminalLine) render() string {
 	switch r.state {
 	case LOADING:
 		if r.showProgress {
@@ -163,6 +154,6 @@ func (r *Line) render() string {
 }
 
 // Update triggers re-rendering
-func (r *Line) Update() {
+func (r *TerminalLine) Update() {
 	r.updater.Update()
 }

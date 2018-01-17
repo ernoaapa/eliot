@@ -1,4 +1,4 @@
-package log
+package ui
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 // Terminal is tracks the Lines and updates all of them when needed
 type Terminal struct {
 	running bool
-	rows    []*Line
+	rows    []*TerminalLine
 	writer  *goterminal.Writer
 
 	mtx *sync.Mutex
@@ -48,7 +48,7 @@ func (t *Terminal) Start() {
 func (t *Terminal) Stop() {
 	t.running = false
 	t.Update()
-	t.rows = []*Line{}
+	t.rows = []*TerminalLine{}
 }
 
 // Update will re-render the output
@@ -64,11 +64,11 @@ func (t *Terminal) Update() {
 }
 
 // NewLine creates new terminal output line what you can change afterward
-func (t *Terminal) NewLine() *Line {
+func (t *Terminal) NewLine() Line {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	row := &Line{updater: t}
+	row := &TerminalLine{updater: t}
 	t.rows = append(t.rows, row)
 	return row
 }

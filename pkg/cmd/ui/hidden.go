@@ -1,4 +1,4 @@
-package log
+package ui
 
 // Hidden is log output implementation what doesn't output anything
 type Hidden struct {
@@ -19,6 +19,6 @@ func (*Hidden) Stop() {}
 func (*Hidden) Update() {}
 
 // NewLine creates new Line what doesn't show up anywhere
-func (h *Hidden) NewLine() *Line {
-	return &Line{updater: h}
+func (h *Hidden) NewLine() Line {
+	return &HiddenLine{}
 }
