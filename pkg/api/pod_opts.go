@@ -8,10 +8,10 @@ import (
 )
 
 // WithSharedMount adds mount point to each container
-func WithSharedMount(mount *containers.Mount) PodOpts {
+func WithSharedMount(mounts ...*containers.Mount) PodOpts {
 	return func(pod *pods.Pod) error {
 		for _, container := range pod.Spec.Containers {
-			container.Mounts = append(container.Mounts, mount)
+			container.Mounts = append(container.Mounts, mounts...)
 		}
 		return nil
 	}

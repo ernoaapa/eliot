@@ -6,7 +6,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
-	"time"
 
 	"github.com/ernoaapa/eliot/cmd"
 	"github.com/ernoaapa/eliot/pkg/api"
@@ -14,12 +13,9 @@ import (
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/cmd/ui"
-	"github.com/ernoaapa/eliot/pkg/config"
 	"github.com/ernoaapa/eliot/pkg/model"
-	"github.com/ernoaapa/eliot/pkg/printers"
 	"github.com/ernoaapa/eliot/pkg/progress"
 	"github.com/ernoaapa/eliot/pkg/resolve"
-	"github.com/ernoaapa/eliot/pkg/sync"
 	"github.com/ernoaapa/eliot/pkg/term"
 	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
@@ -29,34 +25,17 @@ import (
 var runCommand = cli.Command{
 	Name:        "run",
 	HelpName:    "run",
-	Usage:       "Start container in the device",
-	Description: "With run command, you can start new containers in the device",
-	UsageText: `eli run [options] -- <command>
+	Usage:       "Run commmand in new container in the device",
+	Description: "With run command, you can run command in a new container in the device",
+	UsageText: `eli run [options] <image> -- <command> <args>
 
-	 # Run code in current directory in the device
-	 eli run
-
-	 # Run 'build.sh' command in device with files in current directory
-	 eli run -- ./build.sh
-	 
-	 # Run container image in the container
-	 eli run --image docker.io/eaapa/hello-world:latest
-
-	 # Run container with name in the device
-	 eli run --image docker.io/eaapa/hello-world:latest --name my-pod
+	 # Run shell session in 'eaapa/hello-world' container
+	 eli run -i -t eaapa/hello-world -- /bin/sh
 `,
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "name",
 			Usage: "Name for the pod (default: current directory name)",
-		},
-		cli.StringFlag{
-			Name:  "image",
-			Usage: "The container image to start (default: resolve image based on project structure)",
-		},
-		cli.BoolFlag{
-			Name:  "detach, d",
-			Usage: "Run container in background and print container information (default: false)",
 		},
 		cli.StringSliceFlag{
 			Name:  "mount",
@@ -82,41 +61,31 @@ var runCommand = cli.Command{
 			Name:  "stdin, i",
 			Usage: "Keep stdin open on the container(s) in the pod, even if nothing is attached (default: true)",
 		},
-		cli.BoolFlag{
-			Name:  "no-sync",
-			Usage: "Do not sync any directory to the container (default: false)",
-		},
-		cli.StringSliceFlag{
-			Name:  "sync",
-			Usage: "Directory to sync to the target container (default: current directory)",
-			Value: &cli.StringSlice{"."},
-		},
 		cli.StringFlag{
 			Name:  "workdir, w",
 			Usage: "Working directory inside the container",
 		},
 	},
 	Action: func(clicontext *cli.Context) (err error) {
-
 		var (
-			projectConfig = config.ReadProjectConfig("./.eliot.yml")
-			name          = cmd.First(clicontext.String("name"), projectConfig.Name)
-			image         = cmd.First(clicontext.String("image"), projectConfig.Image)
-			detach        = clicontext.Bool("detach")
-			rm            = clicontext.Bool("rm")
-			tty           = clicontext.Bool("tty")
-			env           = projectConfig.EnvWith(clicontext.StringSlice("env"))
-			workdir       = clicontext.String("workdir")
-			noSync        = clicontext.Bool("no-sync")
-			syncDirs      = clicontext.StringSlice("sync")
-			mounts        = cmd.GetMounts(clicontext)
-			binds         = cmd.GetBinds(clicontext, projectConfig.Binds...)
-			args          = clicontext.Args()
+			name    = clicontext.String("name")
+			image   = clicontext.Args().First()
+			rm      = clicontext.Bool("rm")
+			tty     = clicontext.Bool("tty")
+			env     = clicontext.StringSlice("env")
+			workdir = clicontext.String("workdir")
+			mounts  = cmd.MustParseMounts(clicontext.StringSlice("mount"))
+			binds   = cmd.MustParseBinds(clicontext.StringSlice("bind"))
+			args    = cmd.DropDoubleDash(clicontext.Args().Tail())
 
 			stdin  = os.Stdin
 			stdout = os.Stdout
 			stderr = os.Stderr
 		)
+
+		if clicontext.IsSet("detach") || clicontext.IsSet("d") {
+			return errors.New("Detach not available. If you want to run container in background, use 'eli create pod' -command")
+		}
 
 		conf := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(conf)
@@ -143,35 +112,9 @@ var runCommand = cli.Command{
 			name = filepath.Base(cmd.GetCurrentDirectory())
 		}
 
-		if detach && rm {
-			return fmt.Errorf("You cannot use --detach flag with --rm, it would remove right away after container started")
-		}
-
 		for _, variable := range env {
 			if !model.IsValidEnvKeyValuePair(variable) {
 				return fmt.Errorf("Invalid --env value [%s], must be in format KEY=value. E.g. --env FOO=bar", variable)
-			}
-		}
-
-		opts := []api.PodOpts{}
-
-		if !noSync {
-			syncTargetPath := projectConfig.Sync.Target
-
-			opts = append(opts, api.WithContainer(&containers.Container{
-				Name:  fmt.Sprintf("rsync-%s", name),
-				Image: utils.ExpandToFQIN(projectConfig.Sync.Image),
-				Env: []string{
-					fmt.Sprintf("VOLUME=%s", syncTargetPath),
-				},
-			}))
-
-			opts = append(opts, api.WithSharedMount(
-				cmd.MustParseBindFlag(fmt.Sprintf("/var/lib/volumes/%s:%s:rw,rshared", name, syncTargetPath)),
-			))
-
-			if !clicontext.IsSet("workdir") && !clicontext.IsSet("w") {
-				opts = append(opts, api.WithWorkingDir(syncTargetPath))
 			}
 		}
 
@@ -218,16 +161,15 @@ var runCommand = cli.Command{
 					}
 				}
 			}
+
+			for image, line := range lines {
+				line.Donef("Downloaded %s", image)
+			}
 		}()
-		createErr := client.CreatePod(progressc, pod, opts...)
+		createErr := client.CreatePod(progressc, pod)
 		close(progressc)
 		if createErr != nil {
 			return errors.Wrapf(createErr, "Error in creating pod")
-		}
-
-		result, err := client.StartPod(name)
-		if err != nil {
-			return errors.Wrapf(err, "Error in starting pod")
 		}
 
 		if rm {
@@ -242,24 +184,14 @@ var runCommand = cli.Command{
 			}()
 		}
 
-		if detach {
-			writer := printers.GetNewTabWriter(os.Stdout)
-			defer writer.Flush()
-			printer := cmd.GetPrinter(clicontext)
-			return printer.PrintPodDetails(result, writer)
+		result, err := client.StartPod(name)
+		if err != nil {
+			return errors.Wrapf(err, "Error in starting pod")
 		}
 
 		attachContainerID, err := findRunningContainerID(result, name)
 		if err != nil {
 			return errors.Wrapf(err, "Cannot attach to container")
-		}
-
-		hooks := []api.AttachHooks{}
-		if !noSync {
-			hooks = append(hooks, func(endpoint config.Endpoint, done <-chan struct{}) {
-				destination := fmt.Sprintf("rsync://%s:%d/volume", endpoint.GetHost(), 873)
-				sync.StartRsync(done, syncDirs, destination, 1*time.Second)
-			})
 		}
 
 		term := term.TTY{
@@ -281,7 +213,7 @@ var runCommand = cli.Command{
 		defer ui.Start()
 
 		return term.Safe(func() error {
-			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr), hooks...)
+			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr))
 		})
 	},
 }

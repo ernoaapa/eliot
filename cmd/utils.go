@@ -16,6 +16,7 @@ import (
 	ui "github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/ernoaapa/eliot/pkg/discovery"
 	"github.com/ernoaapa/eliot/pkg/printers"
+	"github.com/ernoaapa/eliot/pkg/sync"
 
 	"github.com/sirupsen/logrus"
 
@@ -183,12 +184,12 @@ func GetPrinter(clicontext *cli.Context) printers.ResourcePrinter {
 	return printers.NewHumanReadablePrinter()
 }
 
-// GetMounts parses a --mount string flags
-func GetMounts(clicontext *cli.Context) (result []*containers.Mount) {
-	for _, flag := range clicontext.StringSlice("mount") {
-		mount, err := parseMountFlag(flag)
+// MustParseMounts parses a --mount string flags
+func MustParseMounts(mounts []string) (result []*containers.Mount) {
+	for _, str := range mounts {
+		mount, err := parseMountFlag(str)
 		if err != nil {
-			ui.NewLine().Fatalf("Failed to parse --mount flag: %s", err)
+			ui.NewLine().Fatalf("Failed to parse --mount flag [%s]: %s", str, err)
 		}
 		result = append(result, mount)
 	}
@@ -230,10 +231,8 @@ func parseMountFlag(m string) (*containers.Mount, error) {
 	return mount, nil
 }
 
-// GetBinds parses a --bind string flags
-func GetBinds(clicontext *cli.Context, extra ...string) (result []*containers.Mount) {
-	binds := clicontext.StringSlice("bind")
-	binds = append(binds, extra...)
+// MustParseBinds parses a --bind string flags
+func MustParseBinds(binds []string) (result []*containers.Mount) {
 	for _, flag := range binds {
 		bind, err := ParseBindFlag(flag)
 		if err != nil {
@@ -274,6 +273,19 @@ func ParseBindFlag(b string) (*containers.Mount, error) {
 		Source:      src,
 		Options:     opts,
 	}, nil
+}
+
+// MustParseSyncs parses a sync string in the form "~/local/dir:/data"
+func MustParseSyncs(syncs []string) (result []sync.Sync) {
+	for _, value := range syncs {
+		sync, err := sync.Parse(value)
+		if err != nil {
+			logrus.Fatalf("Error reading sync argument: %s", err)
+		}
+		result = append(result, sync)
+	}
+
+	return result
 }
 
 func fileExists(path string) bool {
