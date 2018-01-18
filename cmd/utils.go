@@ -71,8 +71,14 @@ func GetClient(config *config.Provider) *api.Client {
 		uiline.Fatal("No devices to connect. You must give device endpoint. E.g. --endpoint=192.168.1.2")
 		return nil
 	case 1:
-		uiline.Infof("Connect to %s (%s)", endpoints[0].Name, endpoints[0].URL)
-		return api.NewClient(config.GetNamespace(), endpoints[0])
+		uiline.Loadingf("Connecting to %s (%s)", endpoints[0].Name, endpoints[0].URL)
+		client := api.NewClient(config.GetNamespace(), endpoints[0])
+		info, err := client.GetInfo()
+		if err != nil {
+			uiline.Fatalf("Failed connect to %s (%s)", endpoints[0].Name, endpoints[0].URL)
+		}
+		uiline.Donef("Connected to %s (%s)", info.Hostname, endpoints[0].URL)
+		return client
 	default:
 		uiline.Fatalf("%d devices found. You must give target device. E.g. --endpoint=192.168.1.2", len(endpoints))
 		return nil

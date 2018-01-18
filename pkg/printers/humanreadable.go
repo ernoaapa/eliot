@@ -75,10 +75,10 @@ func getKeys(source map[string]int) (result []string) {
 
 // PrintDevicesTable writes stream of Devices in human readable table format to the writer
 func (p *HumanReadablePrinter) PrintDevicesTable(devices []model.DeviceInfo, writer io.Writer) error {
-	fmt.Fprintln(writer, "\nHOSTNAME\tENDPOINT")
+	fmt.Fprintln(writer, "\nHOSTNAME\tENDPOINT\tVERSION")
 
 	for _, device := range devices {
-		fmt.Fprintf(writer, "%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint())
+		fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint(), device.Version)
 	}
 
 	return nil
