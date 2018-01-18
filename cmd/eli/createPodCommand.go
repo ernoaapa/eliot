@@ -5,7 +5,6 @@ import (
 
 	"github.com/ernoaapa/eliot/cmd"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
-	"github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/ernoaapa/eliot/pkg/printers"
 	"github.com/ernoaapa/eliot/pkg/progress"
 	"github.com/ernoaapa/eliot/pkg/resolve"
@@ -49,29 +48,9 @@ var createPodCommand = cli.Command{
 		config := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(config)
 
-		lines := map[string]ui.Line{}
 		progressc := make(chan []*progress.ImageFetch)
+		go cmd.ShowDownloadProgress(progressc)
 
-		go func() {
-			for fetches := range progressc {
-				for _, fetch := range fetches {
-					if _, ok := lines[fetch.Image]; !ok {
-						lines[fetch.Image] = ui.NewLine().Loadingf("Download %s", fetch.Image)
-					}
-
-					if fetch.IsDone() {
-						if fetch.Failed {
-							lines[fetch.Image].Errorf("Failed %s", fetch.Image)
-						} else {
-							lines[fetch.Image].Donef("Downloaded %s", fetch.Image)
-						}
-					} else {
-						current, total := fetch.GetProgress()
-						lines[fetch.Image].WithProgress(current, total)
-					}
-				}
-			}
-		}()
 		err := client.CreatePod(progressc, pod)
 		close(progressc)
 		if err != nil {

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"syscall"
 
@@ -139,33 +138,9 @@ var runCommand = cli.Command{
 			},
 		}
 
-		lines := map[string]ui.Line{}
 		progressc := make(chan []*progress.ImageFetch)
+		go cmd.ShowDownloadProgress(progressc)
 
-		go func() {
-			for fetches := range progressc {
-				for _, fetch := range fetches {
-					if _, ok := lines[fetch.Image]; !ok {
-						lines[fetch.Image] = ui.NewLine().Loadingf("Download %s", fetch.Image)
-					}
-
-					if fetch.IsDone() {
-						if fetch.Failed {
-							lines[fetch.Image].Errorf("Failed %s", fetch.Image)
-						} else {
-							lines[fetch.Image].Donef("Downloaded %s", fetch.Image)
-						}
-					} else {
-						current, total := fetch.GetProgress()
-						lines[fetch.Image].WithProgress(current, total)
-					}
-				}
-			}
-
-			for image, line := range lines {
-				line.Donef("Downloaded %s", image)
-			}
-		}()
 		createErr := client.CreatePod(progressc, pod)
 		close(progressc)
 		if createErr != nil {
@@ -189,7 +164,7 @@ var runCommand = cli.Command{
 			return errors.Wrapf(err, "Error in starting pod")
 		}
 
-		attachContainerID, err := findRunningContainerID(result, name)
+		attachContainerID, err := cmd.FindRunningContainerID(result, name)
 		if err != nil {
 			return errors.Wrapf(err, "Cannot attach to container")
 		}
@@ -205,7 +180,7 @@ var runCommand = cli.Command{
 			sigc := cmd.ForwardAllSignals(func(signal syscall.Signal) error {
 				return client.Signal(attachContainerID, signal)
 			})
-			defer stopCatch(sigc)
+			defer cmd.StopCatch(sigc)
 		}
 
 		// Stop updating ui lines, let the std piping take the terminal
@@ -216,21 +191,4 @@ var runCommand = cli.Command{
 			return client.Attach(attachContainerID, api.NewAttachIO(term.In, term.Out, stderr))
 		})
 	},
-}
-
-func findRunningContainerID(pod *pods.Pod, name string) (string, error) {
-	if pod.Status != nil && len(pod.Status.ContainerStatuses) > 0 {
-		for _, status := range pod.Status.ContainerStatuses {
-			if status.Name == name {
-				return status.ContainerID, nil
-			}
-		}
-	}
-
-	return "", fmt.Errorf("Cannot find ContainerID with name %s", name)
-}
-
-func stopCatch(sigc chan os.Signal) {
-	signal.Stop(sigc)
-	close(sigc)
 }

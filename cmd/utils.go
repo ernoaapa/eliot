@@ -398,3 +398,22 @@ func ResolveContainerID(containers []*containers.ContainerStatus, containerName 
 		return "", fmt.Errorf("Pod contains %d containers, you must define container name", containerCount)
 	}
 }
+
+// FindRunningContainerID search from Pod definition a containerID by container name
+func FindRunningContainerID(pod *pods.Pod, name string) (string, error) {
+	if pod.Status != nil && len(pod.Status.ContainerStatuses) > 0 {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name == name {
+				return status.ContainerID, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("Cannot find ContainerID with name %s", name)
+}
+
+// StopCatch will close the given channel when receives Stop signal (^C)
+func StopCatch(sigc chan os.Signal) {
+	signal.Stop(sigc)
+	close(sigc)
+}
