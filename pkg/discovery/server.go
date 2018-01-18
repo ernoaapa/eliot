@@ -1,6 +1,9 @@
 package discovery
 
 import (
+	"fmt"
+
+	"github.com/ernoaapa/eliot/pkg/version"
 	"github.com/grandcat/zeroconf"
 	log "github.com/sirupsen/logrus"
 )
@@ -27,7 +30,9 @@ func NewServer(name string, port int) *Server {
 func (s *Server) Serve() {
 	log.Infof("Start discovery server...")
 	log.Debugf("Exposing %s in port %d", s.Name, s.Port)
-	server, err := zeroconf.Register(s.Name, ZeroConfServiceName, s.Domain, s.Port, []string{"txtv=0", "lo=1", "la=2"}, nil)
+	server, err := zeroconf.Register(s.Name, ZeroConfServiceName, s.Domain, s.Port, []string{
+		fmt.Sprintf("v=%s", version.VERSION),
+	}, nil)
 	if err != nil {
 		log.Fatalf("Failed to create zeroconf server: %s", err)
 	}
