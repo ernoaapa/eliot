@@ -99,7 +99,7 @@ var upCommand = cli.Command{
 			syncs         = cmd.MustParseSyncs(append(projectConfig.Syncs, clicontext.StringSlice("sync")...))
 			mounts        = cmd.MustParseMounts(append(projectConfig.Mounts, clicontext.StringSlice("mount")...))
 			binds         = cmd.MustParseBinds(append(projectConfig.Binds, clicontext.StringSlice("bind")...))
-			args          = cmd.DropDoubleDash(clicontext.Args())
+			args          = append(projectConfig.Command, cmd.DropDoubleDash(clicontext.Args())...)
 
 			stdin  = os.Stdin
 			stdout = os.Stdout
