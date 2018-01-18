@@ -179,29 +179,9 @@ var upCommand = cli.Command{
 			},
 		}
 
-		logs := map[string]ui.Line{}
 		progressc := make(chan []*progress.ImageFetch)
+		go cmd.ShowDownloadProgress(progressc)
 
-		go func() {
-			for fetches := range progressc {
-				for _, fetch := range fetches {
-					if _, ok := logs[fetch.Image]; !ok {
-						logs[fetch.Image] = ui.NewLine().Loadingf("Download %s", fetch.Image)
-					}
-
-					if fetch.IsDone() {
-						if fetch.Failed {
-							logs[fetch.Image].Errorf("Failed %s", fetch.Image)
-						} else {
-							logs[fetch.Image].Donef("Downloaded %s", fetch.Image)
-						}
-					} else {
-						current, total := fetch.GetProgress()
-						logs[fetch.Image].WithProgress(current, total)
-					}
-				}
-			}
-		}()
 		createErr := client.CreatePod(progressc, pod, opts...)
 		close(progressc)
 		if createErr != nil {
@@ -225,7 +205,7 @@ var upCommand = cli.Command{
 			}()
 		}
 
-		attachContainerID, err := findRunningContainerID(result, name)
+		attachContainerID, err := cmd.FindRunningContainerID(result, name)
 		if err != nil {
 			return errors.Wrapf(err, "Cannot attach to container")
 		}
@@ -248,7 +228,7 @@ var upCommand = cli.Command{
 			sigc := cmd.ForwardAllSignals(func(signal syscall.Signal) error {
 				return client.Signal(attachContainerID, signal)
 			})
-			defer stopCatch(sigc)
+			defer cmd.StopCatch(sigc)
 		}
 
 		// Stop updating ui lines, let the std piping take the terminal
