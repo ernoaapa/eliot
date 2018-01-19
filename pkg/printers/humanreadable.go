@@ -29,6 +29,11 @@ func NewHumanReadablePrinter() *HumanReadablePrinter {
 
 // PrintPodsTable writes list of Pods in human readable table format to the writer
 func (p *HumanReadablePrinter) PrintPodsTable(pods []*pods.Pod, writer io.Writer) error {
+	if len(pods) == 0 {
+		fmt.Fprintf(writer, "\n\t(No pods)\n\n")
+		return nil
+	}
+
 	fmt.Fprintln(writer, "\nNAMESPACE\tNAME\tCONTAINERS\tSTATUS")
 
 	for _, pod := range pods {
@@ -75,10 +80,17 @@ func getKeys(source map[string]int) (result []string) {
 
 // PrintDevicesTable writes stream of Devices in human readable table format to the writer
 func (p *HumanReadablePrinter) PrintDevicesTable(devices []model.DeviceInfo, writer io.Writer) error {
+	if len(devices) == 0 {
+		fmt.Fprintf(writer, "\n\t(No devices)\n\n")
+		return nil
+	}
 	fmt.Fprintln(writer, "\nHOSTNAME\tENDPOINT\tVERSION")
 
 	for _, device := range devices {
-		fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint(), device.Version)
+		_, err := fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint(), device.Version)
+		if err != nil {
+			return errors.Wrapf(err, "Error while writing device row")
+		}
 	}
 
 	return nil
