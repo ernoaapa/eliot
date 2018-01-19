@@ -31,9 +31,9 @@ If you use `run` command to develop your software project in the device, you pro
 
 ```yml
 name: some-custom-name
-image: someother/image:versin
-sync:
-  target: /go/src/github.com/ernoaapa/eliot
+image: someother/image:version
+syncs:
+  .:/go/src/github.com/ernoaapa/eliot
 binds:
   - /dev:/dev
 ```

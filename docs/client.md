@@ -20,6 +20,56 @@ If you have multiple devices, you need to give `--device` flag for all other com
 **[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli --device linuxkit-96165e7f48d7.local. get pods]
 ```
 
+## `eli run [-i -t] <image> [command]`
+Like `docker run`, `eli run` start container, but start it in the device, not in your local computer.
+With `run` command you can quickly run some container in the device, and after you complete, (by default) eliot removes the container and leaves the device clean.
+
+```shell
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli run docker.io/arm64v8/alpine:latest -- /bin/sh]
+root@linuxkit-96165e7f48d7:/# uname -a
+Linux raspberrypi-e2ccbe63f23d 4.9.72-linuxkit #1 SMP Thu Dec 28 19:08:26 UTC 2017 x86_64 Linux
+root@linuxkit-96165e7f48d7:/# exit
+```
+
+## `eli up -- <command>`
+When you develop your software, often you need to have access to the device to read some hardware sensor from your software. Ideal place for development would be in the device, but it's always too slow and clumsy way to code software. 
+To make development as easy as possible, Eliot have `up` command.
+
+`up` command will: 
+1. Detect what type of project you have in current directory and selects container image (you can use `--image` flag to override image)
+2. Start required containers
+3. Run default command or `<command>` in container
+4. Move your terminal session to the container
+5. Start syncing your local files to the container
+
+```shell
+**[terminal]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli up -- /bin/bash]
+  ✓ Detected golang project, use image: docker.io/library/golang:latest (arch amd64)
+root@linuxkit-96165e7f48d7:/go/src/github.com/ernoaapa/eliot# ls -l
+total 268
+-rw-------  1 nobody 65533    304 Nov 20 17:53 Dockerfile.in
+-rw-------  1 nobody 65533    305 Dec 31 08:07 Dockerfile.tmpl
+-rw-------  1 nobody 65533   1048 Nov 15 06:13 LICENSE
+-rw-------  1 nobody 65533   6549 Jan  2 05:09 Makefile
+-rw-------  1 nobody 65533   1689 Dec 31 03:28 README.md
+drwxr-xr-x  3 nobody 65533   4096 Jan  5 01:16 _book
+drwxr-xr-x  5 nobody 65533   4096 Jan  5 01:16 bin
+-rw-------  1 nobody 65533    327 Jan  5 00:48 book.json
+drwxr-xr-x  2 nobody 65533   4096 Dec 19 02:49 build
+drwxr-xr-x  4 nobody 65533   4096 Jan  5 01:16 cmd
+drwxr-xr-x  2 nobody 65533   4096 Jan  4 17:48 docs
+drwxr-xr-x  2 nobody 65533   4096 Jan  5 00:53 examples
+drwxr-xr-x 42 nobody 65533   4096 Jan  5 01:16 node_modules
+-rw-------  1 nobody 65533 209760 Jan  5 00:47 package-lock.json
+-rw-------  1 nobody 65533   2015 Jan  4 07:27 vendor.conf
+root@linuxkit-96165e7f48d7:/go/src/github.com/ernoaapa/eliot# exit
+  ✓ Deleted pod eliot
+```
+
+You can override defaults with flags (see `eli up --help`) or you can create `.eliot.yml` project configuration. See [configuration](configuration.md#project-configuration) for more info.
+
 ## `eli create -f <file.yml>`
 It's a good practice to store _Pod_ definitions in version control and deploy exactly same deployment to each device.
 You can write definition in `yaml` file which follows the [yaml specification](configuration.md#pod-specification) and use `create` command to create all resources.
@@ -229,40 +279,6 @@ Hello world!
 ```
 
 You can also give `-i` flag to hook up your stdin into the container, but watch out, if you for example press ^C (ctrl+c) to exit, you actually send kill signal to the process in the container which will stop the container.
-
-## `eli run <command>`
-When you develop your software, often you need to have access to the device to read some hardware sensor from your software. To make development as easy as possible, Eliot have `run` command.
-
-`run` command will: 
-1. Detect what type of project you have in current directory and selects container image (you can use `--image` flag to override image)
-2. Start required containers
-3. Run `/bin/bash` session in container
-4. Move your terminal session to the container
-5. Start syncing your local files to the container
-
-```shell
-**[terminal]
-**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli run --bind /dev:/dev /bin/bash]
-root@linuxkit-96165e7f48d7:/go/src/github.com/ernoaapa/eliot# ls -l
-total 268
--rw-------  1 nobody 65533    304 Nov 20 17:53 Dockerfile.in
--rw-------  1 nobody 65533    305 Dec 31 08:07 Dockerfile.tmpl
--rw-------  1 nobody 65533   1048 Nov 15 06:13 LICENSE
--rw-------  1 nobody 65533   6549 Jan  2 05:09 Makefile
--rw-------  1 nobody 65533   1689 Dec 31 03:28 README.md
-drwxr-xr-x  3 nobody 65533   4096 Jan  5 01:16 _book
-drwxr-xr-x  5 nobody 65533   4096 Jan  5 01:16 bin
--rw-------  1 nobody 65533    327 Jan  5 00:48 book.json
-drwxr-xr-x  2 nobody 65533   4096 Dec 19 02:49 build
-drwxr-xr-x  4 nobody 65533   4096 Jan  5 01:16 cmd
-drwxr-xr-x  2 nobody 65533   4096 Jan  4 17:48 docs
-drwxr-xr-x  2 nobody 65533   4096 Jan  5 00:53 examples
-drwxr-xr-x 42 nobody 65533   4096 Jan  5 01:16 node_modules
--rw-------  1 nobody 65533 209760 Jan  5 00:47 package-lock.json
--rw-------  1 nobody 65533   2015 Jan  4 07:27 vendor.conf
-root@linuxkit-96165e7f48d7:/go/src/github.com/ernoaapa/eliot# exit
-  ✓ Deleted pod hello-world
-```
 
 ## `eli build device`
 Easiest way to run Eliot in your device is to use [EliotOS](https://github.com/ernoaapa/eliot-os) which is minimal Operating System where's just minimal components installed to run Eliot and everything else run on top of the Eliot in containers.
