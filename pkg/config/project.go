@@ -62,7 +62,7 @@ func ReadProjectConfig(path string) *ProjectConfig {
 	}
 
 	if !fs.FileExist(path) {
-		return &ProjectConfig{}
+		return config
 	}
 
 	data, err := ioutil.ReadFile(path)
