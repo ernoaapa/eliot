@@ -1,7 +1,6 @@
 package discovery
 
 import (
-	"log"
 	"strings"
 
 	"github.com/ernoaapa/eliot/pkg/model"
@@ -10,7 +9,7 @@ import (
 
 func MapToInternalModel(entry *zeroconf.ServiceEntry) model.DeviceInfo {
 	version := "unknown"
-	log.Println(entry.Text)
+
 	for _, val := range entry.Text {
 		parts := strings.SplitN(val, "=", 2)
 		if len(parts) == 2 && parts[0] == "v" {
