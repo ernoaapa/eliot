@@ -9,7 +9,6 @@
   * [Install EliotOS](installation.md#install-eliotos)
 * [Getting Started](getting_started.md)
   * [Core Concepts](getting_started.md#core-concepts)
-  * [Installation](getting_started.md#installation)
   * [Deploy first app](getting_started.md#deploy-first-app)
   * [Development in device](getting_started.md#core-concepts)
 * [CLI client](client.md)
