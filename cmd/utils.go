@@ -29,6 +29,11 @@ import (
 	"github.com/urfave/cli"
 )
 
+const (
+	outputHuman = "human"
+	outputYaml  = "yaml"
+)
+
 var (
 	// GlobalFlags are flags what all commands have common
 	GlobalFlags = []cli.Flag{
@@ -40,6 +45,11 @@ var (
 			Name:  "quiet",
 			Usage: "Don't print any progress output",
 		},
+		cli.StringFlag{
+			Name:  "output, o",
+			Usage: fmt.Sprintf("Output format. One of: %s", []string{outputHuman, outputYaml}),
+			Value: "human",
+		},
 	}
 )
 
@@ -50,7 +60,7 @@ func GlobalBefore(context *cli.Context) error {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
-	if cmd.IsPipingOut() || context.GlobalBool("quiet") {
+	if cmd.IsPipingOut() || context.GlobalBool("quiet") || context.GlobalString("output") != outputHuman {
 		ui.SetOutput(ui.NewHidden())
 	} else if debug {
 		ui.SetOutput(ui.NewDebug())
@@ -187,7 +197,15 @@ func GetRuntimeClient(clicontext *cli.Context, hostname string) runtime.Client {
 
 // GetPrinter returns printer for formating resources output
 func GetPrinter(clicontext *cli.Context) printers.ResourcePrinter {
-	return printers.NewHumanReadablePrinter()
+	switch output := clicontext.GlobalString("output"); output {
+	case outputHuman:
+		return printers.NewHumanReadablePrinter()
+	case outputYaml:
+		return printers.NewYamlPrinter()
+	default:
+		logrus.Fatalf("Unknown output format: %s", output)
+		return nil
+	}
 }
 
 // MustParseMounts parses a --mount string flags
