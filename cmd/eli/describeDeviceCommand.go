@@ -47,7 +47,7 @@ var describeDeviceCommand = cli.Command{
 			if err != nil {
 				return errors.Wrap(err, "Failed to fetch device info")
 			}
-			if err := printer.PrintDeviceDetails(info, writer); err != nil {
+			if err := printer.PrintDevice(info, writer); err != nil {
 				return err
 			}
 		}

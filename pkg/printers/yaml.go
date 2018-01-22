@@ -11,46 +11,48 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// YamlPrinter is ResourcePrinter implementation which writes output in YAML format
 type YamlPrinter struct {
 }
 
+// NewYamlPrinter creates new YamlPrinter instance
 func NewYamlPrinter() *YamlPrinter {
 	return &YamlPrinter{}
 }
 
-// PrintPodsTable implementation
-func (p *YamlPrinter) PrintPodsTable(pods []*pods.Pod, w io.Writer) error {
+// PrintPods takes list of pods and prints to Writer in YAML format
+func (p *YamlPrinter) PrintPods(pods []*pods.Pod, w io.Writer) error {
 	if err := writeAsYml(pods, w); err != nil {
 		return errors.Wrap(err, "Failed to write pods yaml")
 	}
 	return nil
 }
 
-// PrintDevicesTable implementation
-func (p *YamlPrinter) PrintDevicesTable(devices []model.DeviceInfo, w io.Writer) error {
+// PrintDevices takes list of devices and prints to Writer in YAML format
+func (p *YamlPrinter) PrintDevices(devices []model.DeviceInfo, w io.Writer) error {
 	if err := writeAsYml(devices, w); err != nil {
 		return errors.Wrap(err, "Failed to write devices yaml")
 	}
 	return nil
 }
 
-// PrintDeviceDetails implementation
-func (p *YamlPrinter) PrintDeviceDetails(device *device.Info, w io.Writer) error {
+// PrintDevice takes device info and prints to Writer in YAML format
+func (p *YamlPrinter) PrintDevice(device *device.Info, w io.Writer) error {
 	if err := writeAsYml(device, w); err != nil {
 		return errors.Wrap(err, "Failed to write device yaml")
 	}
 	return nil
 }
 
-// PrintPodDetails implementation
-func (p *YamlPrinter) PrintPodDetails(pod *pods.Pod, w io.Writer) error {
+// PrintPod takes Pod and prints to Writer in YAML format
+func (p *YamlPrinter) PrintPod(pod *pods.Pod, w io.Writer) error {
 	if err := writeAsYml(pod, w); err != nil {
 		return errors.Wrap(err, "Failed to write pod yaml")
 	}
 	return nil
 }
 
-// PrintConfig implementation
+// PrintConfig takes Config and prints to Writer in YAML format
 func (p *YamlPrinter) PrintConfig(config *config.Config, w io.Writer) error {
 	if err := writeAsYml(config, w); err != nil {
 		return errors.Wrap(err, "Failed to write config yaml")

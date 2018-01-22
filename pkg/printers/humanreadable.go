@@ -27,8 +27,8 @@ func NewHumanReadablePrinter() *HumanReadablePrinter {
 	return &HumanReadablePrinter{}
 }
 
-// PrintPodsTable writes list of Pods in human readable table format to the writer
-func (p *HumanReadablePrinter) PrintPodsTable(pods []*pods.Pod, writer io.Writer) error {
+// PrintPods writes list of Pods in human readable table format to the writer
+func (p *HumanReadablePrinter) PrintPods(pods []*pods.Pod, writer io.Writer) error {
 	if len(pods) == 0 {
 		fmt.Fprintf(writer, "\n\t(No pods)\n\n")
 		return nil
@@ -78,8 +78,8 @@ func getKeys(source map[string]int) (result []string) {
 	return result
 }
 
-// PrintDevicesTable writes stream of Devices in human readable table format to the writer
-func (p *HumanReadablePrinter) PrintDevicesTable(devices []model.DeviceInfo, writer io.Writer) error {
+// PrintDevices writes list of Devices in human readable table format to the writer
+func (p *HumanReadablePrinter) PrintDevices(devices []model.DeviceInfo, writer io.Writer) error {
 	if len(devices) == 0 {
 		fmt.Fprintf(writer, "\n\t(No devices)\n\n")
 		return nil
@@ -96,8 +96,8 @@ func (p *HumanReadablePrinter) PrintDevicesTable(devices []model.DeviceInfo, wri
 	return nil
 }
 
-// PrintDeviceDetails writes a dvice in human readable detailed format to the writer
-func (p *HumanReadablePrinter) PrintDeviceDetails(info *device.Info, writer io.Writer) error {
+// PrintDevice writes a device in human readable detailed format to the writer
+func (p *HumanReadablePrinter) PrintDevice(info *device.Info, writer io.Writer) error {
 	t := template.New("device-details")
 	t, err := t.Parse(humanreadable.DeviceDetailsTemplate)
 	if err != nil {
@@ -109,8 +109,8 @@ func (p *HumanReadablePrinter) PrintDeviceDetails(info *device.Info, writer io.W
 	return nil
 }
 
-// PrintPodDetails writes a pod in human readable detailed format to the writer
-func (p *HumanReadablePrinter) PrintPodDetails(pod *pods.Pod, writer io.Writer) error {
+// PrintPod writes a pod in human readable detailed format to the writer
+func (p *HumanReadablePrinter) PrintPod(pod *pods.Pod, writer io.Writer) error {
 	t := template.New("pod-details").Funcs(template.FuncMap{
 		"GetStatus": func(pod pods.Pod, name string) *containers.ContainerStatus {
 			if pod.Status == nil {

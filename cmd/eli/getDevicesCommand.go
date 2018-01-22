@@ -32,6 +32,6 @@ var getDevicesCommand = cli.Command{
 		defer writer.Flush()
 
 		printer := cmd.GetPrinter(clicontext)
-		return printer.PrintDevicesTable(devices, writer)
+		return printer.PrintDevices(devices, writer)
 	},
 }

@@ -34,19 +34,19 @@ func TestSuite(t *testing.T) {
 
 	for name, impl := range implementations {
 		t.Run(name, func(t *testing.T) {
-			testYamlPrintPodsTable(t, impl)
-			testYamlPrintDevicesTable(t, impl)
-			testPrintDeviceDetails(t, impl)
-			testPrintPodsTable(t, impl)
+			testYamlPrintPods(t, impl)
+			testYamlPrintDevices(t, impl)
+			testPrintDevice(t, impl)
+			testPrintPods(t, impl)
 			testPrintConfig(t, impl)
 		})
 	}
 }
 
-func testYamlPrintPodsTable(t *testing.T, printer ResourcePrinter) {
+func testYamlPrintPods(t *testing.T, printer ResourcePrinter) {
 	var buffer bytes.Buffer
 
-	err := printer.PrintPodsTable([]*pods.Pod{examplePod}, &buffer)
+	err := printer.PrintPods([]*pods.Pod{examplePod}, &buffer)
 	assert.NoError(t, err, "Printing pod details should not return error")
 
 	result := buffer.String()
@@ -54,7 +54,7 @@ func testYamlPrintPodsTable(t *testing.T, printer ResourcePrinter) {
 	assert.True(t, len(result) > 0, "Should write something to the writer")
 }
 
-func testYamlPrintDevicesTable(t *testing.T, printer ResourcePrinter) {
+func testYamlPrintDevices(t *testing.T, printer ResourcePrinter) {
 	var buffer bytes.Buffer
 
 	data := []model.DeviceInfo{
@@ -66,7 +66,7 @@ func testYamlPrintDevicesTable(t *testing.T, printer ResourcePrinter) {
 		},
 	}
 
-	err := printer.PrintDevicesTable(data, &buffer)
+	err := printer.PrintDevices(data, &buffer)
 	assert.NoError(t, err, "Printing devices table should not return error")
 
 	result := buffer.String()
@@ -74,7 +74,7 @@ func testYamlPrintDevicesTable(t *testing.T, printer ResourcePrinter) {
 	assert.True(t, len(result) > 0, "Should write something to the writer")
 }
 
-func testPrintDeviceDetails(t *testing.T, printer ResourcePrinter) {
+func testPrintDevice(t *testing.T, printer ResourcePrinter) {
 	var buffer bytes.Buffer
 
 	data := &device.Info{
@@ -89,7 +89,7 @@ func testPrintDeviceDetails(t *testing.T, printer ResourcePrinter) {
 		Os:         "linux",
 	}
 
-	err := printer.PrintDeviceDetails(data, &buffer)
+	err := printer.PrintDevice(data, &buffer)
 	assert.NoError(t, err, "Printing pod details should not return error")
 
 	result := buffer.String()
@@ -97,10 +97,10 @@ func testPrintDeviceDetails(t *testing.T, printer ResourcePrinter) {
 	assert.True(t, len(result) > 0, "Should write something to the writer")
 }
 
-func testPrintPodsTable(t *testing.T, printer ResourcePrinter) {
+func testPrintPods(t *testing.T, printer ResourcePrinter) {
 	var buffer bytes.Buffer
 
-	err := printer.PrintPodsTable([]*pods.Pod{examplePod}, &buffer)
+	err := printer.PrintPods([]*pods.Pod{examplePod}, &buffer)
 	assert.NoError(t, err, "Printing pods table should not return error")
 
 	result := buffer.String()
@@ -108,7 +108,7 @@ func testPrintPodsTable(t *testing.T, printer ResourcePrinter) {
 	assert.True(t, len(result) > 0, "Should write something to the writer")
 }
 
-func testPrintPodDetails(t *testing.T, printer ResourcePrinter) {
+func testPrintPod(t *testing.T, printer ResourcePrinter) {
 	var buffer bytes.Buffer
 
 	data := &pods.Pod{
@@ -127,7 +127,7 @@ func testPrintPodDetails(t *testing.T, printer ResourcePrinter) {
 		},
 	}
 
-	err := printer.PrintPodDetails(data, &buffer)
+	err := printer.PrintPod(data, &buffer)
 	assert.NoError(t, err, "Printing pod details should not return error")
 
 	result := buffer.String()

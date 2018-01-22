@@ -39,7 +39,7 @@ var describePodCommand = cli.Command{
 		defer writer.Flush()
 		printer := cmd.GetPrinter(clicontext)
 		for _, pod := range pods {
-			if err := printer.PrintPodDetails(pod, writer); err != nil {
+			if err := printer.PrintPod(pod, writer); err != nil {
 				return err
 			}
 		}
