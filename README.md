@@ -5,15 +5,17 @@
 
 Eliot is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity, security and stability. Eliot gives simplified app delivery, isolation and additional security to traditional installations.
 
-- [Documentation](http://docs.eliot.run)
-- [Binary releases](https://github.com/ernoaapa/eliot/releases)
-- [Docker releases](https://hub.docker.com/r/ernoaapa/eliotd/tags)
+[![asciicast](https://asciinema.org/a/vZcVZKEfAosSSrhWrJbmIqAd9.png)](https://asciinema.org/a/vZcVZKEfAosSSrhWrJbmIqAd9?autoplay=1&speed=2)
 
 Docker and Kubernetes have inspired heavily and if you're familiar with those, you find really easy to get started with Eliot.
 
 <sub>Built with ❤︎ by [Erno Aapa](https://github.com/ernoaapa) and [contributors](https://github.com/ernoaapa/eliot/contributors)</sub>
 
 ## Usage
+
+- [Documentation](http://docs.eliot.run)
+- [Binary releases](https://github.com/ernoaapa/eliot/releases)
+- [Docker releases](https://hub.docker.com/r/ernoaapa/eliotd/tags)
 
 Eliot is based on top of the [containerd](https://github.com/containerd/containerd) to provide simple, _Kubernetes like_ API for managing containers.
 
