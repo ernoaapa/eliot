@@ -5,7 +5,7 @@
 
 Eliot is a open source system for managing containerized applications on top of the IoT device with an emphasis to usability, simplicity, security and stability. Eliot gives simplified app delivery, isolation and additional security to traditional installations.
 
-[![asciicast](https://asciinema.org/a/vZcVZKEfAosSSrhWrJbmIqAd9.png)](https://asciinema.org/a/vZcVZKEfAosSSrhWrJbmIqAd9?autoplay=1&speed=2)
+[![asciicast](https://asciinema.org/a/vZcVZKEfAosSSrhWrJbmIqAd9.png)](https://asciinema.org/a/vZcVZKEfAosSSrhWrJbmIqAd9?autoplay=1&speed=2&t=4)
 
 Docker and Kubernetes have inspired heavily and if you're familiar with those, you find really easy to get started with Eliot.
 
