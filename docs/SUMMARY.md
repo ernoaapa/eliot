@@ -30,3 +30,6 @@
 * [Contributing](contributing.md)
  * [Getting Started](contributing.md#development-getting-started)
  * [Debugging](contributing.md#debugging)
+* Need help?
+ * [Ask on Gitter](https://gitter.im/eliot-run/Lobby)
+ * [Create a GitHub issue](https://github.com/ernoaapa/eliot/issues/new)
