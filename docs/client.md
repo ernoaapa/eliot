@@ -2,7 +2,7 @@
 To see full documentation about commands and options, type `eli --help` and `eli <command> --help`.
 
 ## `eli get devices`
-Eliot can search devices automatically from network with mDNS protocol. You can get list of devices what Eliot finds with `get devices` command.
+Eliot can search devices automatically from network with mDNS protocol.
 
 ```shell
 **[terminal]
@@ -283,7 +283,7 @@ You can also give `-i` flag to hook up your stdin into the container, but watch 
 ## `eli build device`
 Easiest way to run Eliot in your device is to use [EliotOS](https://github.com/ernoaapa/eliot-os) which is minimal Operating System where's just minimal components installed to run Eliot and everything else run on top of the Eliot in containers.
 
-With `eli build device` command you can build EliotOS image what you can just unpack to your device sdcard.
+With `eli build device` command you can build EliotOS image that you can just unpack to your device sdcard.
 
 > Note: At the moment we support only RaspberryPi 3b, for other devices [see installation guide](installation.md)
 

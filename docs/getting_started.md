@@ -11,7 +11,7 @@ You define what software containers you would like to run in the device, by depl
 
 ### Pods
 
-Pod is a basic building block of Eliot and is the main model object what you deploy and manage.
+Pod is a basic building block of Eliot and is the main model object that you deploy and manage.
 If you're familiar with [Kubernetes definition of _Pod_](https://kubernetes.io/docs/concepts/workloads/pods/pod/), in Eliot it's exactly same except some features are not yet implemented.
 
 A Pod wraps application container (or, in some cases, multiple containers) and gives configuration options like host network, restart policy, etc. All containers in same Pod are meant to get started, deployed, and deleted together.
@@ -41,7 +41,7 @@ NAMESPACE   NAME          CONTAINERS   STATUS
 ```
 Pod listing should be empty.
 
-Now let's deploy [eaapa/hello-world](https://hub.docker.com/eaapa/hello-world) image, what just prints _Hello World_ text.
+Now let's deploy [eaapa/hello-world](https://hub.docker.com/eaapa/hello-world) image, that just prints _Hello World_ text.
 ```shell
 eli create pod --image eaapa/hello-world testing
 **[terminal]
@@ -105,10 +105,10 @@ This was the quick start how to deploy containers to the Eliot.
 Next step is to learn [how you can develop your software in the device in real time](getting_started.md#development-in-device)
 
 ## Development in device
-When developing IoT solution, you usually need to develop software what reads data from hardware sensor and send it to the cloud. For this you need to have access to the device, connect to the sensor and be able to develop your software.
+When developing IoT solution, you usually need to develop software that reads data from hardware sensor and send it to the cloud. For this you need to have access to the device, connect to the sensor and be able to develop your software.
 For this Eliot offer really easy way, `eli run` -command.
 
-With `eli run` command you can connect to the device, start container what contains all required development tools and synchronize your local files to the device in real time.
+With `eli run` command you can connect to the device, start container that contains all required development tools and synchronize your local files to the device in real time.
 
 Following command will: 
 1. Detect what type of project you have and selects container image

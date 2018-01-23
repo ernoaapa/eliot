@@ -10,7 +10,7 @@ In consideration of connected device limitations like unstable connection, limit
 ## Motivation
 
 I was building modern connected device product what users are located around the world. 
-I have over 10 years of software engineer experience with five years of DevOps and faced problem that there's no state-of-the-art solution for managing connected devices a way what is common nowadays in cloud solutions. 
+I have over 10 years of software engineer experience with five years of DevOps and faced problem that there's no state-of-the-art solution for managing connected devices a way that is common nowadays in cloud solutions. 
 Most platforms and services focus heavily to the cloud connectivity, data processing and analysis, but I needed a solution to manage device Operating System and application deployment to build easy to use, modern service for our customers.
 
 Key features needed:
@@ -43,11 +43,11 @@ Eliot and Docker are not competing against each other; they are working together
 [Kubernetes](https://www.kubernetes.io) is great platform for orchestrating containerized software in cloud environment. Kubernetes have been one of the fastest growing open source project in past years and new integrations and 3rd party support is popping out everyday.
 
 Keys to Kubernetes great success, addition to great community, are simple concepts and consistent APIs.
-That's why Eliot is following the great leader and picks many great concepts what works in IoT domain and implements them same way!
+That's why Eliot is following the great leader and picks many great concepts that works in IoT domain and implements them same way!
 Kubernetes is pushing the boundaries of cloud computing and Eliot is working on in IoT.
 
 ### AWS, Azure, Google, IBM
-All cloud IoT solutions ([AWS](https://aws.amazon.com/iot/), [Azure](https://azure.microsoft.com/en-us/suites/iot-suite/), [Google](https://cloud.google.com/solutions/iot/), [IBM](https://www.ibm.com/internet-of-things)) base to the same practice, you use SDK to implement software what collects data from sensor and send it to the cloud where data gets processed and analysed. Analysis result can send message back to the device to trigger some action.
+All cloud IoT solutions ([AWS](https://aws.amazon.com/iot/), [Azure](https://azure.microsoft.com/en-us/suites/iot-suite/), [Google](https://cloud.google.com/solutions/iot/), [IBM](https://www.ibm.com/internet-of-things)) base to the same practice, you use SDK to implement software that collects data from sensor and send it to the cloud where data gets processed and analysed. Analysis result can send message back to the device to trigger some action.
 
 Eliot don't try to provide this kind of features at all, actually you can use any cloud service with Eliot.
 Eliot provides a easy way to deliver your cloud integration to the device and gives you a way to update the software across thousands of devices safely and easily.
@@ -60,4 +60,4 @@ Configuration management tools (e.g. [Ansible](https://www.ansible.com), [Chef](
 
 These are show stoppers for IoT solutions because you might have hundred thousands or more devices distributed around the world which have poor connection rarely available.
 
-Eliot build solution from ground up for IoT devices with focus to things what are important in IoT solutions; security, scalability, stability.
+Eliot build solution from ground up for IoT devices with focus to things that are important in IoT solutions; security, scalability, stability.
