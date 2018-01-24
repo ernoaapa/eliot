@@ -5,6 +5,7 @@
 
 [Docker](https://www.docker.com) and [Kubernetes](https://www.kubernetes.io) have inspired heavily and if you're familiar with those, you find really easy to get started with Eliot.
 
+## See it in action!
 !INCLUDE "asciinema-demo.html"
 
 !INCLUDE "subscribe-form.html"
