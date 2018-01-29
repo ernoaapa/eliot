@@ -1,13 +1,15 @@
 {
   "gitbook": ">= 3.2.3",
   "root": "./docs",
+  "title": "Eliot - Docker and Kubernetes inspired container platform for IoT devices",
   "plugins": [
     "insert-logo",
     "analytics",
     "terminal",
     "anchors",
     "github",
-    "include-html"
+    "include-html",
+    "easyseo"
   ],
   "pluginsConfig": {
     "insert-logo": {
