@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/ernoaapa/eliot/pkg/cmd"
@@ -18,7 +19,7 @@ var buildNodeCommand = cli.Command{
 	Usage:   "Build node image",
 	UsageText: `eli build node [options] [FILE | URL]
 	
-	 # Build default node image
+	 # Build default node disk img -file
 	 eli build node
 	 
 	 # Create Linuxkit file but don't build it
@@ -27,7 +28,7 @@ var buildNodeCommand = cli.Command{
 	 
 	 # Build from custom config and unpack to directory
 	 mkdir dist
-	 eli build node custom-linuxkit.yml | tar xv -C dist
+	 eli build node custom-linuxkit.yml --format tar | tar xv -C dist
 	 `,
 	Flags: []cli.Flag{
 		cli.BoolFlag{
@@ -42,22 +43,27 @@ var buildNodeCommand = cli.Command{
 		},
 		cli.StringFlag{
 			Name:  "output",
-			Usage: "Target output file",
-			Value: "image.tar",
+Usage: "Target output file. (default: image.tar or image.img)",
 		},
 		cli.StringFlag{
 			Name:  "type",
 			Usage: "Target build type, one of Linuxkit output types",
 			Value: "rpi3",
 		},
+		cli.StringFlag{
+			Name:  "format",
+			Usage: "Target output format. One of [tar, img] (default: img)",
+			Value: "img",
+		},
 	},
 	Action: func(clicontext *cli.Context) (err error) {
 		var (
-			source     = clicontext.Args().First()
-			dryRun     = clicontext.Bool("dry-run")
-			serverURL  = clicontext.String("build-server")
-			outputFile = clicontext.String("output")
-			outputType = clicontext.String("type")
+			source       = clicontext.Args().First()
+			dryRun       = clicontext.Bool("dry-run")
+			serverURL    = clicontext.String("build-server")
+			outputType   = clicontext.String("type")
+			outputFormat = clicontext.String("format")
+			outputFile   = getBuildOutputFile(outputFormat, clicontext.String("output"))
 
 			uiline   ui.Line
 			linuxkit []byte
@@ -93,7 +99,7 @@ var buildNodeCommand = cli.Command{
 		}
 
 		uiline = ui.NewLine().Loadingf("Building Linuxkit image in remote build server...")
-		image, err := build.BuildImage(serverURL, outputType, linuxkit)
+		image, err := build.BuildImage(serverURL, outputType, outputFormat, linuxkit)
 		if err != nil {
 			uiline.Errorf("Failed to build Linuxkit image: %s", err)
 			return errors.Wrap(err, "Failed to build Linuxkit image")
@@ -109,4 +115,20 @@ var buildNodeCommand = cli.Command{
 		uiline.Donef("Build complete!")
 		return nil
 	},
+}
+
+func getBuildOutputFile(format, outputFile string) string {
+	if outputFile != "" {
+		return outputFile
+	}
+
+	switch format {
+	case "img":
+		return "image.img"
+	case "tar":
+		return "image.tar"
+	default:
+		log.Fatalf("Unknown output format %s, cannot resolve default output file", format)
+		return ""
+	}
 }
