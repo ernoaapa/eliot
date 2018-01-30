@@ -280,16 +280,16 @@ Hello world!
 
 You can also give `-i` flag to hook up your stdin into the container, but watch out, if you for example press ^C (ctrl+c) to exit, you actually send kill signal to the process in the container which will stop the container.
 
-## `eli build device`
+## `eli build device [--format img | tar]`
 Easiest way to run Eliot in your device is to use [EliotOS](https://github.com/ernoaapa/eliot-os) which is minimal Operating System where's just minimal components installed to run Eliot and everything else run on top of the Eliot in containers.
 
-With `eli build device` command you can build EliotOS image that you can just unpack to your device sdcard.
+With `eli build device` command you can build EliotOS image that you can just write to your device sdcard.
 
 > Note: At the moment we support only RaspberryPi 3b, for other devices [see installation guide](installation.md)
 
 ```shell
 **[terminal]
-**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device > my-image.tar]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device > my-image.img]
 ```
 
 [EliotOS](https://github.com/ernoaapa/eliot-os) is built with [Linuxkit]([EliotOS](https://github.com/ernoaapa/eliot-os) and you can view the Linuxkit configuration with `--dry-run` flag.
@@ -298,7 +298,7 @@ With `eli build device` command you can build EliotOS image that you can just un
 **[terminal]
 **[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device --dry-run]
   ✓ Resolved Linuxkit config!
-  ✓ Resolved output: image.tar!
+  ✓ Resolved output: image.img!
 kernel:
   image: linuxkit/kernel:4.9.72
   cmdline: "console=tty0 console=ttyS0 console=ttyAMA0"
@@ -374,7 +374,7 @@ If you want to customise the Linuxkit configuration before building
 **[terminal]
 **[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device --dry-run > custom-linuxkit.yml]
 # Edit the my-custom-linuxkit.yml -file...
-**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device custom-linuxkit.yml > custom-image.tar]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device custom-linuxkit.yml > custom-image.img]
 ```
 
 #### Shell piping
@@ -400,7 +400,7 @@ files:
 ```shell
 **[terminal]
 **[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command sed -e "s/\MY-HOSTNAME/eliot-$(date +%s)/" custom-linuxkit.yml \
-  | eli build device \
+  | eli build device --format tar \
   | tar xv -C /Volumes/raspberrypi3]
 ```
 
@@ -410,6 +410,6 @@ _Pretty handy, ain't it? :D_
 
 #### How it works?
 Linuxkit doesn't support building arm images on x86, but RaspberryPi is arm based computer.
-For building images, Eliot hosts [Linuxkit build server](https://github.com/ernoaapa/linuxkit-server) and when you execute `eli build device`, it sends the config to `build.eliot.run` server, which builds the image on arm server and send it back as tar package.
+For building images, Eliot hosts [Linuxkit build server](https://github.com/ernoaapa/linuxkit-server) and when you execute `eli build device`, it sends the config to `build.eliot.run` server, which builds the image on arm server and send it back as either disk image (.img) or tar package (.tar).
 
 If you want to host and use your own build server, see the [Linuxkit build server documentation](https://github.com/ernoaapa/linuxkit-server) and pass `--build-server http://my-custom-build-server.com` flag to build the image in your own server.
