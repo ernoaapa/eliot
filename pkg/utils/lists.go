@@ -43,3 +43,11 @@ func RotateRBy(a *[]string, i int) {
 	x, b := (*a)[:(len(*a)-i)], (*a)[(len(*a)-i):]
 	*a = append(b, x...)
 }
+
+// GetFirst return first element from the list or default if list is empty
+func GetFirst(l []string, d string) string {
+	if len(l) == 0 {
+		return d
+	}
+	return l[0]
+}

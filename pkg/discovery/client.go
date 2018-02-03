@@ -4,14 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/ernoaapa/eliot/pkg/model"
+	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	"github.com/grandcat/zeroconf"
 	"github.com/pkg/errors"
 )
 
 // Devices return list of DeviceInfos synchronously with given timeout
-func Devices(timeout time.Duration) (devices []model.DeviceInfo, err error) {
-	results := make(chan model.DeviceInfo)
+func Devices(timeout time.Duration) (devices []*device.Info, err error) {
+	results := make(chan *device.Info)
 	defer close(results)
 
 	go func() {
@@ -29,7 +29,7 @@ func Devices(timeout time.Duration) (devices []model.DeviceInfo, err error) {
 }
 
 // DevicesAsync search for devices in network asynchronously for given timeout
-func DevicesAsync(results chan<- model.DeviceInfo, timeout time.Duration) error {
+func DevicesAsync(results chan<- *device.Info, timeout time.Duration) error {
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to initialize new zeroconf resolver")
@@ -38,7 +38,7 @@ func DevicesAsync(results chan<- model.DeviceInfo, timeout time.Duration) error 
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(entries <-chan *zeroconf.ServiceEntry) {
 		for entry := range entries {
-			results <- MapToInternalModel(entry)
+			results <- MapToAPIModel(entry)
 		}
 	}(entries)
 

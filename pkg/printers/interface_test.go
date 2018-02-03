@@ -9,7 +9,6 @@ import (
 	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
-	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,11 +56,11 @@ func testYamlPrintPods(t *testing.T, printer ResourcePrinter) {
 func testYamlPrintDevices(t *testing.T, printer ResourcePrinter) {
 	var buffer bytes.Buffer
 
-	data := []model.DeviceInfo{
+	data := []*device.Info{
 		{
 			Hostname: "foobar",
-			Labels: map[string]string{
-				"env": "test",
+			Labels: []*device.Label{
+				{Key: "env", Value: "test"},
 			},
 		},
 	}
