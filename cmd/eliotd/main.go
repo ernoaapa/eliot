@@ -39,6 +39,11 @@ func main() {
 			EnvVar: "ELIOT_CONTAINERD",
 			Value:  "/run/containerd/containerd.sock",
 		},
+		cli.DurationFlag{
+			Name:   "timeout, t",
+			Usage:  "total timeout for runtime requests",
+			EnvVar: "ELIOT_TIMEOUT",
+		},
 		cli.BoolTFlag{
 			Name:   "lifecycle-controller",
 			Usage:  "Enable container lifecycle controller",
