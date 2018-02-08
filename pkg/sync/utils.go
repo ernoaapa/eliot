@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// MustParseAll parse sync string or fail with Fatal
 func MustParseAll(strings []string) (result []Sync) {
 	for _, str := range strings {
 		sync, err := Parse(str)

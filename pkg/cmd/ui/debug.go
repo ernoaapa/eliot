@@ -12,6 +12,7 @@ func NewDebug() *Debug {
 	return debug
 }
 
+// Start starts updating the terminal lines
 func (t *Debug) Start() {
 	t.running = true
 }

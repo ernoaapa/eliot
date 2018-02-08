@@ -7,6 +7,7 @@ import (
 	"github.com/grandcat/zeroconf"
 )
 
+// MapToInternalModel takes zeroconf entry and maps it to internal DeviceInfo model
 func MapToInternalModel(entry *zeroconf.ServiceEntry) model.DeviceInfo {
 	version := "unknown"
 

@@ -2,6 +2,7 @@ package terminal
 
 import "github.com/ernoaapa/eliot/pkg/utils"
 
+// Spinner is loading spinner which on each rotation moves spinner around
 type Spinner struct {
 	frames []string
 }

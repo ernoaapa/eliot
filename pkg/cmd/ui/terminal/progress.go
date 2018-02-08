@@ -4,6 +4,7 @@ import (
 	"bytes"
 )
 
+// Bar presents progress bar
 type Bar struct {
 	// Fill is the default character representing completed progress
 	Fill byte
