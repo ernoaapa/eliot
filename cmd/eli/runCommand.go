@@ -24,7 +24,7 @@ import (
 var runCommand = cli.Command{
 	Name:        "run",
 	HelpName:    "run",
-	Usage:       "Run commmand in new container in the device",
+	Usage:       "Run command in new container in the device",
 	Description: "With run command, you can run command in a new container in the device",
 	UsageText: `eli run [options] <image> -- <command> <args>
 
