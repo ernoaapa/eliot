@@ -20,8 +20,8 @@ var examplePod = &pods.Pod{
 	},
 	Spec: &pods.PodSpec{
 		Containers: []*containers.Container{
-			&containers.Container{},
-			&containers.Container{},
+			{},
+			{},
 		},
 	},
 }
@@ -78,7 +78,7 @@ func testPrintDevice(t *testing.T, printer ResourcePrinter) {
 	var buffer bytes.Buffer
 
 	data := &device.Info{
-		Labels:     []*device.Label{&device.Label{Key: "foo", Value: "bar"}},
+		Labels:     []*device.Label{{Key: "foo", Value: "bar"}},
 		Hostname:   "foo-bar",
 		Addresses:  []string{"1.2.3.4"},
 		GrpcPort:   5000,
@@ -118,8 +118,8 @@ func testPrintPod(t *testing.T, printer ResourcePrinter) {
 		},
 		Spec: &pods.PodSpec{
 			Containers: []*containers.Container{
-				&containers.Container{},
-				&containers.Container{},
+				{},
+				{},
 			},
 		},
 		Status: &pods.PodStatus{
@@ -139,7 +139,7 @@ func testPrintConfig(t *testing.T, printer ResourcePrinter) {
 
 	data := &config.Config{
 		Endpoints: []config.Endpoint{
-			config.Endpoint{Name: "localhost", URL: "localhost:5000"},
+			{Name: "localhost", URL: "localhost:5000"},
 		},
 		Namespace: "default",
 	}

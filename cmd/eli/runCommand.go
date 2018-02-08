@@ -125,7 +125,7 @@ var runCommand = cli.Command{
 			Spec: &pods.PodSpec{
 				HostNetwork: true,
 				Containers: []*containers.Container{
-					&containers.Container{
+					{
 						Name:       name,
 						Image:      image,
 						Tty:        tty,

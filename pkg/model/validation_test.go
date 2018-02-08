@@ -8,13 +8,13 @@ import (
 
 func TestValidationIsValid(t *testing.T) {
 	err := Validate([]Pod{
-		Pod{
+		{
 			Metadata: Metadata{
 				Name: "foo",
 			},
 			Spec: PodSpec{
 				Containers: []Container{
-					Container{
+					{
 						Name:  "foo-1",
 						Image: "docker.io/library/foobar",
 						Args: []string{

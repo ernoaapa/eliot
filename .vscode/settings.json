@@ -1,0 +1,6 @@
+{
+  "go.formatTool": "gofmt",
+  "go.formatFlags": [
+    "-s"
+  ]
+}
