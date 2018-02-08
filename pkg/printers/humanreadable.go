@@ -103,10 +103,7 @@ func (p *HumanReadablePrinter) PrintDevice(info *device.Info, writer io.Writer) 
 	if err != nil {
 		log.Fatalf("Invalid pod template: %s", err)
 	}
-	if err := t.Execute(writer, info); err != nil {
-		return err
-	}
-	return nil
+	return t.Execute(writer, info)
 }
 
 // PrintPod writes a pod in human readable detailed format to the writer
@@ -133,10 +130,7 @@ func (p *HumanReadablePrinter) PrintPod(pod *pods.Pod, writer io.Writer) error {
 		"Pod":    pod,
 		"Status": getStatus(pod),
 	}
-	if err := t.Execute(writer, data); err != nil {
-		return err
-	}
-	return nil
+	return t.Execute(writer, data)
 }
 
 // PrintConfig writes list of pods in human readable detailed format to the writer
@@ -147,9 +141,5 @@ func (p *HumanReadablePrinter) PrintConfig(config *config.Config, writer io.Writ
 		log.Fatalf("Invalid config template: %s", err)
 	}
 
-	if err := t.Execute(writer, config); err != nil {
-		return err
-	}
-
-	return nil
+	return t.Execute(writer, config)
 }

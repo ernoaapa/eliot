@@ -19,7 +19,7 @@ type Terminal struct {
 }
 
 // NewTerminal creates new Terminal UI which prints
-// output to the
+// output to the os.Stdout
 func NewTerminal() *Terminal {
 	terminal := &Terminal{
 		writer: goterminal.New(os.Stdout),
@@ -29,6 +29,7 @@ func NewTerminal() *Terminal {
 	return terminal
 }
 
+// Start starts updating the terminal lines
 func (t *Terminal) Start() {
 	t.running = true
 	go func() {
@@ -68,7 +69,7 @@ func (t *Terminal) NewLine() Line {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	row := &TerminalLine{updater: t}
+	row := &TerminalLine{terminal: t}
 	t.rows = append(t.rows, row)
 	return row
 }

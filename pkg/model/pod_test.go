@@ -48,7 +48,7 @@ func TestValidationRequiresMetadata(t *testing.T) {
 	assert.Error(t, getValidator().Struct(Pod{
 		Spec: PodSpec{
 			Containers: []Container{
-				Container{
+				{
 					Name:  "foo",
 					Image: "docker.io/eaapa/hello-world:latest",
 				},
@@ -62,7 +62,7 @@ func TestValidationNameMetadata(t *testing.T) {
 		Metadata: Metadata{},
 		Spec: PodSpec{
 			Containers: []Container{
-				Container{
+				{
 					Name:  "foo",
 					Image: "docker.io/eaapa/hello-world:latest",
 				},
@@ -76,7 +76,7 @@ func TestValidationNameMetadata(t *testing.T) {
 		},
 		Spec: PodSpec{
 			Containers: []Container{
-				Container{
+				{
 					Name:  "foo",
 					Image: "docker.io/eaapa/hello-world:latest",
 				},
@@ -93,7 +93,7 @@ func TestValidationNamespaceMetadata(t *testing.T) {
 		},
 		Spec: PodSpec{
 			Containers: []Container{
-				Container{
+				{
 					Name:  "foo",
 					Image: "docker.io/eaapa/hello-world:latest",
 				},

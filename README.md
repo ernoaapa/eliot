@@ -1,5 +1,5 @@
 
-![Eliot](docs/eliot-logo-medium.png) [![Gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/eliot-run)
+![Eliot](docs/eliot-logo-medium.png) [![Go Report Card](https://goreportcard.com/badge/github.com/ernoaapa/eliot)](https://goreportcard.com/report/github.com/ernoaapa/eliot) [![Gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/eliot-run)
 
 > This is early alpha version! There's not all features yet implemented, not heavily tested with different devices and code might get large breaking changes until the first release.
 

@@ -10,7 +10,7 @@ import (
 
 func TestDefaults(t *testing.T) {
 	pods := []*Pod{
-		&Pod{
+		{
 			Metadata: &core.ResourceMetadata{
 				Name: "foobar",
 			},
@@ -18,14 +18,14 @@ func TestDefaults(t *testing.T) {
 				Containers: []*containers.Container{},
 			},
 		},
-		&Pod{
+		{
 			Metadata: &core.ResourceMetadata{
 				Name:      "foobar",
 				Namespace: "my-namespace",
 			},
 			Spec: &PodSpec{
 				Containers: []*containers.Container{
-					&containers.Container{
+					{
 						Name:  "foo",
 						Image: "docker.io/library/hello-world:latest",
 					},

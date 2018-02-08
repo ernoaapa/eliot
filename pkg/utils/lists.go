@@ -27,7 +27,7 @@ func RotateL(a *[]string) {
 	RotateLBy(a, 1)
 }
 
-// RotateL rotates the string array to left by given steps
+// RotateLBy rotates the string array to left by given steps
 func RotateLBy(a *[]string, i int) {
 	x, b := (*a)[:i], (*a)[i:]
 	*a = append(b, x...)

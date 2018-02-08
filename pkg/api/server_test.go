@@ -8,10 +8,10 @@ import (
 
 func TestGetMetadataValue(t *testing.T) {
 	md := map[string][]string{
-		"foo": []string{
+		"foo": {
 			"bar",
 		},
-		"crazy": []string{
+		"crazy": {
 			"first",
 			"second",
 		},

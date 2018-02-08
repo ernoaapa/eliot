@@ -1,5 +1,6 @@
 package ui
 
+// Line represents single ine in terminal output
 type Line interface {
 	WithProgress(current, total int64) Line
 	Infof(format string, args ...interface{}) Line

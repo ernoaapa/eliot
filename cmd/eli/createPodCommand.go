@@ -66,9 +66,6 @@ var createPodCommand = cli.Command{
 		defer writer.Flush()
 		printer := cmd.GetPrinter(clicontext)
 
-		if err := printer.PrintPod(result, writer); err != nil {
-			return err
-		}
-		return nil
+		return printer.PrintPod(result, writer)
 	},
 }
