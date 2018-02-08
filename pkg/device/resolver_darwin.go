@@ -11,18 +11,17 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/ernoaapa/eliot/pkg/model"
-	"github.com/ernoaapa/eliot/pkg/version"
 )
 
 // GetInfo resolves information about the device
 // Note: Darwin (OSX) implementation is just for development purpose
 // For example, BootID get generated every time when process restarts
-func (r *Resolver) GetInfo(grpcPort int) *model.DeviceInfo {
+func (r *Resolver) GetInfo(grpcPort int, version string) *model.DeviceInfo {
 	ioregOutput := runCommandOrFail("ioreg", "-rd1", "-c", "IOPlatformExpertDevice")
 	hostname, _ := os.Hostname()
 
 	return &model.DeviceInfo{
-		Version:   version.VERSION,
+		Version:   version,
 		Labels:    r.labels,
 		Arch:      runtime.GOARCH,
 		OS:        runtime.GOOS,
