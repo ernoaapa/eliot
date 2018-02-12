@@ -1,9 +1,12 @@
+defaults: &defaults
+  docker:
+    - image: circleci/golang:1.9
+  working_directory: /go/src/github.com/ernoaapa/eliot
+
 version: 2
 jobs:
   test:
-    docker:
-      - image: circleci/golang:1.9
-    working_directory: /go/src/github.com/ernoaapa/eliot
+    <<: *defaults
     steps:
       - checkout
 
@@ -12,84 +15,22 @@ jobs:
       - run: go test -v ./...
 
   build:
-    docker:
-      - image: circleci/golang:1.9
-    working_directory: /go/src/github.com/ernoaapa/eliot
+    <<: *defaults
     steps:
       - checkout
-
       - setup_remote_docker
 
-      - run:
-          name: Install tools
-          command: go get github.com/mitchellh/gox
+      - run: go get github.com/goreleaser/goreleaser
+      - run: goreleaser --snapshot --skip-publish
 
-      - run:
-          name: Build binaries
-          command: |
-            export VERSION=$(git describe --tags --always --dirty)
-            export CGO_ENABLED=0
-            gox -osarch="darwin/amd64 linux/amd64 linux/arm64" -ldflags "-X github.com/ernoaapa/eliot/pkg/version.VERSION=${VERSION}" -output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}" ./cmd/...
-
-      - run:
-          name: Verify binaries
-          command: |
-            ./dist/eliotd_linux_amd64 -h
-
-      - run:
-          name: Build images
-          command: ./.circleci/scripts/docker-build.sh
-
-      - save_cache:
-          key: binaries-{{ .Revision }}
-          paths:
-            - dist
-
-  publish-binaries:
-    docker:
-      - image: circleci/golang:1.9
-    working_directory: /go/src/github.com/ernoaapa/eliot
-    steps:
-
-      - restore_cache:
-          key: binaries-{{ .Revision }}
-
-      - run:
-          name: Install tools
-          command: go get github.com/tcnksm/ghr
-
-      - run:
-          name: Push binaries to GitHub
-          command: |
-            ghr -token $GITHUB_TOKEN -username $CIRCLE_PROJECT_USERNAME -repository $CIRCLE_PROJECT_REPONAME $CIRCLE_TAG dist/
-
-  publish-images:
-    docker:
-      - image: circleci/golang:1.9
-    working_directory: /go/src/github.com/ernoaapa/eliot
+  publish:
+    <<: *defaults
     steps:
       - checkout
-
       - setup_remote_docker
 
-      - restore_cache:
-          key: binaries-{{ .Revision }}
-
-      - run:
-          name: Install tools
-          command: go get github.com/estesp/manifest-tool
-      
-      - run:
-          name: Login Docker hub
-          command: echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin
-
-      - run:
-          name: Build images
-          command: ./.circleci/scripts/docker-build.sh
-
-      - run:
-          name: Push images
-          command: ./.circleci/scripts/docker-push.sh
+      - run: go get github.com/goreleaser/goreleaser
+      - run: goreleaser
 
 workflows:
   version: 2
@@ -109,20 +50,7 @@ workflows:
             tags:
               only: /.*/
 
-      - publish-binaries:
-          requires:
-            - test
-            - build
-          
-          # Don't run when branches updates, only when tags get created
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only:
-                - /v.*/
-
-      - publish-images:
+      - publish:
           requires:
             - test
             - build

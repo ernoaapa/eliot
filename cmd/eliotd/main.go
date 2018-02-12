@@ -2,9 +2,11 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ernoaapa/eliot/cmd"
 	"github.com/ernoaapa/eliot/pkg/api"
@@ -12,11 +14,15 @@ import (
 	"github.com/ernoaapa/eliot/pkg/device"
 	"github.com/ernoaapa/eliot/pkg/discovery"
 	"github.com/ernoaapa/eliot/pkg/profile"
-	"github.com/ernoaapa/eliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/thejerf/suture"
 	"github.com/urfave/cli"
 )
+
+// Get overrided at build time
+var version = "master"
+var commit = "unknown"
+var date = time.Now().Format("2006-01-02_15:04:05")
 
 func main() {
 	app := cli.NewApp()
@@ -83,7 +89,7 @@ func main() {
 			EnvVar: "ELIOT_LABELS",
 		},
 	}, cmd.GlobalFlags...)
-	app.Version = version.VERSION
+	app.Version = fmt.Sprintf("Version: %s, Commit: %s, Build at: %s", version, commit, date)
 	app.Before = cmd.GlobalBefore
 
 	app.Action = func(clicontext *cli.Context) error {
@@ -93,7 +99,7 @@ func main() {
 		)
 
 		resolver := device.NewResolver(cmd.GetLabels(clicontext))
-		device := resolver.GetInfo(grpcPort)
+		device := resolver.GetInfo(grpcPort, version)
 		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
 
 		supervisor := suture.NewSimple("eliotd")
@@ -120,7 +126,7 @@ func main() {
 
 		if clicontext.Bool("grpc-api") && clicontext.Bool("discovery") {
 			log.Infoln("grpc discovery over zeroconf enabled")
-			supervisor.Add(discovery.NewServer(device.Hostname, grpcPort))
+			supervisor.Add(discovery.NewServer(device.Hostname, grpcPort, version))
 			serviceCount++
 		}
 

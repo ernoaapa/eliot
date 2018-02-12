@@ -7,6 +7,6 @@ COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 LABEL maintainer="Erno Aapa <erno.aapa@gmail.com>"
 
-ADD dist/ARG_BIN_ARG_OS_ARG_ARCH /ARG_BIN
+COPY eli /
 
-ENTRYPOINT ["/ARG_BIN"]
+ENTRYPOINT ["/eli"]

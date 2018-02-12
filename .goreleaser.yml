@@ -1,0 +1,58 @@
+builds:
+  - binary: eli
+    main: ./cmd/eli
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+
+  - binary: eliotd
+    main: ./cmd/eliotd
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+
+archive:
+  name_template: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+brew:
+  github:
+    owner: ernoaapa
+    name: homebrew-eliot
+  homepage: "http://eliot.run"
+  description: "Container management system for IoT devices"
+  test: |
+    system "#{bin}/eli --version"
+
+dockers:
+  - binary: eli
+    goos: linux
+    goarch: amd64
+    image: ernoaapa/eli
+    dockerfile: Dockerfile.eli
+    tag_templates:
+      - "v{{ .Version }}"
+
+  - binary: eliotd
+    goos: linux
+    goarch: amd64
+    image: ernoaapa/eliotd
+    dockerfile: Dockerfile.eliotd
+    tag_templates:
+      - "v{{ .Version }}-amd64"
+
+  - binary: eliotd
+    goos: linux
+    goarch: arm64
+    image: ernoaapa/eliotd
+    dockerfile: Dockerfile.eliotd
+    tag_templates:
+      - "v{{ .Version }}-arm64"

@@ -1,13 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/ernoaapa/eliot/cmd"
-	"github.com/ernoaapa/eliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
+
+// Get overrided at build time
+var version = "master"
+var commit = "unknown"
+var date = time.Now().Format("2006-01-02_15:04:05")
 
 func main() {
 	app := cli.NewApp()
@@ -52,7 +58,7 @@ func main() {
 			EnvVar: "ELIOT_DEVICE",
 		},
 	}, cmd.GlobalFlags...)
-	app.Version = version.VERSION
+	app.Version = fmt.Sprintf("Version: %s, Commit: %s, Build at: %s", version, commit, date)
 	app.Before = cmd.GlobalBefore
 
 	app.Commands = []cli.Command{
