@@ -1,9 +1,6 @@
 /dist
 /bin
 /.go
-/.push-*
-/.container-*
-/.dockerfile-*
 
 node_modules
 # Ignore because just used with gitbook
