@@ -29,8 +29,17 @@ jobs:
       - checkout
       - setup_remote_docker
 
-      - run: go get github.com/goreleaser/goreleaser
+      - run:
+          name: Login Docker hub
+          command: echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin
+
+      - run: 
+          name: Install tools
+          command: |
+            go get github.com/goreleaser/goreleaser
+            go get github.com/estesp/manifest-tool
       - run: goreleaser
+      - run: .circleci/scripts/push-docker-manifest.sh $(git describe --tags --always --dirty)
 
 workflows:
   version: 2
