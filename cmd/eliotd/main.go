@@ -11,6 +11,7 @@ import (
 	"github.com/ernoaapa/eliot/pkg/controller"
 	"github.com/ernoaapa/eliot/pkg/device"
 	"github.com/ernoaapa/eliot/pkg/discovery"
+	"github.com/ernoaapa/eliot/pkg/profile"
 	"github.com/ernoaapa/eliot/pkg/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/thejerf/suture"
@@ -39,6 +40,11 @@ func main() {
 			EnvVar: "ELIOT_CONTAINERD",
 			Value:  "/run/containerd/containerd.sock",
 		},
+		cli.DurationFlag{
+			Name:   "timeout, t",
+			Usage:  "total timeout for runtime requests",
+			EnvVar: "ELIOT_TIMEOUT",
+		},
 		cli.BoolTFlag{
 			Name:   "lifecycle-controller",
 			Usage:  "Enable container lifecycle controller",
@@ -59,6 +65,17 @@ func main() {
 			Name:   "discovery",
 			Usage:  "Enable discover GRPC server over zeroconf",
 			EnvVar: "ELIOT_DISCOVERY",
+		},
+		cli.BoolFlag{
+			Name:   "profile",
+			Usage:  "Turn on pprof profiling",
+			EnvVar: "ELIOT_PROFILE",
+		},
+		cli.StringFlag{
+			Name:   "profile-address",
+			Usage:  "The http address for the pprof server",
+			EnvVar: "ELIOT_PROFILE_ADDRESS",
+			Value:  "0.0.0.0:8000",
 		},
 		cli.StringFlag{
 			Name:   "labels",
@@ -81,6 +98,13 @@ func main() {
 
 		supervisor := suture.NewSimple("eliotd")
 		serviceCount := 0
+
+		if clicontext.BoolT("profile") {
+			profileAddr := clicontext.String("profile-address")
+			log.Infof("profiling enabled, address: %s", profileAddr)
+			supervisor.Add(profile.NewServer(profileAddr))
+			serviceCount++
+		}
 
 		if clicontext.Bool("grpc-api") {
 			log.Infoln("grpc-api enabled")

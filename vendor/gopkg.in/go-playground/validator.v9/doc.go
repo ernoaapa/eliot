@@ -94,7 +94,7 @@ used "eqcsfield" it could be multiple levels down. Example:
 
 	// NOTE: when calling validate.Struct(val) topStruct will be the top level struct passed
 	//       into the function
-	//       when calling validate.FieldWithValue(val, field, tag) val will be
+	//       when calling validate.VarWithValue(val, field, tag) val will be
 	//       whatever you pass, struct, field...
 	//       when calling validate.Field(field, tag) val will be nil
 
@@ -132,7 +132,7 @@ so the above will become excludesall=0x2C.
 		Field `validate:"excludesall=0x2C"` // GOOD! Use the UTF-8 hex representation.
 	}
 
-Pipe ("|") is the default separator of validation tags. If you wish to
+Pipe ("|") is the 'or' validation tags deparator. If you wish to
 have a pipe included within the parameter i.e. excludesall=| you will need to
 use the UTF-8 hex representation 0x7C, which is replaced in the code as a pipe,
 so the above will become excludesall=0x7C
@@ -193,7 +193,8 @@ Dive
 This tells the validator to dive into a slice, array or map and validate that
 level of the slice, array or map with the validation tags that follow.
 Multidimensional nesting is also supported, each level you wish to dive will
-require another dive tag.
+require another dive tag. dive has some sub-tags, 'keys' & 'endkeys', please see
+the Keys & EndKeys section just below.
 
 	Usage: dive
 
@@ -210,6 +211,30 @@ Example #2
 	// gt=0 will be applied to []
 	// []string will be spared validation
 	// required will be applied to string
+
+Keys & EndKeys
+
+These are to be used together directly after the dive tag and tells the validator
+that anything between 'keys' and 'endkeys' applies to the keys of a map and not the
+values; think of it like the 'dive' tag, but for map keys instead of values.
+Multidimensional nesting is also supported, each level you wish to validate will
+require another 'keys' and 'endkeys' tag. These tags are only valid for maps.
+
+	Usage: dive,keys,othertagvalidation(s),endkeys,valuevalidationtags
+
+Example #1
+
+	map[string]string with validation tag "gt=0,dive,keys,eg=1|eq=2,endkeys,required"
+	// gt=0 will be applied to the map itself
+	// eg=1|eq=2 will be applied to the map keys
+	// required will be applied to map values
+
+Example #2
+
+	map[[2]string]string with validation tag "gt=0,dive,keys,dive,eq=1|eq=2,endkeys,required"
+	// gt=0 will be applied to the map itself
+	// eg=1|eq=2 will be applied to each array element in the the map keys
+	// required will be applied to map values
 
 Required
 
@@ -344,7 +369,7 @@ Example #1:
 Example #2:
 
 	// Validating by field:
-	validate.FieldWithValue(password, confirmpassword, "eqfield")
+	validate.VarWithValue(password, confirmpassword, "eqfield")
 
 Field Equals Another Field (relative)
 
@@ -366,7 +391,7 @@ Examples:
 	Usage: nefield=Color2
 
 	// Validating by field:
-	validate.FieldWithValue(color1, color2, "nefield")
+	validate.VarWithValue(color1, color2, "nefield")
 
 Field Does Not Equal Another Field (relative)
 
@@ -389,7 +414,7 @@ Example #1:
 Example #2:
 
 	// Validating by field:
-	validate.FieldWithValue(start, end, "gtfield")
+	validate.VarWithValue(start, end, "gtfield")
 
 
 Field Greater Than Another Relative Field
@@ -413,7 +438,7 @@ Example #1:
 Example #2:
 
 	// Validating by field:
-	validate.FieldWithValue(start, end, "gtefield")
+	validate.VarWithValue(start, end, "gtefield")
 
 Field Greater Than or Equal To Another Relative Field
 
@@ -436,7 +461,7 @@ Example #1:
 Example #2:
 
 	// Validating by field:
-	validate.FieldWithValue(start, end, "ltfield")
+	validate.VarWithValue(start, end, "ltfield")
 
 Less Than Another Relative Field
 
@@ -459,7 +484,7 @@ Example #1:
 Example #2:
 
 	// Validating by field:
-	validate.FieldWithValue(start, end, "ltefield")
+	validate.VarWithValue(start, end, "ltefield")
 
 Less Than or Equal To Another Relative Field
 

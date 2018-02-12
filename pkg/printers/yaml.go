@@ -6,7 +6,6 @@ import (
 	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
-	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -29,7 +28,7 @@ func (p *YamlPrinter) PrintPods(pods []*pods.Pod, w io.Writer) error {
 }
 
 // PrintDevices takes list of devices and prints to Writer in YAML format
-func (p *YamlPrinter) PrintDevices(devices []model.DeviceInfo, w io.Writer) error {
+func (p *YamlPrinter) PrintDevices(devices []*device.Info, w io.Writer) error {
 	if err := writeAsYml(devices, w); err != nil {
 		return errors.Wrap(err, "Failed to write devices yaml")
 	}

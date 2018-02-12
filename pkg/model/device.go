@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"net"
 )
 
@@ -48,12 +47,4 @@ type DeviceState struct {
 // PodState represents information about pod current state
 type PodState struct {
 	ID string `validate:"required,gt=0"`
-}
-
-// GetPrimaryEndpoint return primary GRPC endpoint address
-func (d DeviceInfo) GetPrimaryEndpoint() string {
-	if len(d.Addresses) == 0 {
-		return ""
-	}
-	return fmt.Sprintf("%s:%d", d.Addresses[0], d.GrpcPort)
 }

@@ -12,8 +12,8 @@ import (
 	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
-	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/ernoaapa/eliot/pkg/printers/humanreadable"
+	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
 )
 
@@ -79,7 +79,7 @@ func getKeys(source map[string]int) (result []string) {
 }
 
 // PrintDevices writes list of Devices in human readable table format to the writer
-func (p *HumanReadablePrinter) PrintDevices(devices []model.DeviceInfo, writer io.Writer) error {
+func (p *HumanReadablePrinter) PrintDevices(devices []*device.Info, writer io.Writer) error {
 	if len(devices) == 0 {
 		fmt.Fprintf(writer, "\n\t(No devices)\n\n")
 		return nil
@@ -87,7 +87,7 @@ func (p *HumanReadablePrinter) PrintDevices(devices []model.DeviceInfo, writer i
 	fmt.Fprintln(writer, "\nHOSTNAME\tENDPOINT\tVERSION")
 
 	for _, device := range devices {
-		_, err := fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, device.GetPrimaryEndpoint(), device.Version)
+		_, err := fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, utils.GetFirst(device.Addresses, ""), device.Version)
 		if err != nil {
 			return errors.Wrapf(err, "Error while writing device row")
 		}

@@ -17,6 +17,7 @@ import (
 	"github.com/ernoaapa/eliot/pkg/discovery"
 	"github.com/ernoaapa/eliot/pkg/printers"
 	"github.com/ernoaapa/eliot/pkg/sync"
+	"github.com/ernoaapa/eliot/pkg/utils"
 
 	"github.com/sirupsen/logrus"
 
@@ -139,7 +140,7 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 		for _, device := range devices {
 			endpoints = append(endpoints, config.Endpoint{
 				Name: device.Hostname,
-				URL:  device.GetPrimaryEndpoint(),
+				URL:  utils.GetFirst(device.Addresses, ""),
 			})
 		}
 		provider.OverrideEndpoints(endpoints)
