@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
+	"github.com/ernoaapa/eliot/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
 )
@@ -122,4 +123,19 @@ func TestMultiResolveContainerIDFail(t *testing.T) {
 func TestEmptyResolveContainerIDFail(t *testing.T) {
 	_, err := ResolveContainerID([]*containers.ContainerStatus{}, "")
 	assert.Error(t, err)
+}
+
+func TestGetConfigProviderWithEndpointFlag(t *testing.T) {
+	flags := flag.NewFlagSet("test", 0)
+	flags.String("endpoint", "", "")
+
+	flags.Parse([]string{"--endpoint", "1.2.3.4:5000"})
+	clicontext := cli.NewContext(nil, flags, nil)
+
+	provider := GetConfigProvider(clicontext)
+
+	assert.Equal(t, []config.Endpoint{{
+		Name: "1.2.3.4:5000",
+		URL:  "1.2.3.4:5000",
+	}}, provider.GetEndpoints(), "")
 }

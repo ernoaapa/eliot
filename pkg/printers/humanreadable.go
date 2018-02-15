@@ -87,7 +87,8 @@ func (p *HumanReadablePrinter) PrintDevices(devices []*device.Info, writer io.Wr
 	fmt.Fprintln(writer, "\nHOSTNAME\tENDPOINT\tVERSION")
 
 	for _, device := range devices {
-		_, err := fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, utils.GetFirst(device.Addresses, ""), device.Version)
+		endpoint := fmt.Sprintf("%s:%d", utils.GetFirst(device.Addresses, ""), device.GrpcPort)
+		_, err := fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, endpoint, device.Version)
 		if err != nil {
 			return errors.Wrapf(err, "Error while writing device row")
 		}

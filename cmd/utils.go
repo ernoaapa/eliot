@@ -86,6 +86,7 @@ func GetClient(config *config.Provider) *api.Client {
 		client := api.NewClient(config.GetNamespace(), endpoints[0])
 		info, err := client.GetInfo()
 		if err != nil {
+			logrus.Debugf("Connection failure: %s", err)
 			uiline.Fatalf("Failed connect to %s (%s)", endpoints[0].Name, endpoints[0].URL)
 		}
 		uiline.Donef("Connected to %s (%s)", info.Hostname, endpoints[0].URL)
@@ -138,10 +139,12 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 
 		endpoints := []config.Endpoint{}
 		for _, device := range devices {
-			endpoints = append(endpoints, config.Endpoint{
-				Name: device.Hostname,
-				URL:  utils.GetFirst(device.Addresses, ""),
-			})
+			if len(device.Addresses) > 0 {
+				endpoints = append(endpoints, config.Endpoint{
+					Name: device.Hostname,
+					URL:  fmt.Sprintf("%s:%d", utils.GetFirst(device.Addresses, ""), device.GrpcPort),
+				})
+			}
 		}
 		provider.OverrideEndpoints(endpoints)
 	}
@@ -322,7 +325,7 @@ func expandTilde(path string) string {
 	usr, _ := user.Current()
 	dir := usr.HomeDir
 
-	if path[:2] == "~/" {
+	if len(path) >= 2 && path[:2] == "~/" {
 		return filepath.Join(dir, path[2:])
 	}
 	return path
