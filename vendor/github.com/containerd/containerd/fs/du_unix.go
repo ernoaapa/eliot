@@ -15,15 +15,6 @@ type inode struct {
 	dev, ino uint64
 }
 
-func newInode(stat *syscall.Stat_t) inode {
-	return inode{
-		// Dev is uint32 on darwin/bsd, uint64 on linux/solaris
-		dev: uint64(stat.Dev), // nolint: unconvert
-		// Ino is uint32 on bsd, uint64 on darwin/linux/solaris
-		ino: uint64(stat.Ino), // nolint: unconvert
-	}
-}
-
 func diskUsage(roots ...string) (Usage, error) {
 
 	var (
@@ -37,7 +28,9 @@ func diskUsage(roots ...string) (Usage, error) {
 				return err
 			}
 
-			inoKey := newInode(fi.Sys().(*syscall.Stat_t))
+			stat := fi.Sys().(*syscall.Stat_t)
+
+			inoKey := inode{dev: uint64(stat.Dev), ino: uint64(stat.Ino)}
 			if _, ok := inodes[inoKey]; !ok {
 				inodes[inoKey] = struct{}{}
 				size += fi.Size()
@@ -67,7 +60,9 @@ func diffUsage(ctx context.Context, a, b string) (Usage, error) {
 		}
 
 		if kind == ChangeKindAdd || kind == ChangeKindModify {
-			inoKey := newInode(fi.Sys().(*syscall.Stat_t))
+			stat := fi.Sys().(*syscall.Stat_t)
+
+			inoKey := inode{dev: uint64(stat.Dev), ino: uint64(stat.Ino)}
 			if _, ok := inodes[inoKey]; !ok {
 				inodes[inoKey] = struct{}{}
 				size += fi.Size()

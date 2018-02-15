@@ -3,7 +3,6 @@ package images
 import (
 	"context"
 	"encoding/json"
-	"strings"
 	"time"
 
 	"github.com/containerd/containerd/content"
@@ -358,24 +357,13 @@ func RootFS(ctx context.Context, provider content.Provider, configDesc ocispec.D
 	if err := json.Unmarshal(p, &config); err != nil {
 		return nil, err
 	}
-	return config.RootFS.DiffIDs, nil
-}
 
-// IsCompressedDiff returns true if mediaType is a known compressed diff media type.
-// It returns false if the media type is a diff, but not compressed. If the media type
-// is not a known diff type, it returns errdefs.ErrNotImplemented
-func IsCompressedDiff(ctx context.Context, mediaType string) (bool, error) {
-	switch mediaType {
-	case ocispec.MediaTypeImageLayer, MediaTypeDockerSchema2Layer:
-	case ocispec.MediaTypeImageLayerGzip, MediaTypeDockerSchema2LayerGzip:
-		return true, nil
-	default:
-		// Still apply all generic media types *.tar[.+]gzip and *.tar
-		if strings.HasSuffix(mediaType, ".tar.gzip") || strings.HasSuffix(mediaType, ".tar+gzip") {
-			return true, nil
-		} else if !strings.HasSuffix(mediaType, ".tar") {
-			return false, errdefs.ErrNotImplemented
-		}
+	// TODO(stevvooe): Remove this bit when OCI structure uses correct type for
+	// rootfs.DiffIDs.
+	var diffIDs []digest.Digest
+	for _, diffID := range config.RootFS.DiffIDs {
+		diffIDs = append(diffIDs, digest.Digest(diffID))
 	}
-	return false, nil
+
+	return diffIDs, nil
 }
