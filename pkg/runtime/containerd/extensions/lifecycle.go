@@ -77,7 +77,7 @@ func IncrementRestart(ctx context.Context, client *containerd.Client, c *contain
 func GetLifecycleExtension(c containers.Container) (ContainerLifecycle, error) {
 	extension, ok := c.Extensions[lifecycleExtensionName]
 	if !ok {
-		return ContainerLifecycle{}, fmt.Errorf("ContainerLifecycle extension not found in container [%s]", c.ID)
+		return ContainerLifecycle{}, ErrWithMessagef(ErrNotFound, "ContainerLifecycle extension not found in container [%s]", c.ID)
 	}
 
 	decoded, err := typeurl.UnmarshalAny(&extension)
