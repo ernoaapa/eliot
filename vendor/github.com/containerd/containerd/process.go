@@ -191,7 +191,6 @@ func (p *process) Delete(ctx context.Context, opts ...ProcessDeleteOpts) (*ExitS
 		return nil, errdefs.FromGRPC(err)
 	}
 	if p.io != nil {
-		p.io.Cancel()
 		p.io.Wait()
 		p.io.Close()
 	}

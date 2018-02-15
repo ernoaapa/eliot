@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -21,7 +22,6 @@ import (
 	"github.com/opencontainers/runc/libcontainer/user"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
-	"github.com/syndtr/gocapability/capability"
 )
 
 // WithTTY sets the information on the spec as well as the environment variables for
@@ -258,24 +258,7 @@ func WithUIDGID(uid, gid uint32) SpecOpts {
 // uid, and not returns error.
 func WithUserID(uid uint32) SpecOpts {
 	return func(ctx context.Context, client Client, c *containers.Container, s *specs.Spec) (err error) {
-		if c.Snapshotter == "" && c.SnapshotKey == "" {
-			if !isRootfsAbs(s.Root.Path) {
-				return errors.Errorf("rootfs absolute path is required")
-			}
-			uuid, ugid, err := getUIDGIDFromPath(s.Root.Path, func(u user.User) bool {
-				return u.Uid == int(uid)
-			})
-			if err != nil {
-				if os.IsNotExist(err) || err == errNoUsersFound {
-					s.Process.User.UID, s.Process.User.GID = uid, uid
-					return nil
-				}
-				return err
-			}
-			s.Process.User.UID, s.Process.User.GID = uuid, ugid
-			return nil
-
-		}
+		// TODO: support non-snapshot rootfs
 		if c.Snapshotter == "" {
 			return errors.Errorf("no snapshotter set for container")
 		}
@@ -287,20 +270,49 @@ func WithUserID(uid uint32) SpecOpts {
 		if err != nil {
 			return err
 		}
-		return mount.WithTempMount(ctx, mounts, func(root string) error {
-			uuid, ugid, err := getUIDGIDFromPath(root, func(u user.User) bool {
-				return u.Uid == int(uid)
-			})
-			if err != nil {
-				if os.IsNotExist(err) || err == errNoUsersFound {
-					s.Process.User.UID, s.Process.User.GID = uid, uid
-					return nil
-				}
+		root, err := ioutil.TempDir("", "ctd-username")
+		if err != nil {
+			return err
+		}
+		defer os.Remove(root)
+		for _, m := range mounts {
+			if err := m.Mount(root); err != nil {
 				return err
 			}
-			s.Process.User.UID, s.Process.User.GID = uuid, ugid
-			return nil
+		}
+		defer func() {
+			if uerr := mount.Unmount(root, 0); uerr != nil {
+				if err == nil {
+					err = uerr
+				}
+			}
+		}()
+		ppath, err := fs.RootPath(root, "/etc/passwd")
+		if err != nil {
+			return err
+		}
+		f, err := os.Open(ppath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				s.Process.User.UID, s.Process.User.GID = uid, uid
+				return nil
+			}
+			return err
+		}
+		defer f.Close()
+		users, err := user.ParsePasswdFilter(f, func(u user.User) bool {
+			return u.Uid == int(uid)
 		})
+		if err != nil {
+			return err
+		}
+		if len(users) == 0 {
+			s.Process.User.UID, s.Process.User.GID = uid, uid
+			return nil
+		}
+		u := users[0]
+		s.Process.User.UID, s.Process.User.GID = uint32(u.Uid), uint32(u.Gid)
+		return nil
 	}
 }
 
@@ -309,20 +321,8 @@ func WithUserID(uid uint32) SpecOpts {
 // does not exist, or the username is not found in /etc/passwd,
 // it returns error.
 func WithUsername(username string) SpecOpts {
+	// TODO: support non-snapshot rootfs
 	return func(ctx context.Context, client Client, c *containers.Container, s *specs.Spec) (err error) {
-		if c.Snapshotter == "" && c.SnapshotKey == "" {
-			if !isRootfsAbs(s.Root.Path) {
-				return errors.Errorf("rootfs absolute path is required")
-			}
-			uid, gid, err := getUIDGIDFromPath(s.Root.Path, func(u user.User) bool {
-				return u.Name == username
-			})
-			if err != nil {
-				return err
-			}
-			s.Process.User.UID, s.Process.User.GID = uid, gid
-			return nil
-		}
 		if c.Snapshotter == "" {
 			return errors.Errorf("no snapshotter set for container")
 		}
@@ -334,70 +334,43 @@ func WithUsername(username string) SpecOpts {
 		if err != nil {
 			return err
 		}
-		return mount.WithTempMount(ctx, mounts, func(root string) error {
-			uid, gid, err := getUIDGIDFromPath(root, func(u user.User) bool {
-				return u.Name == username
-			})
-			if err != nil {
+		root, err := ioutil.TempDir("", "ctd-username")
+		if err != nil {
+			return err
+		}
+		defer os.Remove(root)
+		for _, m := range mounts {
+			if err := m.Mount(root); err != nil {
 				return err
 			}
-			s.Process.User.UID, s.Process.User.GID = uid, gid
-			return nil
-		})
-	}
-}
-
-// WithAllCapabilities set all linux capabilities for the process
-func WithAllCapabilities(_ context.Context, _ Client, _ *containers.Container, s *specs.Spec) error {
-	caps := getAllCapabilities()
-
-	s.Process.Capabilities.Bounding = caps
-	s.Process.Capabilities.Effective = caps
-	s.Process.Capabilities.Permitted = caps
-	s.Process.Capabilities.Inheritable = caps
-
-	return nil
-}
-
-func getAllCapabilities() []string {
-	last := capability.CAP_LAST_CAP
-	// hack for RHEL6 which has no /proc/sys/kernel/cap_last_cap
-	if last == capability.Cap(63) {
-		last = capability.CAP_BLOCK_SUSPEND
-	}
-	var caps []string
-	for _, cap := range capability.List() {
-		if cap > last {
-			continue
 		}
-		caps = append(caps, "CAP_"+strings.ToUpper(cap.String()))
+		defer func() {
+			if uerr := mount.Unmount(root, 0); uerr != nil {
+				if err == nil {
+					err = uerr
+				}
+			}
+		}()
+		ppath, err := fs.RootPath(root, "/etc/passwd")
+		if err != nil {
+			return err
+		}
+		f, err := os.Open(ppath)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		users, err := user.ParsePasswdFilter(f, func(u user.User) bool {
+			return u.Name == username
+		})
+		if err != nil {
+			return err
+		}
+		if len(users) == 0 {
+			return errors.Errorf("no users found for %s", username)
+		}
+		u := users[0]
+		s.Process.User.UID, s.Process.User.GID = uint32(u.Uid), uint32(u.Gid)
+		return nil
 	}
-	return caps
-}
-
-var errNoUsersFound = errors.New("no users found")
-
-func getUIDGIDFromPath(root string, filter func(user.User) bool) (uid, gid uint32, err error) {
-	ppath, err := fs.RootPath(root, "/etc/passwd")
-	if err != nil {
-		return 0, 0, err
-	}
-	f, err := os.Open(ppath)
-	if err != nil {
-		return 0, 0, err
-	}
-	defer f.Close()
-	users, err := user.ParsePasswdFilter(f, filter)
-	if err != nil {
-		return 0, 0, err
-	}
-	if len(users) == 0 {
-		return 0, 0, errNoUsersFound
-	}
-	u := users[0]
-	return uint32(u.Uid), uint32(u.Gid), nil
-}
-
-func isRootfsAbs(root string) bool {
-	return filepath.IsAbs(root)
 }

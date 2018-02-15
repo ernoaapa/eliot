@@ -523,15 +523,7 @@ func (c *ContainerdClient) Exec(namespace, name, id string, args []string, tty b
 	pspec.Terminal = tty
 	pspec.Args = args
 
-	ioOpts := []cio.Opt{
-		cio.WithStreams(io.Stdin, io.Stdout, io.Stderr),
-	}
-
-	if tty {
-		ioOpts = append(ioOpts, cio.WithTerminal)
-	}
-
-	process, err := task.Exec(ctx, id, pspec, cio.NewCreator(ioOpts...))
+	process, err := task.Exec(ctx, id, pspec, cio.NewIOWithTerminal(io.Stdin, io.Stdout, io.Stderr, tty))
 	if err != nil {
 		return err
 	}
@@ -565,7 +557,7 @@ func (c *ContainerdClient) Attach(namespace, name string, io AttachIO) error {
 		return errors.Wrapf(err, "Cannot attach to container [%s] in namespace [%s]", name, namespace)
 	}
 
-	task, taskErr := container.Task(ctx, cio.NewAttach(cio.WithStreams(io.Stdin, io.Stdout, io.Stderr)))
+	task, taskErr := container.Task(ctx, cio.WithAttach(io.Stdin, io.Stdout, io.Stderr))
 	if taskErr != nil {
 		return taskErr
 	}
