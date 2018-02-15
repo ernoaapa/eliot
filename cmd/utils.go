@@ -325,7 +325,7 @@ func expandTilde(path string) string {
 	usr, _ := user.Current()
 	dir := usr.HomeDir
 
-	if path[:2] == "~/" {
+	if len(path) >= 2 && path[:2] == "~/" {
 		return filepath.Join(dir, path[2:])
 	}
 	return path
