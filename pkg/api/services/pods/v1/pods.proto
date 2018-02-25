@@ -81,3 +81,33 @@ message PodStatus {
 	repeated eliot.services.containers.v1.ContainerStatus containerStatuses = 1;
 	string hostname = 2;
 }
+
+message Affinity {
+  NodeAffinity nodeAffinity = 1;
+}
+
+message NodeAffinity {
+  repeated NodeSelector selectors = 1;
+}
+
+message NodeSelector {
+  repeated Matcher match = 1;
+}
+
+message Matcher {
+  repeated Requirement nodeLabel = 1;
+}
+
+message Requirement {
+  string key = 1;
+  enum Operator {
+    IN = 0;
+    NOT_IN = 1;
+    EXISTS = 2;
+    DOES_NOT_EXIST = 3;
+    GT = 4;
+    LT = 5;
+  }
+  Operator operator = 2;
+  repeated string values = 3;
+}
