@@ -1,0 +1,22 @@
+metadata:
+  name: "affinity-example"
+spec:
+  containers:
+    - name: "affinity-example"
+      image: "docker.io/eaapa/hello-world:latest"
+
+  affinity:
+    nodeAffinity:
+      selectors:
+        - match:
+          - nodeLabel:
+            - key: area
+              operator: In
+              values:
+              - office
+              - factory
+          - deviceLabel:
+            - key: device.eliot.io/type
+              operator: In
+              values:
+              - camera
