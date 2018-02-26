@@ -3,7 +3,7 @@ package printers
 import (
 	"io"
 
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
 	"github.com/pkg/errors"
@@ -27,18 +27,18 @@ func (p *YamlPrinter) PrintPods(pods []*pods.Pod, w io.Writer) error {
 	return nil
 }
 
-// PrintDevices takes list of devices and prints to Writer in YAML format
-func (p *YamlPrinter) PrintDevices(devices []*device.Info, w io.Writer) error {
-	if err := writeAsYml(devices, w); err != nil {
-		return errors.Wrap(err, "Failed to write devices yaml")
+// PrintNodes takes list of nodes and prints to Writer in YAML format
+func (p *YamlPrinter) PrintNodes(nodes []*node.Info, w io.Writer) error {
+	if err := writeAsYml(nodes, w); err != nil {
+		return errors.Wrap(err, "Failed to write nodes yaml")
 	}
 	return nil
 }
 
-// PrintDevice takes device info and prints to Writer in YAML format
-func (p *YamlPrinter) PrintDevice(device *device.Info, w io.Writer) error {
-	if err := writeAsYml(device, w); err != nil {
-		return errors.Wrap(err, "Failed to write device yaml")
+// PrintNode takes node info and prints to Writer in YAML format
+func (p *YamlPrinter) PrintNode(node *node.Info, w io.Writer) error {
+	if err := writeAsYml(node, w); err != nil {
+		return errors.Wrap(err, "Failed to write node yaml")
 	}
 	return nil
 }

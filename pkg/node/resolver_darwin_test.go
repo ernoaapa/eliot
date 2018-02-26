@@ -1,4 +1,4 @@
-package device
+package node
 
 import (
 	"testing"
@@ -16,6 +16,6 @@ func TestGetInfo(t *testing.T) {
 	assert.NotEmpty(t, info.BootID, "should resolve BootID")
 	assert.NotEmpty(t, info.MachineID, "should resolve MachineID")
 	assert.NotEmpty(t, info.SystemUUID, "should resolve SystemUUID")
-	assert.Equal(t, labels, info.Labels, "should have given device labels")
-	assert.Equal(t, 5000, info.GrpcPort, "should have given device grpc port")
+	assert.Equal(t, labels, info.Labels, "should have given node labels")
+	assert.Equal(t, 5000, info.GrpcPort, "should have given node grpc port")
 }

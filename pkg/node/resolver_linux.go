@@ -1,4 +1,4 @@
-package device
+package node
 
 import (
 	"os"
@@ -7,10 +7,10 @@ import (
 	"github.com/ernoaapa/eliot/pkg/model"
 )
 
-// GetInfo resolves information about the device
-func (r *Resolver) GetInfo(grpcPort int, version string) *model.DeviceInfo {
+// GetInfo resolves information about the node
+func (r *Resolver) GetInfo(grpcPort int, version string) *model.NodeInfo {
 	hostname, _ := os.Hostname()
-	return &model.DeviceInfo{
+	return &model.NodeInfo{
 		Version:   version,
 		Labels:    r.labels,
 		Arch:      runtime.GOARCH,

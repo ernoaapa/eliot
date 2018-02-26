@@ -79,7 +79,7 @@ func GetClient(config *config.Provider) *api.Client {
 	endpoints := config.GetEndpoints()
 	switch len(endpoints) {
 	case 0:
-		uiline.Fatal("No devices to connect. You must give device endpoint. E.g. --endpoint=192.168.1.2")
+		uiline.Fatal("No node to connect. You must give node endpoint. E.g. --endpoint=192.168.1.2")
 		return nil
 	case 1:
 		uiline.Loadingf("Connecting to %s (%s)", endpoints[0].Name, endpoints[0].URL)
@@ -92,7 +92,7 @@ func GetClient(config *config.Provider) *api.Client {
 		uiline.Donef("Connected to %s (%s)", info.Hostname, endpoints[0].URL)
 		return client
 	default:
-		uiline.Fatalf("%d devices found. You must give target device. E.g. --endpoint=192.168.1.2", len(endpoints))
+		uiline.Fatalf("%d node found. You must give target node. E.g. --endpoint=192.168.1.2", len(endpoints))
 		return nil
 	}
 }
@@ -126,34 +126,34 @@ func GetConfigProvider(clicontext *cli.Context) *config.Provider {
 
 	if len(provider.GetEndpoints()) == 0 {
 		uiline := ui.NewLine().Loading("Discover from network automatically...")
-		devices, err := discovery.Devices(2 * time.Second)
+		node, err := discovery.Nodes(2 * time.Second)
 		if err != nil {
-			uiline.Errorf("Failed to auto-discover devices in network: %s", err)
+			uiline.Errorf("Failed to auto-discover node in network: %s", err)
 		} else {
-			if len(devices) == 0 {
-				uiline.Warn("No devices discovered from network")
+			if len(node) == 0 {
+				uiline.Warn("No node discovered from network")
 			} else {
-				uiline.Donef("Discovered %d device(s) from network", len(devices))
+				uiline.Donef("Discovered %d node(s) from network", len(node))
 			}
 		}
 
 		endpoints := []config.Endpoint{}
-		for _, device := range devices {
-			if len(device.Addresses) > 0 {
+		for _, node := range node {
+			if len(node.Addresses) > 0 {
 				endpoints = append(endpoints, config.Endpoint{
-					Name: device.Hostname,
-					URL:  fmt.Sprintf("%s:%d", utils.GetFirst(device.Addresses, ""), device.GrpcPort),
+					Name: node.Hostname,
+					URL:  fmt.Sprintf("%s:%d", utils.GetFirst(node.Addresses, ""), node.GrpcPort),
 				})
 			}
 		}
 		provider.OverrideEndpoints(endpoints)
 	}
 
-	if clicontext.GlobalIsSet("device") && clicontext.GlobalString("device") != "" {
-		deviceName := clicontext.GlobalString("device")
-		endpoint, found := provider.GetEndpointByName(deviceName)
+	if clicontext.GlobalIsSet("node") && clicontext.GlobalString("node") != "" {
+		nodeName := clicontext.GlobalString("node")
+		endpoint, found := provider.GetEndpointByName(nodeName)
 		if !found {
-			ui.NewLine().Errorf("Failed to find device with name %s", deviceName)
+			ui.NewLine().Errorf("Failed to find node with name %s", nodeName)
 		}
 		provider.OverrideEndpoints([]config.Endpoint{endpoint})
 	}

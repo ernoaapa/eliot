@@ -9,7 +9,7 @@ var configCommand = cli.Command{
 	HelpName: "config",
 	Usage:    `View and edit client configuration`,
 	Description: `With this command you view and edit the client configurations
-	 like device address, username, namespace, etc.`,
+	 like ndoe address, username, namespace, etc.`,
 	ArgsUsage: "eli config view",
 	Subcommands: []cli.Command{
 		configViewCommand,

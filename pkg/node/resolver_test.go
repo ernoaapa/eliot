@@ -1,4 +1,4 @@
-package device
+package node
 
 import (
 	"fmt"

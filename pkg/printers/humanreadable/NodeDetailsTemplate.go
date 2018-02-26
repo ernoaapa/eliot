@@ -1,7 +1,7 @@
 package humanreadable
 
-// DeviceDetailsTemplate is go template for printing device details
-const DeviceDetailsTemplate = `Hostname:	{{.Hostname}}
+// NodeDetailsTemplate is go template for printing node details
+const NodeDetailsTemplate = `Hostname:	{{.Hostname}}
 Arch/OS:	{{.Os}}/{{.Arch}}
 Version:	{{.Version}}
 Labels:{{range .Labels}}

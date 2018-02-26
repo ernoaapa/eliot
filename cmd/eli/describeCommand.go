@@ -19,6 +19,6 @@ var describeCommand = cli.Command{
 `,
 	Subcommands: []cli.Command{
 		describePodCommand,
-		describeDeviceCommand,
+		describeNodeCommand,
 	},
 }

@@ -1,10 +1,10 @@
 syntax = "proto3";
 package eliot.services.containers.v1;
 
-option go_package = "github.com/ernoaapa/eliot/pkg/api/services/device/v1;device";
+option go_package = "github.com/ernoaapa/eliot/pkg/api/services/node/v1;node";
 
-// Device service provides access to device it self
-service Device {
+// Node service provides access to node itself
+service Node {
 	rpc Info(InfoRequest) returns (InfoResponse);
 }
 
@@ -15,10 +15,10 @@ message InfoResponse {
 }
 
 message Info {
-	// Labels for the device
+	// Labels for the node
 	repeated Label labels = 1;
 
-	// Device hostname
+	// Node hostname
 	string hostname = 2;
 
 	// IP addresses
@@ -38,10 +38,10 @@ message Info {
 	// A random ID that is regenerated on each boot
 	string bootID = 7;
 
-	// Device operating system. One of 386, amd64, arm, s390x, and so on.
+	// Node operating system. One of 386, amd64, arm, s390x, and so on.
 	string arch = 8;
 
-	// device operating system. One of darwin, freebsd, linux, windows, and so on
+	// node operating system. One of darwin, freebsd, linux, windows, and so on
 	string os = 9;
 
 	// Server version

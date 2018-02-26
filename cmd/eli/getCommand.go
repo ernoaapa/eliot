@@ -15,6 +15,6 @@ var getCommand = cli.Command{
 	 eli get pods`,
 	Subcommands: []cli.Command{
 		getPodsCommand,
-		getDevicesCommand,
+		getNodesCommand,
 	},
 }

@@ -16,7 +16,7 @@ var createCommand = cli.Command{
 	Name:        "create",
 	HelpName:    "create",
 	Usage:       "Create pod based on yaml spec",
-	Description: "With create command, you can create new pod into the device based on yaml specification",
+	Description: "With create command, you can create new pod into the node based on yaml specification",
 	UsageText: `eli create [options] -f ./pod.yml
 
 	 # Create pod based on pod.yml

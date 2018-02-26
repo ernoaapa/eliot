@@ -4,12 +4,12 @@ import (
 	"net"
 )
 
-// DeviceInfo contains information about current device
-type DeviceInfo struct {
-	// Labels for the device, provided through cli
+// NodeInfo contains information about current node
+type NodeInfo struct {
+	// Labels for the node, provided through cli
 	Labels map[string]string
 
-	// Device hostname
+	// Node hostname
 	Hostname string `validate:"required,gt=0"`
 
 	// IPs
@@ -29,18 +29,18 @@ type DeviceInfo struct {
 	// A random ID that is regenerated on each boot
 	BootID string `validate:"required,gt=0"`
 
-	// Device operating system. One of 386, amd64, arm, s390x, and so on.
+	// Node operating system. One of 386, amd64, arm, s390x, and so on.
 	Arch string
 
-	// device operating system. One of darwin, freebsd, linux, windows, and so on
+	// node operating system. One of darwin, freebsd, linux, windows, and so on
 	OS string
 
 	// Server version
 	Version string
 }
 
-// DeviceState describes current state of the device
-type DeviceState struct {
+// NodeState describes current state of the node
+type NodeState struct {
 	Pods []PodState `validate:"dive"`
 }
 

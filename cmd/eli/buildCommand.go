@@ -7,13 +7,13 @@ import (
 var buildCommand = cli.Command{
 	Name:        "build",
 	HelpName:    "build",
-	Usage:       `Build Device image, etc.`,
-	Description: "With build command, you can build device image, etc.",
+	Usage:       `Build node image, etc.`,
+	Description: "With build command, you can build node image, etc.",
 	ArgsUsage: `eli build <RESOURCE> [options]
 
-	 # build device image
-	 eli build device`,
+	 # build node image
+	 eli build node`,
 	Subcommands: []cli.Command{
-		buildDeviceCommand,
+		buildNodeCommand,
 	},
 }

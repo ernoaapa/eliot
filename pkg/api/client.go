@@ -14,7 +14,7 @@ import (
 
 	"github.com/ernoaapa/eliot/pkg/api/mapping"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/api/stream"
 	"github.com/ernoaapa/eliot/pkg/config"
@@ -22,7 +22,7 @@ import (
 	"github.com/rs/xid"
 )
 
-// Client connects directly to device RPC API
+// Client connects directly to node RPC API
 type Client struct {
 	Namespace string
 	Endpoint  config.Endpoint
@@ -38,16 +38,16 @@ func NewClient(namespace string, endpoint config.Endpoint) *Client {
 	}
 }
 
-// GetInfo calls server and get device info
-func (c *Client) GetInfo() (*device.Info, error) {
+// GetInfo calls server and get node info
+func (c *Client) GetInfo() (*node.Info, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	client := device.NewDeviceClient(conn)
-	resp, err := client.Info(c.ctx, &device.InfoRequest{})
+	client := node.NewNodeClient(conn)
+	resp, err := client.Info(c.ctx, &node.InfoRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Client) GetPod(podName string) (*pods.Pod, error) {
 	return nil, fmt.Errorf("Pod with name [%s] not found", podName)
 }
 
-// CreatePod creates new pod to the device
+// CreatePod creates new pod to the node
 func (c *Client) CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, opts ...PodOpts) error {
 	for _, o := range opts {
 		err := o(pod)
@@ -126,7 +126,7 @@ func (c *Client) CreatePod(status chan<- []*progress.ImageFetch, pod *pods.Pod, 
 	}
 }
 
-// StartPod starts created pod in device
+// StartPod starts created pod in node
 func (c *Client) StartPod(name string) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {
@@ -146,7 +146,7 @@ func (c *Client) StartPod(name string) (*pods.Pod, error) {
 	return resp.GetPod(), nil
 }
 
-// DeletePod removes pod from the device
+// DeletePod removes pod from the node
 func (c *Client) DeletePod(pod *pods.Pod) (*pods.Pod, error) {
 	conn, err := grpc.Dial(c.Endpoint.URL, grpc.WithInsecure())
 	if err != nil {

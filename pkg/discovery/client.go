@@ -4,32 +4,32 @@ import (
 	"context"
 	"time"
 
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	"github.com/grandcat/zeroconf"
 	"github.com/pkg/errors"
 )
 
-// Devices return list of DeviceInfos synchronously with given timeout
-func Devices(timeout time.Duration) (devices []*device.Info, err error) {
-	results := make(chan *device.Info)
+// Nodes return list of NodeInfos synchronously with given timeout
+func Nodes(timeout time.Duration) (nodes []*node.Info, err error) {
+	results := make(chan *node.Info)
 	defer close(results)
 
 	go func() {
-		for device := range results {
-			devices = append(devices, device)
+		for node := range results {
+			nodes = append(nodes, node)
 		}
 	}()
 
-	err = DevicesAsync(results, timeout)
+	err = NodesAsync(results, timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	return devices, nil
+	return nodes, nil
 }
 
-// DevicesAsync search for devices in network asynchronously for given timeout
-func DevicesAsync(results chan<- *device.Info, timeout time.Duration) error {
+// NodesAsync search for nodes in network asynchronously for given timeout
+func NodesAsync(results chan<- *node.Info, timeout time.Duration) error {
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to initialize new zeroconf resolver")
@@ -46,7 +46,7 @@ func DevicesAsync(results chan<- *device.Info, timeout time.Duration) error {
 	defer cancel()
 	err = resolver.Browse(ctx, ZeroConfServiceName, "", entries)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to browse zeroconf devices")
+		return errors.Wrapf(err, "Failed to browse zeroconf nodes")
 	}
 
 	<-ctx.Done()

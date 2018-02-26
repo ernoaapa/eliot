@@ -1,4 +1,4 @@
-package device
+package node
 
 import (
 	"io/ioutil"
@@ -10,12 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Resolver provides information about the device
+// Resolver provides information about the node
 type Resolver struct {
 	labels map[string]string
 }
 
-// NewResolver creates new resolver with static device labels
+// NewResolver creates new resolver with static node labels
 func NewResolver(labels map[string]string) *Resolver {
 	return &Resolver{
 		labels: withHostLabels(labels),

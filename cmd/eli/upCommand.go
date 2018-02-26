@@ -28,20 +28,20 @@ import (
 var upCommand = cli.Command{
 	Name:        "up",
 	HelpName:    "up",
-	Usage:       "Start development session in the device",
-	Description: "With up command, you can start new development session in the device",
+	Usage:       "Start development session in the node",
+	Description: "With up command, you can start new development session in the node",
 	UsageText: `eli up [options] -- <command>
 
-	 # Run code in current directory in the device
+	 # Run code in current directory in the node
 	 eli up
 
-	 # Run 'build.sh' command in device with files in current directory
+	 # Run 'build.sh' command in node with files in current directory
 	 eli up -- ./build.sh
 	 
 	 # Run container image in the container
 	 eli up --image docker.io/eaapa/hello-world:latest
 
-	 # Run container with name in the device
+	 # Run container with name in the node
 	 eli up --image docker.io/eaapa/hello-world:latest --name my-pod
 `,
 	Flags: []cli.Flag{
@@ -117,7 +117,7 @@ var upCommand = cli.Command{
 			log := ui.NewLine().Loading("Resolve image for the project...")
 			info, err := client.GetInfo()
 			if err != nil {
-				log.Fatalf("Unable to resolve image for the project. Failed to get target device architecture: %s", err)
+				log.Fatalf("Unable to resolve image for the project. Failed to get target node architecture: %s", err)
 			}
 
 			var projectType string

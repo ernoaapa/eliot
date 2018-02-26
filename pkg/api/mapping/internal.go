@@ -5,14 +5,14 @@ import (
 
 	core "github.com/ernoaapa/eliot/pkg/api/core"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/model"
 )
 
-// MapInfoToAPIModel maps internal device info model to API model
-func MapInfoToAPIModel(info *model.DeviceInfo) *device.Info {
-	return &device.Info{
+// MapInfoToAPIModel maps internal node info model to API model
+func MapInfoToAPIModel(info *model.NodeInfo) *node.Info {
+	return &node.Info{
 		Labels:     mapLabelsToAPIModel(info.Labels),
 		Hostname:   info.Hostname,
 		Addresses:  addressesToString(info.Addresses),
@@ -26,9 +26,9 @@ func MapInfoToAPIModel(info *model.DeviceInfo) *device.Info {
 	}
 }
 
-func mapLabelsToAPIModel(labels map[string]string) (result []*device.Label) {
+func mapLabelsToAPIModel(labels map[string]string) (result []*node.Label) {
 	for key, value := range labels {
-		result = append(result, &device.Label{Key: key, Value: value})
+		result = append(result, &node.Label{Key: key, Value: value})
 	}
 	return result
 }

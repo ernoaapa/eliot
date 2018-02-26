@@ -1,4 +1,4 @@
-package device
+package node
 
 import (
 	"fmt"
@@ -13,14 +13,14 @@ import (
 	"github.com/ernoaapa/eliot/pkg/model"
 )
 
-// GetInfo resolves information about the device
+// GetInfo resolves information about the node
 // Note: Darwin (OSX) implementation is just for development purpose
 // For example, BootID get generated every time when process restarts
-func (r *Resolver) GetInfo(grpcPort int, version string) *model.DeviceInfo {
+func (r *Resolver) GetInfo(grpcPort int, version string) *model.NodeInfo {
 	ioregOutput := runCommandOrFail("ioreg", "-rd1", "-c", "IOPlatformExpertDevice")
 	hostname, _ := os.Hostname()
 
-	return &model.DeviceInfo{
+	return &model.NodeInfo{
 		Version:   version,
 		Labels:    r.labels,
 		Arch:      runtime.GOARCH,
@@ -40,7 +40,7 @@ func (r *Resolver) GetInfo(grpcPort int, version string) *model.DeviceInfo {
 func runCommandOrFail(name string, arg ...string) string {
 	bytes, err := exec.Command(name, arg...).Output()
 	if err != nil {
-		log.Fatalf("Failed to resolve device info: %s", err)
+		log.Fatalf("Failed to resolve node info: %s", err)
 	}
 	return strings.TrimSpace(string(bytes))
 }

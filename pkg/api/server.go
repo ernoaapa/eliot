@@ -14,7 +14,7 @@ import (
 
 	"github.com/ernoaapa/eliot/pkg/api/mapping"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/api/stream"
 	"github.com/ernoaapa/eliot/pkg/progress"
@@ -27,15 +27,15 @@ import (
 
 // Server implements the GRPC API for the eli
 type Server struct {
-	info   *model.DeviceInfo
+	info   *model.NodeInfo
 	client runtime.Client
 	grpc   *grpc.Server
 	listen string
 }
 
-// Info is 'device' service Info implementation
-func (s *Server) Info(context context.Context, req *device.InfoRequest) (*device.InfoResponse, error) {
-	return &device.InfoResponse{
+// Info is Node service Info implementation
+func (s *Server) Info(context context.Context, req *node.InfoRequest) (*node.InfoResponse, error) {
+	return &node.InfoResponse{
 		Info: mapping.MapInfoToAPIModel(s.info),
 	}, nil
 }
@@ -283,7 +283,7 @@ func getMetadataValue(md metadata.MD, key string) string {
 }
 
 // NewServer creates new API server
-func NewServer(listen string, client runtime.Client, info *model.DeviceInfo) *Server {
+func NewServer(listen string, client runtime.Client, info *model.NodeInfo) *Server {
 	apiserver := &Server{
 		info:   info,
 		client: client,
@@ -293,7 +293,7 @@ func NewServer(listen string, client runtime.Client, info *model.DeviceInfo) *Se
 	apiserver.grpc = grpc.NewServer()
 	pods.RegisterPodsServer(apiserver.grpc, apiserver)
 	containers.RegisterContainersServer(apiserver.grpc, apiserver)
-	device.RegisterDeviceServer(apiserver.grpc, apiserver)
+	node.RegisterNodeServer(apiserver.grpc, apiserver)
 	return apiserver
 }
 
