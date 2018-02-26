@@ -11,7 +11,7 @@ func TestGetInfo(t *testing.T) {
 		"foo": "bar",
 	}
 
-	info := NewResolver(labels).GetInfo(5000, "test-version")
+	info := NewResolver(5000, "test-version", labels).GetInfo()
 
 	assert.NotEmpty(t, info.BootID, "should resolve BootID")
 	assert.NotEmpty(t, info.MachineID, "should resolve MachineID")

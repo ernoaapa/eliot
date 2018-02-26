@@ -16,18 +16,18 @@ import (
 // GetInfo resolves information about the node
 // Note: Darwin (OSX) implementation is just for development purpose
 // For example, BootID get generated every time when process restarts
-func (r *Resolver) GetInfo(grpcPort int, version string) *model.NodeInfo {
+func (r *Resolver) GetInfo() *model.NodeInfo {
 	ioregOutput := runCommandOrFail("ioreg", "-rd1", "-c", "IOPlatformExpertDevice")
 	hostname, _ := os.Hostname()
 
 	return &model.NodeInfo{
-		Version:   version,
+		Version:   r.version,
 		Labels:    r.labels,
 		Arch:      runtime.GOARCH,
 		OS:        runtime.GOOS,
 		Hostname:  hostname,
 		Addresses: getAddresses(),
-		GrpcPort:  grpcPort,
+		GrpcPort:  r.grpcPort,
 
 		MachineID: parseFieldFromIoregOutput(ioregOutput, "IOPlatformSerialNumber"),
 

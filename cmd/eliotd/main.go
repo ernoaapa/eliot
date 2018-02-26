@@ -98,8 +98,8 @@ func main() {
 			grpcPort   = parseGrpcPort(grpcListen)
 		)
 
-		resolver := node.NewResolver(cmd.GetLabels(clicontext))
-		node := resolver.GetInfo(grpcPort, version)
+		resolver := node.NewResolver(grpcPort, version, cmd.GetLabels(clicontext))
+		node := resolver.GetInfo()
 		client := cmd.GetRuntimeClient(clicontext, node.Hostname)
 
 		supervisor := suture.NewSimple("eliotd")
@@ -114,7 +114,7 @@ func main() {
 
 		if clicontext.Bool("grpc-api") {
 			log.Infoln("grpc-api enabled")
-			supervisor.Add(api.NewServer(grpcListen, client, node))
+			supervisor.Add(api.NewServer(grpcListen, client, resolver))
 			serviceCount++
 		}
 

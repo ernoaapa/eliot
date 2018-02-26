@@ -8,16 +8,16 @@ import (
 )
 
 // GetInfo resolves information about the node
-func (r *Resolver) GetInfo(grpcPort int, version string) *model.NodeInfo {
+func (r *Resolver) GetInfo() *model.NodeInfo {
 	hostname, _ := os.Hostname()
 	return &model.NodeInfo{
-		Version:   version,
+		Version:   r.version,
 		Labels:    r.labels,
 		Arch:      runtime.GOARCH,
 		OS:        runtime.GOOS,
 		Hostname:  hostname,
 		Addresses: getAddresses(),
-		GrpcPort:  grpcPort,
+		GrpcPort:  r.grpcPort,
 
 		MachineID: resolveFirst(
 			"MachineID",

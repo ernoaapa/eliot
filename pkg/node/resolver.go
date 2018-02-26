@@ -12,13 +12,17 @@ import (
 
 // Resolver provides information about the node
 type Resolver struct {
-	labels map[string]string
+	grpcPort int
+	version  string
+	labels   map[string]string
 }
 
 // NewResolver creates new resolver with static node labels
-func NewResolver(labels map[string]string) *Resolver {
+func NewResolver(grpcPort int, version string, labels map[string]string) *Resolver {
 	return &Resolver{
-		labels: withHostLabels(labels),
+		grpcPort: grpcPort,
+		version:  version,
+		labels:   withHostLabels(labels),
 	}
 }
 
