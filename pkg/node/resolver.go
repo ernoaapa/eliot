@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
@@ -9,6 +10,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 )
+
+var eliotLabelPrefix = "eliot.io"
 
 // Resolver provides information about the node
 type Resolver struct {
@@ -28,11 +31,11 @@ func NewResolver(grpcPort int, version string, labels map[string]string) *Resolv
 
 func withHostLabels(labels map[string]string) map[string]string {
 	if _, exist := labels["arch"]; !exist {
-		labels["arch"] = runtime.GOARCH
+		labels[fmt.Sprintf("%s/%s", eliotLabelPrefix, "arch")] = runtime.GOARCH
 	}
 
 	if _, exist := labels["os"]; !exist {
-		labels["os"] = runtime.GOOS
+		labels[fmt.Sprintf("%s/%s", eliotLabelPrefix, "os")] = runtime.GOOS
 	}
 	return labels
 }
