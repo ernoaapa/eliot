@@ -13,16 +13,17 @@ import (
 // MapInfoToAPIModel maps internal node info model to API model
 func MapInfoToAPIModel(info *model.NodeInfo) *node.Info {
 	return &node.Info{
-		Labels:     mapLabelsToAPIModel(info.Labels),
-		Hostname:   info.Hostname,
-		Addresses:  addressesToString(info.Addresses),
-		GrpcPort:   int64(info.GrpcPort),
-		MachineID:  info.MachineID,
-		SystemUUID: info.SystemUUID,
-		BootID:     info.BootID,
-		Arch:       info.Arch,
-		Os:         info.OS,
-		Version:    info.Version,
+		Labels:      mapLabelsToAPIModel(info.Labels),
+		Hostname:    info.Hostname,
+		Addresses:   addressesToString(info.Addresses),
+		GrpcPort:    int64(info.GrpcPort),
+		MachineID:   info.MachineID,
+		SystemUUID:  info.SystemUUID,
+		BootID:      info.BootID,
+		Arch:        info.Arch,
+		Os:          info.OS,
+		Version:     info.Version,
+		Filesystems: mapFilesystemsToAPIModel(info.Filesystems),
 	}
 }
 
@@ -118,6 +119,20 @@ func MapContainerStatusesToAPIModel(statuses []model.ContainerStatus) (result []
 			Image:        status.Image,
 			State:        status.State,
 			RestartCount: int32(status.RestartCount),
+		})
+	}
+	return result
+}
+
+func mapFilesystemsToAPIModel(disks []model.Filesystem) (result []*node.Filesystem) {
+	for _, disk := range disks {
+		result = append(result, &node.Filesystem{
+			Filesystem: disk.Filesystem,
+			TypeName:   disk.TypeName,
+			MountDir:   disk.MountDir,
+			Total:      disk.Total,
+			Free:       disk.Free,
+			Available:  disk.Available,
 		})
 	}
 	return result

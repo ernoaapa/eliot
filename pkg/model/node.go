@@ -37,6 +37,9 @@ type NodeInfo struct {
 
 	// Server version
 	Version string
+
+	// Filesystems
+	Filesystems []Filesystem
 }
 
 // NodeState describes current state of the node
@@ -47,4 +50,20 @@ type NodeState struct {
 // PodState represents information about pod current state
 type PodState struct {
 	ID string `validate:"required,gt=0"`
+}
+
+// Filesystem represents information about single filesystem in the target node
+type Filesystem struct {
+	// E.g /dev/vda1, tmpfs, cgroup, etc.
+	Filesystem string
+	// E.g. ext4, tmpfs, cgroup, etc.
+	TypeName string
+	// Path to the mounted dir
+	MountDir string
+	// Total data blocks
+	Total uint64
+	// Free blocks
+	Free uint64
+	// Free blocks available to unprivileged user
+	Available uint64
 }

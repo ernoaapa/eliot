@@ -86,6 +86,9 @@ func testPrintNode(t *testing.T, printer ResourcePrinter) {
 		BootID:     "12334345345",
 		Arch:       "amd64",
 		Os:         "linux",
+		Filesystems: []*node.Filesystem{
+			{Filesystem: "overlay", TypeName: "overlay", Total: 1023856, Used: 8, Available: 1023848, MountDir: "/"},
+		},
 	}
 
 	err := printer.PrintNode(data, &buffer)

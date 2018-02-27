@@ -14,4 +14,12 @@ GrpcPort:	{{.GrpcPort}}
 MachineID:	{{.MachineID}}
 SystemUUID:	{{.SystemUUID}}
 BootID:	{{.BootID}}
+{{- if .Filesystems }}
+Filesystems:
+	Filesystem	Type	Size	Used	Available	Use%	Mounted on
+	----------	----	----	----	---------	----	----------
+{{- range .Filesystems}}
+	{{.Filesystem}}	{{.TypeName}}	{{.Total}}	{{.Total - .Free}}	{{.Available}}	{{FormatPercent .Total .Free .Available}}	{{.MountDir}}
+{{- end}}
+{{- end}}
 `

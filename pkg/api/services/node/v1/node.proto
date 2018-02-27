@@ -46,9 +46,27 @@ message Info {
 
 	// Server version
 	string version = 10;
+
+	// Filesystem infos
+	repeated Filesystem filesystems = 11;
 }
 
 message Label {
 	string key = 1;
 	string value = 2;
+}
+
+message Filesystem {
+	// E.g /dev/vda1, tmpfs, cgroup, etc.
+	string filesystem = 1;
+	// E.g. ext4, tmpfs, cgroup, etc.
+	string typeName = 2;
+	// Path to the mounted dir
+	string mountDir = 3;
+	// Total data blocks
+	uint64 total = 4;
+	// Free blocks
+	uint64 free = 5;
+	// Free blocks available to unprivileged user
+	uint64 available = 6;
 }

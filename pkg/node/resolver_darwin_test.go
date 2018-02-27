@@ -18,4 +18,5 @@ func TestGetInfo(t *testing.T) {
 	assert.NotEmpty(t, info.SystemUUID, "should resolve SystemUUID")
 	assert.Equal(t, labels, info.Labels, "should have given node labels")
 	assert.Equal(t, 5000, info.GrpcPort, "should have given node grpc port")
+	assert.True(t, len(info.Filesystems) > 0, "should have at least one disk")
 }

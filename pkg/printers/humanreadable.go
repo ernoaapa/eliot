@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"sort"
+	"strconv"
 	"strings"
 
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
@@ -99,12 +100,33 @@ func (p *HumanReadablePrinter) PrintNodes(nodes []*node.Info, writer io.Writer) 
 
 // PrintNode writes a node in human readable detailed format to the writer
 func (p *HumanReadablePrinter) PrintNode(info *node.Info, writer io.Writer) error {
-	t := template.New("node-details")
+	t := template.New("node-details").Funcs(template.FuncMap{
+		"FormatPercent": formatPercent,
+	})
 	t, err := t.Parse(humanreadable.NodeDetailsTemplate)
 	if err != nil {
 		log.Fatalf("Invalid pod template: %s", err)
 	}
 	return t.Execute(writer, info)
+}
+
+func formatPercent(total, free, available uint64) string {
+	percent := 0.0
+	bUsed := (total - free) / 1024
+	bAvail := available / 1024
+	utotal := bUsed + bAvail
+	used := bUsed
+
+	if utotal != 0 {
+		u100 := used * 100
+		pct := u100 / utotal
+		if u100%utotal != 0 {
+			pct++
+		}
+		percent = (float64(pct) / float64(100)) * 100.0
+	}
+
+	return strconv.FormatFloat(percent, 'f', -1, 64) + "%"
 }
 
 // PrintPod writes a pod in human readable detailed format to the writer

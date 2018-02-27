@@ -34,7 +34,14 @@ func (r *Resolver) GetInfo() *model.NodeInfo {
 		SystemUUID: parseFieldFromIoregOutput(ioregOutput, "IOPlatformUUID"),
 
 		BootID: runCommandOrFail("/usr/bin/uuidgen"),
+
+		Filesystems: resolveFilesystems(),
 	}
+}
+
+func resolveFilesystems() []model.Filesystem {
+	log.Warn("MacOS is for development purpose only, resolving Filesystems not implemented")
+	return []model.Filesystem{}
 }
 
 func runCommandOrFail(name string, arg ...string) string {
