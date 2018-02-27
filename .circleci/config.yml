@@ -1,6 +1,6 @@
 defaults: &defaults
   docker:
-    - image: circleci/golang:1.9
+    - image: circleci/golang:1.10
   working_directory: /go/src/github.com/ernoaapa/eliot
 
 version: 2
@@ -21,7 +21,7 @@ jobs:
       - setup_remote_docker
 
       - run: go get github.com/goreleaser/goreleaser
-      - run: goreleaser --snapshot --skip-publish
+      - run: goreleaser --snapshot
 
   publish:
     <<: *defaults
