@@ -162,7 +162,7 @@ func MapContainerStatusToInternalModel(container containers.Container, status co
 
 func getRestartCount(container containers.Container) int {
 	lifecycle, err := extensions.GetLifecycleExtension(container)
-	if err != nil {
+	if err != nil && !extensions.IsNotFound(err) {
 		log.Warnf("Error while resolving container restart count, fallback to zero: %s", err)
 	}
 
@@ -189,7 +189,7 @@ func haveNamespace(container containers.Container, namespace specs.LinuxNamespac
 
 func getRestartPolicy(container containers.Container) string {
 	lifecycle, err := extensions.GetLifecycleExtension(container)
-	if err != nil {
+	if err != nil && !extensions.IsNotFound(err) {
 		log.Warnf("Error while resolving container restart policy, fallback to default: %s", err)
 	}
 
