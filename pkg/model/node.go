@@ -40,6 +40,9 @@ type NodeInfo struct {
 
 	// Filesystems
 	Filesystems []Filesystem
+
+	// Seconds since node boot up
+	Uptime uint64
 }
 
 // NodeState describes current state of the node

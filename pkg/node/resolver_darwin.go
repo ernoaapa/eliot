@@ -22,6 +22,7 @@ func (r *Resolver) GetInfo() *model.NodeInfo {
 
 	return &model.NodeInfo{
 		Version:   r.version,
+		Uptime:    0,
 		Labels:    r.labels,
 		Arch:      runtime.GOARCH,
 		OS:        runtime.GOOS,
@@ -29,11 +30,9 @@ func (r *Resolver) GetInfo() *model.NodeInfo {
 		Addresses: getAddresses(),
 		GrpcPort:  r.grpcPort,
 
-		MachineID: parseFieldFromIoregOutput(ioregOutput, "IOPlatformSerialNumber"),
-
+		MachineID:  parseFieldFromIoregOutput(ioregOutput, "IOPlatformSerialNumber"),
 		SystemUUID: parseFieldFromIoregOutput(ioregOutput, "IOPlatformUUID"),
-
-		BootID: runCommandOrFail("/usr/bin/uuidgen"),
+		BootID:     runCommandOrFail("/usr/bin/uuidgen"),
 
 		Filesystems: resolveFilesystems(),
 	}

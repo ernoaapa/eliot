@@ -13,6 +13,7 @@ import (
 // MapInfoToAPIModel maps internal node info model to API model
 func MapInfoToAPIModel(info *model.NodeInfo) *node.Info {
 	return &node.Info{
+		Uptime:      info.Uptime,
 		Labels:      mapLabelsToAPIModel(info.Labels),
 		Hostname:    info.Hostname,
 		Addresses:   addressesToString(info.Addresses),

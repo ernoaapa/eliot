@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
 	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
@@ -16,6 +17,8 @@ import (
 	"github.com/ernoaapa/eliot/pkg/printers/humanreadable"
 	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
+
+	"github.com/hako/durafmt"
 )
 
 // HumanReadablePrinter is an implementation of ResourcePrinter which prints
@@ -102,6 +105,10 @@ func (p *HumanReadablePrinter) PrintNodes(nodes []*node.Info, writer io.Writer) 
 func (p *HumanReadablePrinter) PrintNode(info *node.Info, writer io.Writer) error {
 	t := template.New("node-details").Funcs(template.FuncMap{
 		"FormatPercent": formatPercent,
+		"FormatUptime":  formatUptime,
+		"Subtract": func(a, b uint64) uint64 {
+			return a - b
+		},
 	})
 	t, err := t.Parse(humanreadable.NodeDetailsTemplate)
 	if err != nil {
@@ -127,6 +134,11 @@ func formatPercent(total, free, available uint64) string {
 	}
 
 	return strconv.FormatFloat(percent, 'f', -1, 64) + "%"
+}
+
+func formatUptime(uptime uint64) string {
+	var duration = time.Duration(uptime)
+	return durafmt.Parse(duration).String()
 }
 
 // PrintPod writes a pod in human readable detailed format to the writer

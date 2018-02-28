@@ -49,6 +49,9 @@ message Info {
 
 	// Filesystem infos
 	repeated Filesystem filesystems = 11;
+
+	// Seconds since node boot up
+	uint64 uptime = 12;
 }
 
 message Label {

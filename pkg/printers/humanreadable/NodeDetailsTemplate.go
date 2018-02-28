@@ -2,6 +2,7 @@ package humanreadable
 
 // NodeDetailsTemplate is go template for printing node details
 const NodeDetailsTemplate = `Hostname:	{{.Hostname}}
+Uptime:	{{FormatUptime .Uptime}}
 Arch/OS:	{{.Os}}/{{.Arch}}
 Version:	{{.Version}}
 Labels:{{range .Labels}}
@@ -19,7 +20,7 @@ Filesystems:
 	Filesystem	Type	Size	Used	Available	Use%	Mounted on
 	----------	----	----	----	---------	----	----------
 {{- range .Filesystems}}
-	{{.Filesystem}}	{{.TypeName}}	{{.Total}}	{{.Total - .Free}}	{{.Available}}	{{FormatPercent .Total .Free .Available}}	{{.MountDir}}
+	{{.Filesystem}}	{{.TypeName}}	{{.Total}}	{{Subtract .Total .Free}}	{{.Available}}	{{FormatPercent .Total .Free .Available}}	{{.MountDir}}
 {{- end}}
 {{- end}}
 `

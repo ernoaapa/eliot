@@ -17,6 +17,7 @@ func (r *Resolver) GetInfo() *model.NodeInfo {
 	hostname, _ := os.Hostname()
 	return &model.NodeInfo{
 		Version:   r.version,
+		Uptime:    resolveUptime(),
 		Labels:    r.labels,
 		Arch:      runtime.GOARCH,
 		OS:        runtime.GOOS,
@@ -60,10 +61,11 @@ func resolveUptime() uint64 {
 	sysinfo := syscall.Sysinfo_t{}
 
 	if err := syscall.Sysinfo(&sysinfo); err != nil {
-		return err
+		log.Warnf("Cannot resolve uptime. Error: %s", err)
+		return 0
 	}
 
-	return sysinfo.Uptime
+	return uint64(sysinfo.Uptime)
 }
 
 // resolveFilesystems resolves filesystems from /etc/mtab file

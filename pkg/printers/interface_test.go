@@ -87,7 +87,7 @@ func testPrintNode(t *testing.T, printer ResourcePrinter) {
 		Arch:       "amd64",
 		Os:         "linux",
 		Filesystems: []*node.Filesystem{
-			{Filesystem: "overlay", TypeName: "overlay", Total: 1023856, Used: 8, Available: 1023848, MountDir: "/"},
+			{Filesystem: "overlay", TypeName: "overlay", Total: 1023856, Free: 1023848, Available: 1023848, MountDir: "/"},
 		},
 	}
 
