@@ -11,6 +11,7 @@ func TestFormatPercent(t *testing.T) {
 }
 
 func TestFormatDuration(t *testing.T) {
-	assert.Equal(t, "292 years 24 weeks 3 days 23 hours 47 minutes 16 seconds 854 milliseconds", formatUptime(9223372036854775807), "should format maximum int64 (half of uint64)")
-	assert.Equal(t, "-", formatUptime(18446744073709551615), "Should not break if goes above int64 (e.g. if maximum uint64)")
+	assert.Equal(t, "2 minutes 40 seconds", formatUptime(160), "Should format 160 seconds")
+	assert.Equal(t, "292 years 24 weeks 3 days 23 hours 47 minutes 16 seconds", formatUptime(9223372036), "should format large value (maximum Nanosecond duration in seconds)")
+	assert.Equal(t, "18446744073709551615 seconds", formatUptime(18446744073709551615), "Should not break if goes above int64 (e.g. if maximum uint64)")
 }

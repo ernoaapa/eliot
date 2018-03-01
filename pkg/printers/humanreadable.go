@@ -137,7 +137,11 @@ func formatPercent(total, free, available uint64) string {
 }
 
 func formatUptime(uptime uint64) string {
-	var duration = time.Duration(uptime)
+	var duration = time.Duration(uptime * 1000 * 1000 * 1000)
+	if duration < 0 {
+		// the duration went over maximum int64, fallback to just display the seconds
+		return fmt.Sprintf("%d seconds", uptime)
+	}
 	return durafmt.Parse(duration).String()
 }
 
