@@ -11,6 +11,7 @@ import (
 var (
 	ErrNotFound      = errors.New("not found")
 	ErrAlreadyExists = errors.New("already exists")
+	ErrNotSupported  = errors.New("not supported")
 )
 
 // IsNotFound returns true if the error is due to a missing resource
