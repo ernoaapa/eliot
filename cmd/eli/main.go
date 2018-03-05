@@ -21,20 +21,20 @@ func main() {
 	app.Usage = `commandline interface for managing eliot`
 	app.UsageText = `eli [global options] command [command options] [arguments...]
 
-	 # Detect devices
-	 eli get devices
+	 # Detect nodes
+	 eli get nodes
 
 	 # Get running pods
 	 eli get pods
 
-	# Get pods in device
-	eli --device hostname.local. get pods
+	# Get pods in node
+	eli --node hostname.local. get pods
 
 	# See help of commands
 	eli run --help
 	`
-	app.Description = `The 'eli' is tool for managing agent in the device.
-	 With this tool, you can create, view and remove containers from the device.`
+	app.Description = `The 'eli' is tool for managing agent in the node.
+	 With this tool, you can create, view and remove containers from the node.`
 	app.Flags = append([]cli.Flag{
 		cli.StringFlag{
 			Name:   "config, c",
@@ -49,13 +49,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "endpoint",
-			Usage:  "Use specific device endpoint. E.g. '192.168.1.101:5000'",
+			Usage:  "Use specific node endpoint. E.g. '192.168.1.101:5000'",
 			EnvVar: "ELIOT_ENDPOINT",
 		},
 		cli.StringFlag{
-			Name:   "device",
-			Usage:  "Use specific device by name. E.g. 'somehost.local'",
-			EnvVar: "ELIOT_DEVICE",
+			Name:   "node",
+			Usage:  "Use specific node by name. E.g. 'somehost.local'",
+			EnvVar: "ELIOT_NODE",
 		},
 	}, cmd.GlobalFlags...)
 	app.Version = fmt.Sprintf("Version: %s, Commit: %s, Build at: %s", version, commit, date)

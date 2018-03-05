@@ -11,8 +11,8 @@ import (
 	"github.com/ernoaapa/eliot/cmd"
 	"github.com/ernoaapa/eliot/pkg/api"
 	"github.com/ernoaapa/eliot/pkg/controller"
-	"github.com/ernoaapa/eliot/pkg/device"
 	"github.com/ernoaapa/eliot/pkg/discovery"
+	"github.com/ernoaapa/eliot/pkg/node"
 	"github.com/ernoaapa/eliot/pkg/profile"
 	log "github.com/sirupsen/logrus"
 	"github.com/thejerf/suture"
@@ -27,7 +27,7 @@ var date = time.Now().Format("2006-01-02_15:04:05")
 func main() {
 	app := cli.NewApp()
 	app.Name = "eliotd"
-	app.Usage = "Daemon for the device to enable Eliot"
+	app.Usage = "Daemon for the node to enable Eliot"
 	app.UsageText = `eliotd [arguments...]
 
 	 # By default listen port 5000
@@ -85,7 +85,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "labels",
-			Usage:  "Comma separated list of device labels. E.g. --labels device=rpi3,location=home,environment=testing",
+			Usage:  "Comma separated list of node labels. E.g. --labels node=rpi3,location=home,environment=testing",
 			EnvVar: "ELIOT_LABELS",
 		},
 	}, cmd.GlobalFlags...)
@@ -98,9 +98,9 @@ func main() {
 			grpcPort   = parseGrpcPort(grpcListen)
 		)
 
-		resolver := device.NewResolver(cmd.GetLabels(clicontext))
-		device := resolver.GetInfo(grpcPort, version)
-		client := cmd.GetRuntimeClient(clicontext, device.Hostname)
+		resolver := node.NewResolver(grpcPort, version, cmd.GetLabels(clicontext))
+		node := resolver.GetInfo()
+		client := cmd.GetRuntimeClient(clicontext, node.Hostname)
 
 		supervisor := suture.NewSimple("eliotd")
 		serviceCount := 0
@@ -114,7 +114,7 @@ func main() {
 
 		if clicontext.Bool("grpc-api") {
 			log.Infoln("grpc-api enabled")
-			supervisor.Add(api.NewServer(grpcListen, client, device))
+			supervisor.Add(api.NewServer(grpcListen, client, resolver))
 			serviceCount++
 		}
 
@@ -126,7 +126,7 @@ func main() {
 
 		if clicontext.Bool("grpc-api") && clicontext.Bool("discovery") {
 			log.Infoln("grpc discovery over zeroconf enabled")
-			supervisor.Add(discovery.NewServer(device.Hostname, grpcPort, version))
+			supervisor.Add(discovery.NewServer(node.Hostname, grpcPort, version))
 			serviceCount++
 		}
 

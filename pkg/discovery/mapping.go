@@ -4,11 +4,11 @@ import (
 	"net"
 	"strings"
 
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	"github.com/grandcat/zeroconf"
 )
 
-func MapToAPIModel(entry *zeroconf.ServiceEntry) *device.Info {
+func MapToAPIModel(entry *zeroconf.ServiceEntry) *node.Info {
 	version := "unknown"
 
 	for _, val := range entry.Text {
@@ -18,7 +18,7 @@ func MapToAPIModel(entry *zeroconf.ServiceEntry) *device.Info {
 		}
 	}
 
-	return &device.Info{
+	return &node.Info{
 		Hostname:  entry.HostName,
 		Addresses: addressesToString(append(entry.AddrIPv4, entry.AddrIPv6...)),
 		GrpcPort:  int64(entry.Port),

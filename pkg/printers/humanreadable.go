@@ -6,15 +6,19 @@ import (
 	"io"
 	"log"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/config"
 	"github.com/ernoaapa/eliot/pkg/printers/humanreadable"
 	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
+
+	"github.com/hako/durafmt"
 )
 
 // HumanReadablePrinter is an implementation of ResourcePrinter which prints
@@ -78,33 +82,67 @@ func getKeys(source map[string]int) (result []string) {
 	return result
 }
 
-// PrintDevices writes list of Devices in human readable table format to the writer
-func (p *HumanReadablePrinter) PrintDevices(devices []*device.Info, writer io.Writer) error {
-	if len(devices) == 0 {
-		fmt.Fprintf(writer, "\n\t(No devices)\n\n")
+// PrintNodes writes list of Nodes in human readable table format to the writer
+func (p *HumanReadablePrinter) PrintNodes(nodes []*node.Info, writer io.Writer) error {
+	if len(nodes) == 0 {
+		fmt.Fprintf(writer, "\n\t(No nodes)\n\n")
 		return nil
 	}
 	fmt.Fprintln(writer, "\nHOSTNAME\tENDPOINT\tVERSION")
 
-	for _, device := range devices {
-		endpoint := fmt.Sprintf("%s:%d", utils.GetFirst(device.Addresses, ""), device.GrpcPort)
-		_, err := fmt.Fprintf(writer, "%s\t%s\t%s\n", device.Hostname, endpoint, device.Version)
+	for _, node := range nodes {
+		endpoint := fmt.Sprintf("%s:%d", utils.GetFirst(node.Addresses, ""), node.GrpcPort)
+		_, err := fmt.Fprintf(writer, "%s\t%s\t%s\n", node.Hostname, endpoint, node.Version)
 		if err != nil {
-			return errors.Wrapf(err, "Error while writing device row")
+			return errors.Wrapf(err, "Error while writing node row")
 		}
 	}
 
 	return nil
 }
 
-// PrintDevice writes a device in human readable detailed format to the writer
-func (p *HumanReadablePrinter) PrintDevice(info *device.Info, writer io.Writer) error {
-	t := template.New("device-details")
-	t, err := t.Parse(humanreadable.DeviceDetailsTemplate)
+// PrintNode writes a node in human readable detailed format to the writer
+func (p *HumanReadablePrinter) PrintNode(info *node.Info, writer io.Writer) error {
+	t := template.New("node-details").Funcs(template.FuncMap{
+		"FormatPercent": formatPercent,
+		"FormatUptime":  formatUptime,
+		"Subtract": func(a, b uint64) uint64 {
+			return a - b
+		},
+	})
+	t, err := t.Parse(humanreadable.NodeDetailsTemplate)
 	if err != nil {
 		log.Fatalf("Invalid pod template: %s", err)
 	}
 	return t.Execute(writer, info)
+}
+
+func formatPercent(total, free, available uint64) string {
+	percent := 0.0
+	bUsed := (total - free) / 1024
+	bAvail := available / 1024
+	utotal := bUsed + bAvail
+	used := bUsed
+
+	if utotal != 0 {
+		u100 := used * 100
+		pct := u100 / utotal
+		if u100%utotal != 0 {
+			pct++
+		}
+		percent = (float64(pct) / float64(100)) * 100.0
+	}
+
+	return strconv.FormatFloat(percent, 'f', -1, 64) + "%"
+}
+
+func formatUptime(uptime uint64) string {
+	var duration = time.Duration(uptime * 1000 * 1000 * 1000)
+	if duration < 0 {
+		// the duration went over maximum int64, fallback to just display the seconds
+		return fmt.Sprintf("%d seconds", uptime)
+	}
+	return durafmt.Parse(duration).String()
 }
 
 // PrintPod writes a pod in human readable detailed format to the writer

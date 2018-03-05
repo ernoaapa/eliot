@@ -4,7 +4,7 @@ package humanreadable
 const PodDetailsTemplate = `{{$pod := .Pod -}}
 Name:	{{.Pod.Metadata.Name}}
 Namespace:	{{.Pod.Metadata.Namespace}}
-Device:	{{.Pod.Status.Hostname}}
+Node:	{{.Pod.Status.Hostname}}
 State:	{{.Status}}
 Restart Policy:	{{.Pod.Spec.RestartPolicy}}
 Host Network:	{{.Pod.Spec.HostNetwork}}

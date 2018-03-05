@@ -5,30 +5,32 @@ import (
 
 	core "github.com/ernoaapa/eliot/pkg/api/core"
 	containers "github.com/ernoaapa/eliot/pkg/api/services/containers/v1"
-	device "github.com/ernoaapa/eliot/pkg/api/services/device/v1"
+	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
 	pods "github.com/ernoaapa/eliot/pkg/api/services/pods/v1"
 	"github.com/ernoaapa/eliot/pkg/model"
 )
 
-// MapInfoToAPIModel maps internal device info model to API model
-func MapInfoToAPIModel(info *model.DeviceInfo) *device.Info {
-	return &device.Info{
-		Labels:     mapLabelsToAPIModel(info.Labels),
-		Hostname:   info.Hostname,
-		Addresses:  addressesToString(info.Addresses),
-		GrpcPort:   int64(info.GrpcPort),
-		MachineID:  info.MachineID,
-		SystemUUID: info.SystemUUID,
-		BootID:     info.BootID,
-		Arch:       info.Arch,
-		Os:         info.OS,
-		Version:    info.Version,
+// MapInfoToAPIModel maps internal node info model to API model
+func MapInfoToAPIModel(info *model.NodeInfo) *node.Info {
+	return &node.Info{
+		Uptime:      info.Uptime,
+		Labels:      mapLabelsToAPIModel(info.Labels),
+		Hostname:    info.Hostname,
+		Addresses:   addressesToString(info.Addresses),
+		GrpcPort:    int64(info.GrpcPort),
+		MachineID:   info.MachineID,
+		SystemUUID:  info.SystemUUID,
+		BootID:      info.BootID,
+		Arch:        info.Arch,
+		Os:          info.OS,
+		Version:     info.Version,
+		Filesystems: mapFilesystemsToAPIModel(info.Filesystems),
 	}
 }
 
-func mapLabelsToAPIModel(labels map[string]string) (result []*device.Label) {
+func mapLabelsToAPIModel(labels map[string]string) (result []*node.Label) {
 	for key, value := range labels {
-		result = append(result, &device.Label{Key: key, Value: value})
+		result = append(result, &node.Label{Key: key, Value: value})
 	}
 	return result
 }
@@ -118,6 +120,20 @@ func MapContainerStatusesToAPIModel(statuses []model.ContainerStatus) (result []
 			Image:        status.Image,
 			State:        status.State,
 			RestartCount: int32(status.RestartCount),
+		})
+	}
+	return result
+}
+
+func mapFilesystemsToAPIModel(disks []model.Filesystem) (result []*node.Filesystem) {
+	for _, disk := range disks {
+		result = append(result, &node.Filesystem{
+			Filesystem: disk.Filesystem,
+			TypeName:   disk.TypeName,
+			MountDir:   disk.MountDir,
+			Total:      disk.Total,
+			Free:       disk.Free,
+			Available:  disk.Available,
 		})
 	}
 	return result

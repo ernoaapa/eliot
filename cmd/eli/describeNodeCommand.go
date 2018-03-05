@@ -12,17 +12,17 @@ import (
 	"github.com/urfave/cli"
 )
 
-var describeDeviceCommand = cli.Command{
-	Name:    "device",
-	Aliases: []string{"devices"},
-	Usage:   "Return details of device",
-	UsageText: `eli describe device [options] [NAME | IP]
+var describeNodeCommand = cli.Command{
+	Name:    "node",
+	Aliases: []string{"nodes", "device"}, // device is deprecated command
+	Usage:   "Return details of node",
+	UsageText: `eli describe node [options] [NAME | IP]
 	
-	# Describe device
-	eli describe device my-device
+	# Describe node
+	eli describe node my-node
 
 	# Describe all pods
-	eli describe devices
+	eli describe nodes
 `,
 	Action: func(clicontext *cli.Context) error {
 		cfg := cmd.GetConfigProvider(clicontext)
@@ -45,9 +45,9 @@ var describeDeviceCommand = cli.Command{
 		for _, endpoint := range endpoints {
 			info, err := api.NewClient(cfg.GetNamespace(), endpoint).GetInfo()
 			if err != nil {
-				return errors.Wrap(err, "Failed to fetch device info")
+				return errors.Wrap(err, "Failed to fetch node info")
 			}
-			if err := printer.PrintDevice(info, writer); err != nil {
+			if err := printer.PrintNode(info, writer); err != nil {
 				return err
 			}
 		}

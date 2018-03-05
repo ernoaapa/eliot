@@ -24,8 +24,8 @@ import (
 var runCommand = cli.Command{
 	Name:        "run",
 	HelpName:    "run",
-	Usage:       "Run command in new container in the device",
-	Description: "With run command, you can run command in a new container in the device",
+	Usage:       "Run command in new container in the node",
+	Description: "With run command, you can run command in a new container in the node",
 	UsageText: `eli run [options] <image> -- <command> <args>
 
 	 # Run shell session in 'eaapa/hello-world' container
@@ -93,7 +93,7 @@ var runCommand = cli.Command{
 			uiline := ui.NewLine().Loading("Resolve image for the project...")
 			info, err := client.GetInfo()
 			if err != nil {
-				uiline.Fatalf("Unable to resolve image for the project. Failed to get target device architecture: %s", err)
+				uiline.Fatalf("Unable to resolve image for the project. Failed to get target node architecture: %s", err)
 			}
 
 			var projectType string

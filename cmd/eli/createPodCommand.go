@@ -16,7 +16,7 @@ var createPodCommand = cli.Command{
 	Name:        "pod",
 	HelpName:    "pod",
 	Usage:       "Create new pod",
-	Description: "With create pod command, you can create new pod into the device",
+	Description: "With create pod command, you can create new pod into the node",
 	UsageText: `eli create pod [options] <NAME>
 
 	 # Create new pod 'my-pod' and create single container

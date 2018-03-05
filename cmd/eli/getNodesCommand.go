@@ -11,27 +11,27 @@ import (
 	"github.com/urfave/cli"
 )
 
-var getDevicesCommand = cli.Command{
-	Name:    "devices",
-	Aliases: []string{"device"},
-	Usage:   "Get Device resources",
-	UsageText: `eli get devices [options]
+var getNodesCommand = cli.Command{
+	Name:    "nodes",
+	Aliases: []string{"node", "devices"}, // devices is deprecated command
+	Usage:   "Get Node resources",
+	UsageText: `eli get nodes [options]
 			 
-	 # Get table of known devices
-	 eli get devices`,
+	 # Get table of known nodes
+	 eli get nodes`,
 	Action: func(clicontext *cli.Context) error {
 		uiline := ui.NewLine().Loading("Discover from network automatically...")
 
-		devices, err := discovery.Devices(5 * time.Second)
+		nodes, err := discovery.Nodes(5 * time.Second)
 		if err != nil {
-			uiline.Fatalf("Failed to auto-discover devices in network: %s", err)
+			uiline.Fatalf("Failed to auto-discover nodes in network: %s", err)
 		}
-		uiline.Donef("Discovered %d devices from network", len(devices))
+		uiline.Donef("Discovered %d nodes from network", len(nodes))
 
 		writer := printers.GetNewTabWriter(os.Stdout)
 		defer writer.Flush()
 
 		printer := cmd.GetPrinter(clicontext)
-		return printer.PrintDevices(devices, writer)
+		return printer.PrintNodes(nodes, writer)
 	},
 }

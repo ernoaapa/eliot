@@ -12,22 +12,22 @@ import (
 	"github.com/urfave/cli"
 )
 
-var buildDeviceCommand = cli.Command{
-	Name:    "device",
-	Aliases: []string{"dev", "devices"},
-	Usage:   "Build device image",
-	UsageText: `eli build device [options] [FILE | URL]
+var buildNodeCommand = cli.Command{
+	Name:    "node",
+	Aliases: []string{"nodes", "device"}, // device is deprecated command
+	Usage:   "Build node image",
+	UsageText: `eli build node [options] [FILE | URL]
 	
-	 # Build default device image
-	 eli build device
+	 # Build default node image
+	 eli build node
 	 
 	 # Create Linuxkit file but don't build it
-	 eli build device --dry-run
-	 eli build device --dry-run > custom-linuxkit.yml
+	 eli build node --dry-run
+	 eli build node --dry-run > custom-linuxkit.yml
 	 
 	 # Build from custom config and unpack to directory
 	 mkdir dist
-	 eli build device custom-linuxkit.yml | tar xv -C dist
+	 eli build node custom-linuxkit.yml | tar xv -C dist
 	 `,
 	Flags: []cli.Flag{
 		cli.BoolFlag{

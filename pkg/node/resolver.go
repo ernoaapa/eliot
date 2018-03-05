@@ -1,6 +1,7 @@
-package device
+package node
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
@@ -10,25 +11,31 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Resolver provides information about the device
+var eliotLabelPrefix = "eliot.io"
+
+// Resolver provides information about the node
 type Resolver struct {
-	labels map[string]string
+	grpcPort int
+	version  string
+	labels   map[string]string
 }
 
-// NewResolver creates new resolver with static device labels
-func NewResolver(labels map[string]string) *Resolver {
+// NewResolver creates new resolver with static node labels
+func NewResolver(grpcPort int, version string, labels map[string]string) *Resolver {
 	return &Resolver{
-		labels: withHostLabels(labels),
+		grpcPort: grpcPort,
+		version:  version,
+		labels:   withHostLabels(labels),
 	}
 }
 
 func withHostLabels(labels map[string]string) map[string]string {
 	if _, exist := labels["arch"]; !exist {
-		labels["arch"] = runtime.GOARCH
+		labels[fmt.Sprintf("%s/%s", eliotLabelPrefix, "arch")] = runtime.GOARCH
 	}
 
 	if _, exist := labels["os"]; !exist {
-		labels["os"] = runtime.GOOS
+		labels[fmt.Sprintf("%s/%s", eliotLabelPrefix, "os")] = runtime.GOOS
 	}
 	return labels
 }
