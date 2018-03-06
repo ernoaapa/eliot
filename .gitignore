@@ -2,9 +2,17 @@
 /bin
 /.go
 
+# Linuxkit build
+rpi3.yml
+*-cmdline
+*-initrd.img
+*-kernel
+*-state
+
 node_modules
 # Ignore because just used with gitbook
 package-lock.json
 
 # Output of documentation
 _book
+
