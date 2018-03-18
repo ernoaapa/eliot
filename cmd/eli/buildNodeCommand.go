@@ -43,7 +43,7 @@ var buildNodeCommand = cli.Command{
 		},
 		cli.StringFlag{
 			Name:  "output",
-Usage: "Target output file. (default: image.tar or image.img)",
+			Usage: "Target output file. (default: eliot-os.tar or eliot-os.img)",
 		},
 		cli.StringFlag{
 			Name:  "type",
@@ -124,9 +124,9 @@ func getBuildOutputFile(format, outputFile string) string {
 
 	switch format {
 	case "img":
-		return "image.img"
+		return "eliot-os.img"
 	case "tar":
-		return "image.tar"
+		return "eliot-os.tar"
 	default:
 		log.Fatalf("Unknown output format %s, cannot resolve default output file", format)
 		return ""
