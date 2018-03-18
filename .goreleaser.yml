@@ -24,6 +24,7 @@ archive:
   name_template: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 brew:
+  name: eli
   github:
     owner: ernoaapa
     name: homebrew-eliot

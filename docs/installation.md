@@ -5,7 +5,7 @@
 Eliot client, called `eli`, is just a binary what you can download from [Eliot releases](https://github.com/ernoaapa/eliot/releases).
 
 ### MacOS
-1. `brew install ernoaapa/eliot/eliot`
+1. `brew install ernoaapa/eliot/eli`
 2. Test `eli --version`
 
 ### Linux
