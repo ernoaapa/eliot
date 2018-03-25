@@ -3,6 +3,8 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"runtime"
+	"strings"
 	"syscall"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/containerd/containerd/namespaces"
 	namespaceutils "github.com/containerd/containerd/namespaces"
 	"github.com/containerd/containerd/oci"
+	"github.com/containerd/containerd/platforms"
 	"github.com/containerd/containerd/plugin"
 	"github.com/containerd/containerd/remotes"
 	"github.com/ernoaapa/eliot/pkg/model"
@@ -403,10 +406,9 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 		return nil, nil
 	}
 
-	_, err = client.Pull(
+	img, err := client.Pull(
 		ctx,
 		ref,
-		containerd.WithPullUnpack,
 		containerd.WithSchema1Conversion,
 		containerd.WithImageHandler(images.HandlerFunc(handler)),
 	)
@@ -414,9 +416,45 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 		return errors.Wrapf(err, "Error while pulling image [%s] to namespace [%s]", ref, namespace)
 	}
 
+	supported, err := images.Platforms(ctx, img.ContentStore(), img.Target())
+	if err != nil {
+		return errors.Wrapf(err, "Error while resolving image [%s] supported platforms", ref)
+	}
+
+	if !platformExist(platforms.Default(), supported) {
+		platformNames := []string{}
+		for _, platform := range supported {
+			platformNames = append(platformNames, platforms.Format(platform))
+		}
+		return ErrWithMessagef(ErrNotSupported, "Image [%s] does not support [%s]. Supported platforms: %s", ref, platforms.Default(), strings.Join(platformNames, ","))
+	}
+
+	available, _, _, _, err := images.Check(ctx, img.ContentStore(), img.Target(), platforms.Default())
+	if err != nil {
+		return errors.Wrapf(err, "Error while checking image [%s] availability", ref)
+	}
+
+	if !available {
+		return ErrWithMessagef(ErrNotSupported, "Image [%s] does not available for [%s/%s]", ref, runtime.GOOS, runtime.GOARCH)
+	}
+
+	if err := img.Unpack(ctx, containerd.DefaultSnapshotter); err != nil {
+		return errors.Wrapf(err, "Error while unpacking image [%s] to namespace [%s]", ref, namespace)
+	}
+
 	progress.AllDone()
 
 	return nil
+}
+
+func platformExist(platform string, supported []imagespecs.Platform) bool {
+	matcher, _ := platforms.Parse(platform)
+	for _, platform := range supported {
+		if matcher.Match(platform) {
+			return true
+		}
+	}
+	return false
 }
 
 // GetNamespaces return all namespaces
