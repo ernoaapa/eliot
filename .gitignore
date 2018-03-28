@@ -16,3 +16,5 @@ package-lock.json
 # Output of documentation
 _book
 
+# Built images
+*.img
