@@ -20,7 +20,7 @@ Filesystems:
 	Filesystem	Type	Size	Used	Available	Use%	Mounted on
 	----------	----	----	----	---------	----	----------
 {{- range .Filesystems}}
-	{{.Filesystem}}	{{.TypeName}}	{{.Total}}	{{Subtract .Total .Free}}	{{.Available}}	{{FormatPercent .Total .Free .Available}}	{{.MountDir}}
+	{{.Filesystem}}	{{.TypeName}}	{{FormatBytes .Total}}	{{Subtract .Total .Free | FormatBytes}}	{{FormatBytes .Available}}	{{FormatPercent .Total .Free .Available}}	{{.MountDir}}
 {{- end}}
 {{- end}}
 `
