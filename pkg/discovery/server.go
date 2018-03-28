@@ -20,10 +20,11 @@ type Server struct {
 // NewServer creates new discovery server
 func NewServer(name string, port int, version string) *Server {
 	return &Server{
-		Name:    name,
-		Domain:  "local.",
-		Port:    port,
-		Version: version,
+		Name:     name,
+		Domain:   "local.",
+		Port:     port,
+		Version:  version,
+		shutdown: make(chan bool),
 	}
 }
 
