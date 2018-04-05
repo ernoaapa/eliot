@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	node "github.com/ernoaapa/eliot/pkg/api/services/node/v1"
@@ -11,44 +12,30 @@ import (
 
 // Nodes return list of NodeInfos synchronously with given timeout
 func Nodes(timeout time.Duration) (nodes []*node.Info, err error) {
-	results := make(chan *node.Info)
-	defer close(results)
-
-	go func() {
-		for node := range results {
-			nodes = append(nodes, node)
-		}
-	}()
-
-	err = NodesAsync(results, timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	return nodes, nil
-}
-
-// NodesAsync search for nodes in network asynchronously for given timeout
-func NodesAsync(results chan<- *node.Info, timeout time.Duration) error {
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to initialize new zeroconf resolver")
+		return nodes, errors.Wrapf(err, "Failed to initialize new zeroconf resolver")
 	}
 
+	// Initialize a waitgroup variable
+	var wg sync.WaitGroup
+	wg.Add(1)
 	entries := make(chan *zeroconf.ServiceEntry)
 	go func(entries <-chan *zeroconf.ServiceEntry) {
 		for entry := range entries {
-			results <- MapToAPIModel(entry)
+			nodes = append(nodes, MapToAPIModel(entry))
 		}
+		wg.Done()
 	}(entries)
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	err = resolver.Browse(ctx, ZeroConfServiceName, "", entries)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to browse zeroconf nodes")
+		return nodes, errors.Wrapf(err, "Failed to browse zeroconf nodes")
 	}
 
-	<-ctx.Done()
-	return nil
+	wg.Wait()
+
+	return nodes, nil
 }
