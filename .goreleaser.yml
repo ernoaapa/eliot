@@ -7,6 +7,11 @@ builds:
     goarch:
       - amd64
       - arm64
+      - arm
+    goarm:
+      - 6
+      - 7
+
     env:
       - CGO_ENABLED=0
 
@@ -17,6 +22,11 @@ builds:
     goarch:
       - amd64
       - arm64
+      - arm
+    goarm:
+      - 6
+      - 7
+
     env:
       - CGO_ENABLED=0
 
@@ -57,3 +67,25 @@ dockers:
     dockerfile: Dockerfile.eliotd
     tag_templates:
       - "v{{ .Version }}-arm64"
+
+nfpm:
+  homepage: http://www.eliot.run
+  maintainer: Erno Aapa <erno.aapa@gmail.com>
+  description: "Container management system for IoT devices"
+  license: Apache 2.0
+  formats:
+    - deb
+
+  # At the moment repositories includes really old version of containerd
+  # so we bake in the containerd daemon and runc binary
+  # dependencies:
+  #   - containerd@v1.0.3
+  dependencies:
+    - libseccomp2 #(Actually runc dep)
+
+  files:
+    "build/etc/systemd/system/eliotd.service": "/etc/systemd/system/eliotd.service"
+    "build/etc/systemd/system/containerd.service": "/etc/systemd/system/containerd.service"
+    # Built during the build process
+    "bin/runc": "/usr/local/bin/runc"
+    "bin/containerd": "/usr/local/bin/containerd"

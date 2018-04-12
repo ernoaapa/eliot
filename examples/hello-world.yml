@@ -3,4 +3,8 @@ metadata:
 spec:
   containers:
     - name: "hello-world"
-      image: "docker.io/eaapa/hello-world:latest"
+      image: "docker.io/arm32v7/busybox:latest"
+      args:
+        - /bin/sh
+        - -c
+        - "while true; echo 'Eliot Rocks!'; do sleep 1; done;"

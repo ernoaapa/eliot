@@ -28,6 +28,8 @@ jobs:
       - setup_remote_docker
 
       - run: go get github.com/goreleaser/goreleaser
+      - run: sudo apt-get update && sudo apt-get install -y btrfs-tools libseccomp-dev
+      - run: ./build/build-containerd-and-runc.sh
       - run: goreleaser --snapshot
 
   publish:
@@ -45,8 +47,19 @@ jobs:
           command: |
             go get github.com/goreleaser/goreleaser
             go get github.com/estesp/manifest-tool
+            go get github.com/mlafeldt/pkgcloud/...
+
+      - run: sudo apt-get update && sudo apt-get install -y btrfs-tools libseccomp-dev
+      - run: ./build/build-containerd-and-runc.sh
       - run: goreleaser
       - run: .circleci/scripts/push-docker-manifest.sh $(git describe --tags --always --dirty)
+      - run:
+          name: Publish Linux packages
+          command: |
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_amd64.deb
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_arm64.deb
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_armv6.deb
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_armv7.deb
 
 workflows:
   version: 2

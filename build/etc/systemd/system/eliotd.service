@@ -1,0 +1,14 @@
+[Unit]
+Description=Eliot daemon
+Documentation=https://github.com/ernoaapa/eliot
+Requires=containerd.target
+After=containerd.target
+
+[Service]
+ExecStart=/usr/local/bin/eliotd --debug --grpc-api-listen 0.0.0.0:5000
+Restart=always
+KillMode=process
+RestartSec=2
+
+[Install]
+WantedBy=default.target
