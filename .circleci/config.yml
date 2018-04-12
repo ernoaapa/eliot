@@ -27,10 +27,21 @@ jobs:
       - checkout
       - setup_remote_docker
 
-      - run: go get github.com/goreleaser/goreleaser
+      - run: 
+          name: Install tools
+          command: |
+            go get github.com/goreleaser/goreleaser
+            go get github.com/mlafeldt/pkgcloud/...
       - run: sudo apt-get update && sudo apt-get install -y btrfs-tools libseccomp-dev
       - run: ./build/build-containerd-and-runc.sh
       - run: goreleaser --snapshot
+      - run:
+          name: Publish Linux packages
+          command: |
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_amd64.deb
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_arm64.deb
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_armv6.deb
+            pkgcloud-push ernoaapa/eliot/raspbian/stretch dist/eliot_*_linux_armv7.deb
 
   publish:
     <<: *defaults
