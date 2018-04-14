@@ -1,11 +1,12 @@
 [Unit]
 Description=Eliot daemon
 Documentation=https://github.com/ernoaapa/eliot
-Requires=containerd.target
-After=containerd.target
+Requires=containerd.service
+After=containerd.service
 
 [Service]
-ExecStart=/usr/local/bin/eliotd --debug --grpc-api-listen 0.0.0.0:5000
+EnvironmentFile=/etc/eliotd/config
+ExecStart=/usr/local/bin/eliotd
 Restart=always
 KillMode=process
 RestartSec=2
