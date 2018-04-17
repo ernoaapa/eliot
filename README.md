@@ -1,5 +1,7 @@
 
-![Eliot](docs/eliot-logo-medium.png) [![Go Report Card](https://goreportcard.com/badge/github.com/ernoaapa/eliot)](https://goreportcard.com/report/github.com/ernoaapa/eliot)
+![Eliot](docs/eliot-logo-medium.png)
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/ernoaapa/eliot)](https://goreportcard.com/report/github.com/ernoaapa/eliot)[![Go Report Card](https://img.shields.io/badge/deb-packagecloud.io-844fec.svg)](https://packagecloud.io/ernoaapa/eliot)
 
 > This is early alpha version! There's not all features yet implemented, not heavily tested with different devices and code might get large breaking changes until the first release.
 
