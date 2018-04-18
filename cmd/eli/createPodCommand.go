@@ -20,7 +20,7 @@ var createPodCommand = cli.Command{
 	UsageText: `eli create pod [options] <NAME>
 
 	 # Create new pod 'my-pod' and create single container
-	 eli create pod --image docker.io/arm64v8/alpine:latest my-pod
+	 eli create pod --image alpine my-pod
 `,
 	Flags: []cli.Flag{
 		cli.StringSliceFlag{
