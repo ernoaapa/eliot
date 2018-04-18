@@ -27,7 +27,8 @@ jobs:
       - checkout
       - setup_remote_docker
 
-      - run: go get github.com/goreleaser/goreleaser
+      - run: ./build/install-build-tools.sh
+
       - run: goreleaser --snapshot
 
   publish:
@@ -40,16 +41,37 @@ jobs:
           name: Login Docker hub
           command: echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin
 
-      - run: 
-          name: Install tools
-          command: |
-            go get github.com/goreleaser/goreleaser
-            go get github.com/estesp/manifest-tool
+      - run: ./build/install-build-tools.sh
+
       - run: goreleaser
       - run: .circleci/scripts/push-docker-manifest.sh $(git describe --tags --always --dirty)
+      - run:
+          name: Publish Linux packages
+          command: |
+            for package in dist/eliot_*.deb; do
+              pkgcloud-push ernoaapa/eliot/raspbian/stretch $package
+            done
 
+  deps_build_and_release:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - run: ./build/install-build-tools.sh
+
+      - run:
+          name: Install build dependencies
+          command: sudo apt-get update && sudo apt-get install -y btrfs-tools libseccomp-dev
+
+      - run:
+          name: build & release deps
+          command: GOOS=linux GOARCH=amd64 ./deps/publish-all.sh
 workflows:
   version: 2
+  deps:
+    jobs:
+      - deps_build_and_release
+
   build_and_test:
     jobs:
       - test:

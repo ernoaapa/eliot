@@ -1,0 +1,14 @@
+[Unit]
+Description=Containerd
+Documentation=https://github.com/containerd/containerd
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/containerd
+Restart=always
+KillMode=process
+RestartSec=10
+
+[Install]
+WantedBy=default.target

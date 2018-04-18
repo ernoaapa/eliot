@@ -1,6 +1,6 @@
 
 # EliotOS
-EliotOS is minimal Linux Operating System, built with [Linuxkit](https://github.com/linuxkit/linuxkit), which contains only minimal components to run Eliot.
+EliotOS is minimal Linux Operating System, built with [Linuxkit](https://github.com/linuxkit/linuxkit), which contains only minimal components to run Eliot. At the moment, EliotOS supports only RaspberryPI3.
 
 - `Linux kernel`
 - `containerd` - Container runtime

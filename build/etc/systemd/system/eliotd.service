@@ -1,0 +1,15 @@
+[Unit]
+Description=Eliot daemon
+Documentation=https://github.com/ernoaapa/eliot
+Requires=containerd.service
+After=containerd.service
+
+[Service]
+EnvironmentFile=/etc/eliotd/config
+ExecStart=/usr/local/bin/eliotd
+Restart=always
+KillMode=process
+RestartSec=2
+
+[Install]
+WantedBy=default.target

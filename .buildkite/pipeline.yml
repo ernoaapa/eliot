@@ -1,0 +1,16 @@
+steps:
+  - label: Go version
+    command: go version
+
+  - label: Docker version
+    command: docker version
+
+  - label: Install tools
+    command:
+      - GOPATH=~/go ./build/install-build-tools.sh
+
+  - wait
+
+  - label: Build containerd arm64 deb package
+    command:
+      - GOOS=linux GOARCH=arm64 GOOS=linux GOARCH=arm64 ./deps/publish-all.sh

@@ -7,6 +7,11 @@ builds:
     goarch:
       - amd64
       - arm64
+      - arm
+    goarm:
+      - 6
+      - 7
+
     env:
       - CGO_ENABLED=0
 
@@ -17,6 +22,11 @@ builds:
     goarch:
       - amd64
       - arm64
+      - arm
+    goarm:
+      - 6
+      - 7
+
     env:
       - CGO_ENABLED=0
 
@@ -57,3 +67,20 @@ dockers:
     dockerfile: Dockerfile.eliotd
     tag_templates:
       - "v{{ .Version }}-arm64"
+
+nfpm:
+  homepage: http://www.eliot.run
+  maintainer: Erno Aapa <erno.aapa@gmail.com>
+  description: "Container management system for IoT devices"
+  license: Apache 2.0
+  formats:
+    - deb
+
+  dependencies:
+    - containerd (>= 1.0.3)
+
+  files:
+    "build/etc/systemd/system/eliotd.service": "/etc/systemd/system/eliotd.service"
+  
+  config_files:
+    "build/etc/eliotd/config": "/etc/eliotd/config"

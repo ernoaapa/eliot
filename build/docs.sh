@@ -2,6 +2,7 @@
 # 
 # Small script to build and update documentation to GitHub Pages
 # 
+set -euo pipefail
 
 rm -rf _book
 gitbook install
