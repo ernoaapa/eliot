@@ -14,7 +14,6 @@ import (
 	"github.com/ernoaapa/eliot/pkg/cmd/ui"
 	"github.com/ernoaapa/eliot/pkg/model"
 	"github.com/ernoaapa/eliot/pkg/progress"
-	"github.com/ernoaapa/eliot/pkg/resolve"
 	"github.com/ernoaapa/eliot/pkg/term"
 	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
@@ -68,7 +67,7 @@ var runCommand = cli.Command{
 	Action: func(clicontext *cli.Context) (err error) {
 		var (
 			name    = clicontext.String("name")
-			image   = clicontext.Args().First()
+			image   = utils.ExpandToFQIN(clicontext.Args().First())
 			rm      = clicontext.Bool("rm")
 			tty     = clicontext.Bool("tty")
 			env     = clicontext.StringSlice("env")
@@ -88,23 +87,6 @@ var runCommand = cli.Command{
 
 		conf := cmd.GetConfigProvider(clicontext)
 		client := cmd.GetClient(conf)
-
-		if image == "" {
-			uiline := ui.NewLine().Loading("Resolve image for the project...")
-			info, err := client.GetInfo()
-			if err != nil {
-				uiline.Fatalf("Unable to resolve image for the project. Failed to get target node architecture: %s", err)
-			}
-
-			var projectType string
-			projectType, image, err = resolve.Image(info.Arch, cmd.GetCurrentDirectory())
-			if err != nil {
-				uiline.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
-			}
-			uiline.Donef("Detected %s project, use image: %s (arch %s)", projectType, image, info.Arch)
-		}
-
-		image = utils.ExpandToFQIN(image)
 
 		if name == "" {
 			// Default to current directory name

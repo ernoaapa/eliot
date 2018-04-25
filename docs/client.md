@@ -26,7 +26,7 @@ With `run` command you can quickly run some container in the device, and after y
 
 ```shell
 **[terminal]
-**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli run docker.io/arm64v8/alpine:latest -- /bin/sh]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli run alpine -- /bin/sh]
 root@linuxkit-96165e7f48d7:/# uname -a
 Linux raspberrypi-e2ccbe63f23d 4.9.72-linuxkit #1 SMP Thu Dec 28 19:08:26 UTC 2017 x86_64 Linux
 root@linuxkit-96165e7f48d7:/# exit
@@ -124,10 +124,10 @@ Sometimes you want to create a _Pod_ and making [yaml specification](configurati
 
 ```shell
 **[terminal]
-**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli create pod --image docker.io/arm64v8/alpine:latest testing]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli create pod --image alpine testing]
   ✓ Discovered 1 device(s) from network
   • Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
-  ⠸ Download docker.io/arm64v8/alpine:latest
+  ⠸ Download docker.io/library/alpine:latest
 Name:             testing
 Namespace:        eliot
 Device:           linuxkit-96165e7f48d7
@@ -136,8 +136,8 @@ Restart Policy:   always
 Host Network:     false
 Host PID:         false
 Containers:
-          arm64v8-alpine:
-                    Image:           docker.io/arm64v8/alpine:latest
+          library-alpine:
+                    Image:           docker.io/library/alpine:latest
                     ContainerID:     b97cq4r744405e9hmscg
                     State:           running
                     Restart Count:   0

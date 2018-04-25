@@ -11,34 +11,13 @@ import (
 )
 
 // Image try to resolve what container image should be used to run project in the directory
-func Image(arch string, projectDir string) (projectType, image string, err error) {
+func Image(projectDir string) (projectType, image string, err error) {
 	if isNodeProject(projectDir) {
-		switch arch {
-		case "amd64":
-			return "nodejs", "docker.io/library/node:latest", nil
-		case "arm64":
-			return "nodejs", "docker.io/arm64v8/node:latest", nil
-		default:
-			return "", "", fmt.Errorf("Unsupported NodeJS project in architecture [%s]", arch)
-		}
+		return "node", "docker.io/library/node:latest", nil
 	} else if isGolangProject(projectDir) {
-		switch arch {
-		case "amd64":
-			return "golang", "docker.io/library/golang:latest", nil
-		case "arm64":
-			return "golang", "docker.io/arm64v8/golang:latest", nil
-		default:
-			return "", "", fmt.Errorf("Unsupported Golang project in architecture [%s]", arch)
-		}
+		return "golang", "docker.io/library/golang:latest", nil
 	} else if isPythonProject(projectDir) {
-		switch arch {
-		case "amd64":
-			return "python", "docker.io/library/python:latest", nil
-		case "arm64":
-			return "python", "docker.io/arm64v8/python:latest", nil
-		default:
-			return "", "", fmt.Errorf("Unsupported Golang project in architecture [%s]", arch)
-		}
+		return "python", "docker.io/library/python:latest", nil
 	}
 
 	return "", "", fmt.Errorf("Unable to resolve container image for project in directory [%s]", projectDir)

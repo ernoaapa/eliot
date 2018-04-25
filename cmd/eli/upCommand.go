@@ -115,17 +115,13 @@ var upCommand = cli.Command{
 
 		if image == "" {
 			log := ui.NewLine().Loading("Resolve image for the project...")
-			info, err := client.GetInfo()
-			if err != nil {
-				log.Fatalf("Unable to resolve image for the project. Failed to get target node architecture: %s", err)
-			}
 
 			var projectType string
-			projectType, image, err = resolve.Image(info.Arch, cmd.GetCurrentDirectory())
+			projectType, image, err = resolve.Image(cmd.GetCurrentDirectory())
 			if err != nil {
 				log.Fatal("Unable to automatically resolve image for the project. You must define target container image with --image option")
 			}
-			log.Donef("Detected %s project, use image: %s (arch %s)", projectType, image, info.Arch)
+			log.Donef("Detected %s project, use image: %s", projectType, image)
 		}
 
 		image = utils.ExpandToFQIN(image)
