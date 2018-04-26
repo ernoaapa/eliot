@@ -45,14 +45,14 @@ Eliot provides deb packages through packagecloud for Debian linux, for example R
 curl -s https://packagecloud.io/install/repositories/ernoaapa/eliot/script.deb.sh | sudo bash
 
 # Install Eliot and dependencies
-apt-get update && apt-get install -y eliot
+sudo apt-get install -y eliot
 
 # Start the services
-systemctl start containerd && systemctl enable containerd
-systemctl start eliotd && systemctl enable eliotd
+sudo systemctl start containerd && sudo systemctl enable containerd
+sudo systemctl start eliotd && sudo systemctl enable eliotd
 ```
 
-That's it! Now try running `eli get nodes` and you should see your device!
+That's it! Now try running `eli get nodes` in your local computer and you should see your device!
 
 ### Manual installation
 - Build and install [runc](https://github.com/opencontainers/runc)
