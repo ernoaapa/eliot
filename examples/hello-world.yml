@@ -3,7 +3,7 @@ metadata:
 spec:
   containers:
     - name: "hello-world"
-      image: "docker.io/arm32v7/busybox:latest"
+      image: "docker.io/library/busybox:latest"
       args:
         - /bin/sh
         - -c
