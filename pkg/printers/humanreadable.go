@@ -18,6 +18,7 @@ import (
 	"github.com/ernoaapa/eliot/pkg/utils"
 	"github.com/pkg/errors"
 
+	"github.com/c2h5oh/datasize"
 	"github.com/hako/durafmt"
 )
 
@@ -108,6 +109,9 @@ func (p *HumanReadablePrinter) PrintNode(info *node.Info, writer io.Writer) erro
 		"FormatUptime":  formatUptime,
 		"Subtract": func(a, b uint64) uint64 {
 			return a - b
+		},
+		"FormatBytes": func(v uint64) string {
+			return datasize.ByteSize(v).HumanReadable()
 		},
 	})
 	t, err := t.Parse(humanreadable.NodeDetailsTemplate)
