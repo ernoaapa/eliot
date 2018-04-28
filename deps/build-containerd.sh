@@ -5,6 +5,7 @@
 set -eu
 
 CONTAINERD_VERSION="v1.0.3"
+RUNC_DEP_VERSION="1.0.0-rc4+9f9c9623"
 BUILD_DIR=/tmp/build
 ELIOT_SRC_DIR=$(pwd)
 TARGET_DIR=${ELIOT_SRC_DIR}/dist
@@ -32,7 +33,7 @@ version: "${CONTAINERD_VERSION}"
 section: "default"
 priority: "extra"
 depends:
-- runc (>=0.1.1)
+- runc (>=${RUNC_DEP_VERSION})
 maintainer: "Erno Aapa <erno.aapa@gmail.com>"
 description: An open and reliable container runtime
 homepage: "https://containerd.io"
