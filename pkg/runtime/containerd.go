@@ -438,7 +438,7 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 		return ErrWithMessagef(ErrNotSupported, "Image [%s] does not available for [%s/%s]", ref, runtime.GOOS, runtime.GOARCH)
 	}
 
-	if err := img.Unpack(ctx, containerd.DefaultSnapshotter); err != nil {
+	if err := img.Unpack(ctx, snapshotter); err != nil {
 		return errors.Wrapf(err, "Error while unpacking image [%s] to namespace [%s]", ref, namespace)
 	}
 
