@@ -77,7 +77,7 @@ nfpm:
     - deb
 
   dependencies:
-    - containerd (>= 1.0.3)
+    - containerd (>= 1.1.0)
 
   files:
     "build/etc/systemd/system/eliotd.service": "/etc/systemd/system/eliotd.service"

@@ -419,7 +419,7 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 		return errors.Wrapf(err, "Error while resolving image [%s] supported platforms", ref)
 	}
 
-	if !platformExist(platforms.Default(), supported) {
+	if !platformExist(platforms.DefaultSpec(), supported) {
 		platformNames := []string{}
 		for _, platform := range supported {
 			platformNames = append(platformNames, platforms.Format(platform))
@@ -445,8 +445,8 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 	return nil
 }
 
-func platformExist(platform string, supported []imagespecs.Platform) bool {
-	matcher, _ := platforms.Parse(platform)
+func platformExist(platform imagespecs.Platform, supported []imagespecs.Platform) bool {
+	matcher := platforms.NewMatcher(platform)
 	for _, platform := range supported {
 		if matcher.Match(platform) {
 			return true
@@ -559,7 +559,10 @@ func (c *ContainerdClient) Exec(namespace, name, id string, args []string, tty b
 	pspec.Terminal = tty
 	pspec.Args = args
 
-	process, err := task.Exec(ctx, id, pspec, cio.NewIOWithTerminal(io.Stdin, io.Stdout, io.Stderr, tty))
+	process, err := task.Exec(ctx, id, pspec, cio.NewCreator(
+		cio.WithStreams(io.Stdin, io.Stdout, io.Stderr),
+		cio.WithTerminal,
+	))
 	if err != nil {
 		return err
 	}
@@ -593,7 +596,9 @@ func (c *ContainerdClient) Attach(namespace, name string, io AttachIO) error {
 		return errors.Wrapf(err, "Cannot attach to container [%s] in namespace [%s]", name, namespace)
 	}
 
-	task, taskErr := container.Task(ctx, cio.WithAttach(io.Stdin, io.Stdout, io.Stderr))
+	task, taskErr := container.Task(ctx, cio.NewAttach(
+		cio.WithStreams(io.Stdin, io.Stdout, io.Stderr),
+	))
 	if taskErr != nil {
 		return taskErr
 	}
