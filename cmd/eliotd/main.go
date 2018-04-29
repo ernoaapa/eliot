@@ -46,6 +46,12 @@ func main() {
 			EnvVar: "ELIOT_CONTAINERD",
 			Value:  "/run/containerd/containerd.sock",
 		},
+		cli.StringFlag{
+			Name:   "containerd-snapshotter",
+			Usage:  "containerd snapshotter to use",
+			EnvVar: "ELIOT_CONTAINERD_SNAPSHOTTER",
+			Value:  "overlayfs",
+		},
 		cli.DurationFlag{
 			Name:   "timeout, t",
 			Usage:  "total timeout for runtime requests",

@@ -31,25 +31,23 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var (
-	snapshotter = "overlayfs"
-)
-
 // ContainerdClient is containerd client wrapper
 type ContainerdClient struct {
-	context  context.Context
-	timeout  time.Duration
-	address  string
-	hostname string
+	context     context.Context
+	timeout     time.Duration
+	snapshotter string
+	address     string
+	hostname    string
 }
 
 // NewContainerdClient creates new containerd client with given timeout
-func NewContainerdClient(context context.Context, timeout time.Duration, address, hostname string) *ContainerdClient {
+func NewContainerdClient(context context.Context, timeout time.Duration, snapshotter, address, hostname string) *ContainerdClient {
 	return &ContainerdClient{
-		context:  context,
-		timeout:  timeout,
-		address:  address,
-		hostname: hostname,
+		context:     context,
+		timeout:     timeout,
+		address:     address,
+		snapshotter: snapshotter,
+		hostname:    hostname,
 	}
 }
 
@@ -209,7 +207,7 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 	containerOpts := []containerd.NewContainerOpts{
 		containerd.WithContainerLabels(mapping.NewLabels(pod, container)),
 		containerd.WithNewSpec(specOpts...),
-		containerd.WithSnapshotter(snapshotter),
+		containerd.WithSnapshotter(c.snapshotter),
 		containerd.WithNewSnapshot(id.String(), image),
 		containerd.WithRuntime(fmt.Sprintf("%s.%s", plugin.RuntimePlugin, "linux"), nil),
 		extensions.WithLifecycleExtension,
@@ -438,7 +436,7 @@ func (c *ContainerdClient) PullImage(namespace, ref string, progress *progress.I
 		return ErrWithMessagef(ErrNotSupported, "Image [%s] does not available for [%s/%s]", ref, runtime.GOOS, runtime.GOARCH)
 	}
 
-	if err := img.Unpack(ctx, snapshotter); err != nil {
+	if err := img.Unpack(ctx, c.snapshotter); err != nil {
 		return errors.Wrapf(err, "Error while unpacking image [%s] to namespace [%s]", ref, namespace)
 	}
 
