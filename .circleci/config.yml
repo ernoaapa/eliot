@@ -21,6 +21,10 @@ jobs:
           mv overalls.coverprofile coverage.txt
           bash <(curl -s https://codecov.io/bash)
 
+      - store_artifacts:
+          path: coverage.txt
+          destination: coverage.txt
+
   build:
     <<: *defaults
     steps:
@@ -30,6 +34,9 @@ jobs:
       - run: ./build/install-build-tools.sh
 
       - run: goreleaser --snapshot
+
+      - store_artifacts:
+          path: dist
 
   publish:
     <<: *defaults

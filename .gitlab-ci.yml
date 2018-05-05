@@ -1,0 +1,125 @@
+image: golang:1.10-stretch
+
+variables:
+  REPO_NAME: github.com/ernoaapa/eliot
+
+stages:
+- test
+- build
+- publish
+
+before_script:
+  - go version
+  # Move project under $GOPATH
+  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+  - cd $GOPATH/src/$REPO_NAME
+  # Configure Docker
+  - ./build/install-docker.sh
+  - echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin
+
+# BUILD
+build:
+  stage: build
+  tags:
+    - arm64
+  script:
+    - ./build/install-build-tools.sh
+    - goreleaser --snapshot
+  artifacts:
+    paths:
+    - dist/
+
+
+# TEST
+.test: &test
+  stage: test
+  script:
+    - "! go fmt -l pkg cmd 2>&1 | read"
+    - go vet ./...
+    - go test -v ./...
+
+test:arm64:
+  <<: *test
+  tags:
+    - arm64
+
+test:armv7:
+  <<: *test
+  tags:
+    - armv7
+
+# PUBLISH
+.publish: &publish
+  stage: publish
+  only:
+    - tags
+  script:
+    - ./build/install-build-tools.sh
+    - goreleaser --rm-dist
+    - .circleci/scripts/push-docker-manifest.sh $(git describe --tags --always --dirty)
+    - |
+      for package in dist/eliot_*.deb; do
+        pkgcloud-push ernoaapa/eliot/raspbian/stretch $package
+      done
+  artifacts:
+    paths:
+    - dist/
+
+publish:arm64:
+  <<: *publish
+  tags:
+    - arm64
+  variables:
+    GOARCH: arm64
+
+publish:armv6:
+  <<: *publish
+  tags:
+    - armv6
+  variables:
+    GOARCH: arm
+    GOARM: "6"
+
+publish:armv7:
+  <<: *publish
+  tags:
+    - armv7
+  variables:
+    GOARCH: arm
+    GOARM: "7"
+
+
+# PUBLISH DEBS
+.publish-debs: &publish-debs
+  stage: publish
+  script:
+    - ./build/install-build-tools.sh
+    - apt-get update && apt-get install -y btrfs-tools libseccomp-dev
+    - ./deps/publish-all.sh
+  artifacts:
+    paths:
+    - dist/
+
+publish-debs:arm64:
+  <<: *publish-debs
+  tags:
+    - arm64
+  variables:
+    GOARCH: arm64
+
+publish-debs:armv6:
+  <<: *publish-debs
+  tags:
+    - armv6
+  variables:
+    GOARCH: arm
+    GOARM: "6"
+
+publish-debs:armv7:
+  <<: *publish-debs
+  tags:
+    - armv7
+  variables:
+    GOARCH: arm
+    GOARM: "7"
