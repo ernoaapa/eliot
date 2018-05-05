@@ -125,13 +125,6 @@ func resolveContainerStatus(ctx context.Context, container containerd.Container)
 	return status
 }
 
-func getValues(podsByName map[string]*model.Pod) (result []model.Pod) {
-	for _, pod := range podsByName {
-		result = append(result, *pod)
-	}
-	return result
-}
-
 // GetPod return pod by name
 func (c *ContainerdClient) GetPod(namespace, podName string) (model.Pod, error) {
 	pods, err := c.GetPods(namespace)
