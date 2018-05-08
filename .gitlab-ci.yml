@@ -57,7 +57,7 @@ test:armv7:
   script:
     - ./build/install-build-tools.sh
     - goreleaser --rm-dist
-    - .circleci/scripts/push-docker-manifest.sh $(git describe --tags --always --dirty)
+    - build/push-docker-manifest.sh $(git describe --tags --always --dirty)
     - |
       for package in dist/eliot_*.deb; do
         pkgcloud-push ernoaapa/eliot/raspbian/stretch $package

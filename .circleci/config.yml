@@ -51,7 +51,7 @@ jobs:
       - run: ./build/install-build-tools.sh
 
       - run: goreleaser
-      - run: .circleci/scripts/push-docker-manifest.sh $(git describe --tags --always --dirty)
+      - run: build/push-docker-manifest.sh $(git describe --tags --always --dirty)
       - run:
           name: Publish Linux packages
           command: |
