@@ -2,20 +2,19 @@
 
 set -eu
 
-echo "GOPATH: $GOPATH"
-
-rm -rf $GOPATH/src/github.com/goreleaser/nfpm
+echo "GOPATH: $GOPATH (PATH: $PATH)"
 
 go get -u github.com/goreleaser/goreleaser
+goreleaser --version
 
 go get -u github.com/goreleaser/nfpm
-# Switch to fixed fork
 cd $GOPATH/src/github.com/goreleaser/nfpm
-git remote add ernoaapa https://github.com/ernoaapa/nfpm.git || true
-git fetch ernoaapa
-git checkout ernoaapa/fix-arm-architecture
 go get ./...
 GOBIN=$GOPATH/bin go install ./cmd/nfpm/
+cd -
+nfpm --version
 
-go get github.com/estesp/manifest-tool
-go get github.com/mlafeldt/pkgcloud/...
+go get -u github.com/estesp/manifest-tool
+manifest-tool --version
+
+go get -u github.com/mlafeldt/pkgcloud/...
