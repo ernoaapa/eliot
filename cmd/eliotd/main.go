@@ -34,7 +34,7 @@ func main() {
 	 eliotd
 
 	 # Listen custom port
-	 eliotd --gprc-listen 0.0.0.0:5001
+	 eliotd --grpc-api-listen 0.0.0.0:5001
 	 
 	 # Disable lifecycle controller and enable only the GRPC API
 	 eliotd  --grpc=true --lifecycle-controller=false`
