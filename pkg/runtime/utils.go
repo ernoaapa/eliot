@@ -23,3 +23,11 @@ func ensureMountSourceDirExists(mounts []model.Mount) error {
 	}
 	return nil
 }
+
+// getValues return list of values from map
+func getValues(podsByName map[string]*model.Pod) (result []model.Pod) {
+	for _, pod := range podsByName {
+		result = append(result, *pod)
+	}
+	return result
+}
