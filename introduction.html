@@ -1,0 +1,763 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Eliot · Eliot - Docker and Kubernetes inspired container platform for IoT devices</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-insert-logo/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-terminal/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="introduction.html" />
+    
+    
+    <link rel="prev" href="./" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.2" data-path="introduction.html">
+            
+                <a href="introduction.html">
+            
+                    
+                    Eliot
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="introduction.html">
+            
+                <a href="introduction.html#motivation">
+            
+                    
+                    Motivation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="introduction.html">
+            
+                <a href="introduction.html#use-cases">
+            
+                    
+                    Use Cases
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="introduction.html">
+            
+                <a href="introduction.html#eliot-vs-other">
+            
+                    
+                    Eliot vs. Other
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="installation.html">
+            
+                <a href="installation.html">
+            
+                    
+                    Installation
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="installation.html">
+            
+                <a href="installation.html#install-cli">
+            
+                    
+                    Install CLI
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="installation.html">
+            
+                <a href="installation.html#install-device">
+            
+                    
+                    Install device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="getting_started.html">
+            
+                <a href="getting_started.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Core Concepts
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="getting_started.html">
+            
+                <a href="getting_started.html#deploy-first-app">
+            
+                    
+                    Deploy first app
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Development in device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="client.html">
+            
+                <a href="client.html">
+            
+                    
+                    CLI client
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="client.html">
+            
+                <a href="client.html#eli-get-devices">
+            
+                    
+                    eli get devices
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="client.html">
+            
+                <a href="client.html#eli-run--i--t-image-command">
+            
+                    
+                    eli run
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="client.html">
+            
+                <a href="client.html#eli-up----command">
+            
+                    
+                    eli up
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="client.html">
+            
+                <a href="client.html#eli-create--f-fileyml">
+            
+                    
+                    eli create
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="client.html">
+            
+                <a href="client.html#eli-create-pod---image-image-ref-pod-name">
+            
+                    
+                    eli create pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="client.html">
+            
+                <a href="client.html#eli-get-pods">
+            
+                    
+                    eli get pods
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="client.html">
+            
+                <a href="client.html#eli-describe-pod-pod-name">
+            
+                    
+                    eli describe pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="client.html">
+            
+                <a href="client.html#eli-delete-pod-pod-name">
+            
+                    
+                    eli delete pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="client.html">
+            
+                <a href="client.html#eli-exec---container-id-pod-name----command">
+            
+                    
+                    eli exec
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="client.html">
+            
+                <a href="client.html#eli-attach--i---container-id-pod-name">
+            
+                    
+                    eli attach
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="client.html">
+            
+                <a href="client.html#eli-build-device">
+            
+                    
+                    eli build device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="configuration.html">
+            
+                <a href="configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="configuration.html">
+            
+                <a href="configuration.html#pod-specification">
+            
+                    
+                    Pod Specification
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="configuration.html">
+            
+                <a href="configuration.html#project-configuration">
+            
+                    
+                    Project Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="eliotos.html">
+            
+                <a href="eliotos.html">
+            
+                    
+                    EliotOS
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="contributing.html">
+            
+                <a href="contributing.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.8.1" data-path="contributing.html">
+            
+                <a href="contributing.html#development-getting-started">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.2" data-path="contributing.html">
+            
+                <a href="contributing.html#debugging">
+            
+                    
+                    Debugging
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" >
+            
+                <span>
+            
+                    
+                    Need help?
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.9.1" >
+            
+                <a target="_blank" href="https://gitter.im/eliot-run/Lobby">
+            
+                    
+                    Ask on Gitter
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.2" >
+            
+                <a target="_blank" href="https://github.com/ernoaapa/eliot/issues/new">
+            
+                    
+                    Create a GitHub issue
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Eliot</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="who"><a name="who" class="plugin-anchor" href="#who"><i class="fa fa-link" aria-hidden="true"></i></a>Who?</h1>
+<p><a href="https://github.com/ernoaapa/eliot" target="_blank">Eliot</a> is lightweight Kubernetes like system to manage containerized applications on IoT devices with an emphasis on simplicity, minimality, and usability. The goal is to give a simple way to develop, deploy and manage applications running in IoT device. Comparing to other traditional platforms, Eliot takes modern technologies from cloud to enable more DevOps way of working in IoT world.</p>
+<p>Eliot re-uses technologies and concepts from <a href="https://www.cncf.io/" target="_blank">Cloud Native technologies</a>, like <a href="https://www.docker.com" target="_blank">Docker</a> and <a href="https://www.kubernetes.io" target="_blank">Kubernetes</a>. So if you&apos;re familiar with those, you find really easy to get started with Eliot.</p>
+<h2 id="motivation"><a name="motivation" class="plugin-anchor" href="#motivation"><i class="fa fa-link" aria-hidden="true"></i></a>Motivation</h2>
+<p>I was building modern connected device product what were distributed around the world.
+I have over 10 years of software engineer experience with five years of DevOps and faced the problem that there&apos;s no state-of-the-art solution for managing connected devices a way that is common nowadays in cloud solutions. 
+Most platforms and services focus heavily to the cloud connectivity, data processing, and analysis, but I needed a solution to manage device Operating System and application deployment to build easy to use, modern service for our customers.</p>
+<p>Key features needed:</p>
+<ul>
+<li>No network connectivity requirement</li>
+<li>Simple in-device development</li>
+<li>Fast application deployment</li>
+<li>Over-The-Air device management</li>
+<li>Resource allocation and restriction</li>
+<li>Security and software isolation</li>
+<li>Built for IoT from ground up</li>
+</ul>
+<p>And that&apos;s the day when <a href="https://github.com/ernoaapa/eliot" target="_blank">Eliot</a> were born &#x2764;&#xFE0E;</p>
+<h2 id="use-cases"><a name="use-cases" class="plugin-anchor" href="#use-cases"><i class="fa fa-link" aria-hidden="true"></i></a>Use cases</h2>
+<p>Eliot has a small footprint and minimal requirements why it&apos;s suitable for a wide range or use cases.
+Linux is used nowadays everywhere; info screens, sensors, factories, home IoT, security, cars, etc. and Eliot can support most of them. And thanks to Golang, there&apos;s releases available to wide range of architectures.</p>
+<h2 id="eliot-vs-other"><a name="eliot-vs-other" class="plugin-anchor" href="#eliot-vs-other"><i class="fa fa-link" aria-hidden="true"></i></a>Eliot vs. Other</h2>
+<h3 id="docker"><a name="docker" class="plugin-anchor" href="#docker"><i class="fa fa-link" aria-hidden="true"></i></a>Docker</h3>
+<p><a href="https://www.docker.com" target="_blank">Docker</a> is a software technology providing containers, promoted by the company <a href="http://www.docker.com/company" target="_blank">Docker, Inc.</a>, and provides full-blown container platform for the cloud environment, taking care of container distribution, orchestration, authentication, infrastructure, etc. Docker has been playing a big role in pushing out the container technology.</p>
+<p>At the heart &#x2764;&#xFE0E; of Docker is <a href="https://containerd.io" target="_blank">containerd</a>, which provides an additional layer of abstraction and automation of operating-system-level virtualization on Windows and Linux. Docker extracted and open sourced to accelerate the innovation across the ecosystem and donated it to open foundation. <em>And Eliot is based on the containerd!</em></p>
+<p>Eliot and Docker are not competing against each other; they are working together, in Open Source, to take the ecosystem forward.</p>
+<h3 id="kubernetes"><a name="kubernetes" class="plugin-anchor" href="#kubernetes"><i class="fa fa-link" aria-hidden="true"></i></a>Kubernetes</h3>
+<p><a href="https://www.kubernetes.io" target="_blank">Kubernetes</a> is a great platform for orchestrating containerized software in the cloud environment. Kubernetes have been one of the fastest growing open source projects in past years and new integrations and 3rd party support are popping out every day.</p>
+<p>Keys to Kubernetes great success, addition to the great community, are simple concepts and consistent APIs. That&apos;s why Eliot is following the great leader. Goal is to re-use Kubernetes code as much as possible, but at the same time keep focus tightly in IoT limitations and requirements.
+Kubernetes is pushing the boundaries of cloud computing and Eliot is working on in IoT.</p>
+<h3 id="aws-azure-google-ibm"><a name="aws-azure-google-ibm" class="plugin-anchor" href="#aws-azure-google-ibm"><i class="fa fa-link" aria-hidden="true"></i></a>AWS, Azure, Google, IBM</h3>
+<p>All cloud IoT solutions (<a href="https://aws.amazon.com/iot/" target="_blank">AWS</a>, <a href="https://azure.microsoft.com/en-us/suites/iot-suite/" target="_blank">Azure</a>, <a href="https://cloud.google.com/solutions/iot/" target="_blank">Google</a>, <a href="https://www.ibm.com/internet-of-things" target="_blank">IBM</a>) base to the same practice, you use SDK to implement software that collects data from the sensor and send it to the cloud where data gets processed and analyzed. Analysis result can send a message back to the device to trigger some action.</p>
+<p>Eliot doesn&apos;t try to provide this kind of features at all, actually, you can use any cloud service with Eliot.
+Eliot provides an easy way to deliver your cloud integration to the device and gives you a way to update the software safely and easily.</p>
+<p>Even better, might be that you don&apos;t need to code anything! There might be available open source implementation made by someone in Docker community or you can share your code with the thousands of Docker users around the world with a single command.</p>
+<h3 id="ansible-chef-saltstack"><a name="ansible-chef-saltstack" class="plugin-anchor" href="#ansible-chef-saltstack"><i class="fa fa-link" aria-hidden="true"></i></a>Ansible, Chef, SaltStack</h3>
+<p>Configuration management tools (e.g. <a href="https://www.ansible.com" target="_blank">Ansible</a>, <a href="https://www.chef.io" target="_blank">Chef</a>, <a href="https://saltstack.com/" target="_blank">SaltStack</a>) are configuration management tools for managing servers. Communication models are often point-to-point and are limited up to thousands of nodes with a strong focus to make configuration changes as real-time as possible.</p>
+<p>These are show stoppers for IoT solutions because you might have hundred thousands or more devices distributed around the world which have poor connection rarely available.</p>
+<p>Eliot builds the solution from the ground up for IoT devices with the focus on things that are important in IoT solutions; security, scalability, stability.</p>
+<script src="_gitbook_plugin_analytics.js"></script>
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="./" class="navigation navigation-prev " aria-label="Previous page: Introduction">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="introduction.html#motivation" class="navigation navigation-next " aria-label="Next page: Motivation">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Eliot","level":"1.2","depth":1,"next":{"title":"Motivation","level":"1.2.1","depth":2,"anchor":"#motivation","path":"introduction.md","ref":"introduction.md#motivation","articles":[]},"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["insert-logo","analytics","terminal","anchors","github","include-html","easyseo"],"root":"./docs","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/ernoaapa/eliot"},"analytics":{"google":"UA-111964531-1"},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"include-html":{},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"easyseo":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"terminal":{"copyButtons":true,"fade":true,"style":"flat"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchors":{},"insert-logo":{"style":"background: none;","url":"https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-small.png"}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Eliot - Docker and Kubernetes inspired container platform for IoT devices","gitbook":">= 3.2.3"},"file":{"path":"introduction.md","mtime":"2018-06-27T12:04:03.695Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-27T12:04:53.961Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-insert-logo/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-terminal/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

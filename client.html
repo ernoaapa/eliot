@@ -1,0 +1,1088 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>CLI client · Eliot - Docker and Kubernetes inspired container platform for IoT devices</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-insert-logo/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-terminal/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="client.html" />
+    
+    
+    <link rel="prev" href="getting_started.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="introduction.html">
+            
+                <a href="introduction.html">
+            
+                    
+                    Eliot
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="introduction.html">
+            
+                <a href="introduction.html#motivation">
+            
+                    
+                    Motivation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="introduction.html">
+            
+                <a href="introduction.html#use-cases">
+            
+                    
+                    Use Cases
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="introduction.html">
+            
+                <a href="introduction.html#eliot-vs-other">
+            
+                    
+                    Eliot vs. Other
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="installation.html">
+            
+                <a href="installation.html">
+            
+                    
+                    Installation
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="installation.html">
+            
+                <a href="installation.html#install-cli">
+            
+                    
+                    Install CLI
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="installation.html">
+            
+                <a href="installation.html#install-device">
+            
+                    
+                    Install device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="getting_started.html">
+            
+                <a href="getting_started.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Core Concepts
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="getting_started.html">
+            
+                <a href="getting_started.html#deploy-first-app">
+            
+                    
+                    Deploy first app
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Development in device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.5" data-path="client.html">
+            
+                <a href="client.html">
+            
+                    
+                    CLI client
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="client.html">
+            
+                <a href="client.html#eli-get-devices">
+            
+                    
+                    eli get devices
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="client.html">
+            
+                <a href="client.html#eli-run--i--t-image-command">
+            
+                    
+                    eli run
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="client.html">
+            
+                <a href="client.html#eli-up----command">
+            
+                    
+                    eli up
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="client.html">
+            
+                <a href="client.html#eli-create--f-fileyml">
+            
+                    
+                    eli create
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="client.html">
+            
+                <a href="client.html#eli-create-pod---image-image-ref-pod-name">
+            
+                    
+                    eli create pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="client.html">
+            
+                <a href="client.html#eli-get-pods">
+            
+                    
+                    eli get pods
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="client.html">
+            
+                <a href="client.html#eli-describe-pod-pod-name">
+            
+                    
+                    eli describe pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="client.html">
+            
+                <a href="client.html#eli-delete-pod-pod-name">
+            
+                    
+                    eli delete pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="client.html">
+            
+                <a href="client.html#eli-exec---container-id-pod-name----command">
+            
+                    
+                    eli exec
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="client.html">
+            
+                <a href="client.html#eli-attach--i---container-id-pod-name">
+            
+                    
+                    eli attach
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="client.html">
+            
+                <a href="client.html#eli-build-device">
+            
+                    
+                    eli build device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="configuration.html">
+            
+                <a href="configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="configuration.html">
+            
+                <a href="configuration.html#pod-specification">
+            
+                    
+                    Pod Specification
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="configuration.html">
+            
+                <a href="configuration.html#project-configuration">
+            
+                    
+                    Project Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="eliotos.html">
+            
+                <a href="eliotos.html">
+            
+                    
+                    EliotOS
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="contributing.html">
+            
+                <a href="contributing.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.8.1" data-path="contributing.html">
+            
+                <a href="contributing.html#development-getting-started">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.2" data-path="contributing.html">
+            
+                <a href="contributing.html#debugging">
+            
+                    
+                    Debugging
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" >
+            
+                <span>
+            
+                    
+                    Need help?
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.9.1" >
+            
+                <a target="_blank" href="https://gitter.im/eliot-run/Lobby">
+            
+                    
+                    Ask on Gitter
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.2" >
+            
+                <a target="_blank" href="https://github.com/ernoaapa/eliot/issues/new">
+            
+                    
+                    Create a GitHub issue
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >CLI client</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="eli-client"><a name="eli-client" class="plugin-anchor" href="#eli-client"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli</code> client</h1>
+<p>To see full documentation about commands and options, type <code>eli --help</code> and <code>eli &lt;command&gt; --help</code>.</p>
+<h2 id="eli-get-devices"><a name="eli-get-devices" class="plugin-anchor" href="#eli-get-devices"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli get devices</code></h2>
+<p>Eliot can search devices automatically from network with mDNS protocol.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli get devices]
+  &#x2713; Discovered 1 devices from network
+
+HOSTNAME                       ENDPOINT
+linuxkit-96165e7f48d7.local.   192.168.64.79:5000
+</code></pre>
+<p>If you have multiple devices, you need to give <code>--device</code> flag for all other commands to specify the target device.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli --device linuxkit-96165e7f48d7.local. get pods]
+</code></pre>
+<h2 id="eli-run--i--t-image-command"><a name="eli-run--i--t-image-command" class="plugin-anchor" href="#eli-run--i--t-image-command"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli run [-i -t] &lt;image&gt; [command]</code></h2>
+<p>Like <code>docker run</code>, <code>eli run</code> start container, but start it in the device, not in your local computer.
+With <code>run</code> command you can quickly run some container in the device, and after you complete, (by default) eliot removes the container and leaves the device clean.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli run alpine -- /bin/sh]
+root@linuxkit-96165e7f48d7:/# uname -a
+Linux raspberrypi-e2ccbe63f23d 4.9.72-linuxkit #1 SMP Thu Dec 28 19:08:26 UTC 2017 x86_64 Linux
+root@linuxkit-96165e7f48d7:/# exit
+</code></pre>
+<h2 id="eli-up----command"><a name="eli-up----command" class="plugin-anchor" href="#eli-up----command"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli up -- &lt;command&gt;</code></h2>
+<p>When you develop your software, often you need to have access to the device to read some hardware sensor from your software. Ideal place for development would be in the device, but it&apos;s always too slow and clumsy way to code software. 
+To make development as easy as possible, Eliot have <code>up</code> command.</p>
+<p><code>up</code> command will: </p>
+<ol>
+<li>Detect what type of project you have in current directory and selects container image (you can use <code>--image</code> flag to override image)</li>
+<li>Start required containers</li>
+<li>Run default command or <code>&lt;command&gt;</code> in container</li>
+<li>Move your terminal session to the container</li>
+<li>Start syncing your local files to the container</li>
+</ol>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~/go/src/github.com/ernoaapa/eliot]**[delimiter  $ ]**[command eli up -- /bin/bash]
+  &#x2713; Detected golang project, use image: docker.io/library/golang:latest (arch amd64)
+root@linuxkit-96165e7f48d7:/go/src/github.com/ernoaapa/eliot# ls -l
+total 268
+-rw-------  1 nobody 65533    304 Nov 20 17:53 Dockerfile.in
+-rw-------  1 nobody 65533    305 Dec 31 08:07 Dockerfile.tmpl
+-rw-------  1 nobody 65533   1048 Nov 15 06:13 LICENSE
+-rw-------  1 nobody 65533   6549 Jan  2 05:09 Makefile
+-rw-------  1 nobody 65533   1689 Dec 31 03:28 README.md
+drwxr-xr-x  3 nobody 65533   4096 Jan  5 01:16 _book
+drwxr-xr-x  5 nobody 65533   4096 Jan  5 01:16 bin
+-rw-------  1 nobody 65533    327 Jan  5 00:48 book.json
+drwxr-xr-x  2 nobody 65533   4096 Dec 19 02:49 build
+drwxr-xr-x  4 nobody 65533   4096 Jan  5 01:16 cmd
+drwxr-xr-x  2 nobody 65533   4096 Jan  4 17:48 docs
+drwxr-xr-x  2 nobody 65533   4096 Jan  5 00:53 examples
+drwxr-xr-x 42 nobody 65533   4096 Jan  5 01:16 node_modules
+-rw-------  1 nobody 65533 209760 Jan  5 00:47 package-lock.json
+-rw-------  1 nobody 65533   2015 Jan  4 07:27 vendor.conf
+root@linuxkit-96165e7f48d7:/go/src/github.com/ernoaapa/eliot# exit
+  &#x2713; Deleted pod eliot
+</code></pre>
+<p>You can override defaults with flags (see <code>eli up --help</code>) or you can create <code>.eliot.yml</code> project configuration. See <a href="configuration.html#project-configuration">configuration</a> for more info.</p>
+<h2 id="eli-create--f-fileyml"><a name="eli-create--f-fileyml" class="plugin-anchor" href="#eli-create--f-fileyml"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli create -f &lt;file.yml&gt;</code></h2>
+<p>It&apos;s a good practice to store <em>Pod</em> definitions in version control and deploy exactly same deployment to each device.
+You can write definition in <code>yaml</code> file which follows the <a href="configuration.html#pod-specification">yaml specification</a> and use <code>create</code> command to create all resources.</p>
+<p><strong>pods.yml</strong></p>
+<pre><code class="lang-yaml"><span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> <span class="hljs-string">&quot;hello-world&quot;</span>
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  containers:</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">&quot;hello-world&quot;</span>
+<span class="hljs-attr">      image:</span> <span class="hljs-string">&quot;docker.io/eaapa/hello-world:latest&quot;</span>
+</code></pre>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli create -f pods.yml]
+  &#x2713; Discovered 1 device(s) from network
+  &#x2022; Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+  &#x280F; Download docker.io/eaapa/hello-world:latest [==================================================================&gt;-]
+Name:             hello-world
+Namespace:        eliot
+Device:           linuxkit-96165e7f48d7
+State:            running(1)
+Restart Policy:   always
+Host Network:     false
+Host PID:         false
+Containers:
+          hello-world:
+                    Image:           docker.io/eaapa/hello-world:latest
+                    ContainerID:     b97cqo3744405e9hmsd0
+                    State:           running
+                    Restart Count:   0
+                    Working Dir:     /
+                    Args:
+                              - /print-hello-world.sh
+                    Env:
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                    Mounts:
+                              - type=proc,source=proc,destination=/proc,options=
+                              - type=tmpfs,source=tmpfs,destination=/dev,options=nosuid:strictatime:mode=755:size=65536k
+                              - type=devpts,source=devpts,destination=/dev/pts,options=nosuid:noexec:newinstance:ptmxmode=0666:mode=0620:gid=5
+                              - type=tmpfs,source=shm,destination=/dev/shm,options=nosuid:noexec:nodev:mode=1777:size=65536k
+                              - type=mqueue,source=mqueue,destination=/dev/mqueue,options=nosuid:noexec:nodev
+                              - type=sysfs,source=sysfs,destination=/sys,options=nosuid:noexec:nodev:ro
+                              - type=tmpfs,source=tmpfs,destination=/run,options=nosuid:strictatime:mode=755:size=65536k
+</code></pre>
+<h2 id="eli-create-pod---image-image-ref-pod-name"><a name="eli-create-pod---image-image-ref-pod-name" class="plugin-anchor" href="#eli-create-pod---image-image-ref-pod-name"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli create pod --image &lt;image ref&gt; &lt;pod name&gt;</code></h2>
+<p>Sometimes you want to create a <em>Pod</em> and making <a href="configuration.html#pod-specification">yaml specification</a> is just overhead, you can use <code>eli create pod</code> to create a <em>Pod</em> to the device.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli create pod --image alpine testing]
+  &#x2713; Discovered 1 device(s) from network
+  &#x2022; Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+  &#x2838; Download docker.io/library/alpine:latest
+Name:             testing
+Namespace:        eliot
+Device:           linuxkit-96165e7f48d7
+State:            running(1)
+Restart Policy:   always
+Host Network:     false
+Host PID:         false
+Containers:
+          library-alpine:
+                    Image:           docker.io/library/alpine:latest
+                    ContainerID:     b97cq4r744405e9hmscg
+                    State:           running
+                    Restart Count:   0
+                    Working Dir:     /
+                    Args:
+                              - /bin/sh
+                    Env:
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                    Mounts:
+                              - type=proc,source=proc,destination=/proc,options=
+                              - type=tmpfs,source=tmpfs,destination=/dev,options=nosuid:strictatime:mode=755:size=65536k
+                              - type=devpts,source=devpts,destination=/dev/pts,options=nosuid:noexec:newinstance:ptmxmode=0666:mode=0620:gid=5
+                              - type=tmpfs,source=shm,destination=/dev/shm,options=nosuid:noexec:nodev:mode=1777:size=65536k
+                              - type=mqueue,source=mqueue,destination=/dev/mqueue,options=nosuid:noexec:nodev
+                              - type=sysfs,source=sysfs,destination=/sys,options=nosuid:noexec:nodev:ro
+                              - type=tmpfs,source=tmpfs,destination=/run,options=nosuid:strictatime:mode=755:size=65536k
+</code></pre>
+<p>You can have <code>--image</code> multiple times to add multiple containers into the <em>Pod</em>.</p>
+<h2 id="eli-get-pods"><a name="eli-get-pods" class="plugin-anchor" href="#eli-get-pods"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli get pods</code></h2>
+<p>You can get list of all running Pods with <code>get pods</code>.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli get pods]
+  &#x2713; Discovered 1 device(s) from network
+  &#x2022; Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+
+NAMESPACE   NAME          CONTAINERS   STATUS
+eliot       testing       1            running(1)
+eliot       hello-world   1            running(1)
+</code></pre>
+<h2 id="eli-describe-pod-pod-name"><a name="eli-describe-pod-pod-name" class="plugin-anchor" href="#eli-describe-pod-pod-name"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli describe pod &lt;pod name&gt;</code></h2>
+<p>To view <em>Pod</em> details like container image(s), statuses, etc., use command <code>describe pod &lt;pod name&gt;</code>.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli describe pod hello-world]
+  &#x2713; Discovered 1 device(s) from network
+  &#x2022; Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+Name:             hello-world
+Namespace:        eliot
+Device:           linuxkit-96165e7f48d7
+State:            running(1)
+Restart Policy:   always
+Host Network:     false
+Host PID:         false
+Containers:
+          hello-world:
+                    Image:           docker.io/eaapa/hello-world:latest
+                    ContainerID:     b97cqo3744405e9hmsd0
+                    State:           running
+                    Restart Count:   0
+                    Working Dir:     /
+                    Args:
+                              - /print-hello-world.sh
+                    Env:
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                              - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                    Mounts:
+                              - type=proc,source=proc,destination=/proc,options=
+                              - type=tmpfs,source=tmpfs,destination=/dev,options=nosuid:strictatime:mode=755:size=65536k
+                              - type=devpts,source=devpts,destination=/dev/pts,options=nosuid:noexec:newinstance:ptmxmode=0666:mode=0620:gid=5
+                              - type=tmpfs,source=shm,destination=/dev/shm,options=nosuid:noexec:nodev:mode=1777:size=65536k
+                              - type=mqueue,source=mqueue,destination=/dev/mqueue,options=nosuid:noexec:nodev
+                              - type=sysfs,source=sysfs,destination=/sys,options=nosuid:noexec:nodev:ro
+                              - type=tmpfs,source=tmpfs,destination=/run,options=nosuid:strictatime:mode=755:size=65536k
+</code></pre>
+<h2 id="eli-delete-pod-pod-name"><a name="eli-delete-pod-pod-name" class="plugin-anchor" href="#eli-delete-pod-pod-name"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli delete pod &lt;pod name&gt;</code></h2>
+<p>To stop and clean up <em>Pod</em> from device give <em>Pod</em> name to <code>delete pod &lt;pod name&gt;</code> command.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli delete pod hello-world]
+  &#x2713; Discovered 1 device(s) from network
+  &#x2022; Connect to linuxkit-96165e7f48d7.local. (192.168.64.79:5000)
+  &#x2713; Fetched pods
+  &#x2713; Deleted pod hello-world
+</code></pre>
+<p>After this, Eliot will stop and remove all container(s) from the device and free the used resources.</p>
+<h2 id="eli-exec---container-id-pod-name----command"><a name="eli-exec---container-id-pod-name----command" class="plugin-anchor" href="#eli-exec---container-id-pod-name----command"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli exec [--container id] &lt;pod name&gt; -- &lt;command&gt;</code></h2>
+<p>Sometimes you want to execute command inside the container to for example to debug some problem.
+If the <em>Pod</em> contains multiple containers, you need to give target container id with <code>--container</code> flag.</p>
+<blockquote>
+<p>Note: separate the eli command from target command with <code>--</code></p>
+</blockquote>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli exec testing -- date]
+Fri Jan  5 01:03:45 UTC 2018
+</code></pre>
+<p>With <code>eli exec</code> you can also open terminal session and enter into the container:</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli exec -i -t testing -- /bin/sh]
+/ #
+/ # ls -la
+total 56
+drwxr-xr-x    1 root     root          4096 Jan  5 00:55 .
+drwxr-xr-x    1 root     root          4096 Jan  5 00:55 ..
+drwxr-xr-x    2 root     root          4096 Dec  1 16:32 bin
+drwxr-xr-x    5 root     root           340 Jan  5 00:55 dev
+drwxr-xr-x   15 root     root          4096 Dec  1 16:32 etc
+drwxr-xr-x    2 root     root          4096 Dec  1 16:32 home
+drwxr-xr-x    5 root     root          4096 Dec  1 16:32 lib
+drwxr-xr-x    5 root     root          4096 Dec  1 16:32 media
+drwxr-xr-x    2 root     root          4096 Dec  1 16:32 mnt
+dr-xr-xr-x  149 root     root             0 Jan  5 00:55 proc
+drwx------    1 root     root          4096 Jan  5 01:06 root
+drwxr-xr-x    2 root     root            40 Jan  5 00:55 run
+drwxr-xr-x    2 root     root          4096 Dec  1 16:32 sbin
+drwxr-xr-x    2 root     root          4096 Dec  1 16:32 srv
+dr-xr-xr-x   13 root     root             0 Jan  5 00:55 sys
+drwxrwxrwt    2 root     root          4096 Dec  1 16:32 tmp
+drwxr-xr-x    7 root     root          4096 Dec  1 16:32 usr
+drwxr-xr-x   11 root     root          4096 Dec  1 16:32 var
+/ # exit
+</code></pre>
+<blockquote>
+<p>Note: If you have minimal container, it might not include the /bin/sh and you get error <code>/bin/sh: no such file or directory</code></p>
+</blockquote>
+<h2 id="eli-attach--i---container-id-pod-name"><a name="eli-attach--i---container-id-pod-name" class="plugin-anchor" href="#eli-attach--i---container-id-pod-name"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli attach [-i] [--container id] &lt;pod name&gt;</code></h2>
+<p>Sometimes you want to hook up your current terminal session to the container process stdin/stdout.
+If <em>Pod</em> contains multiple containers, you must pass containerID with <code>--container</code> flag.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli attach hello-world]
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+^C
+</code></pre>
+<p>You can also give <code>-i</code> flag to hook up your stdin into the container, but watch out, if you for example press ^C (ctrl+c) to exit, you actually send kill signal to the process in the container which will stop the container.</p>
+<h2 id="eli-build-device"><a name="eli-build-device" class="plugin-anchor" href="#eli-build-device"><i class="fa fa-link" aria-hidden="true"></i></a><code>eli build device</code></h2>
+<p>Easiest way to run Eliot in your device is to use <a href="https://github.com/ernoaapa/eliot-os" target="_blank">EliotOS</a> which is minimal Operating System where&apos;s just minimal components installed to run Eliot and everything else run on top of the Eliot in containers.</p>
+<p>With <code>eli build device</code> command you can build EliotOS image that you can just unpack to your device sdcard.</p>
+<blockquote>
+<p>Note: At the moment we support only RaspberryPi 3b, for other devices <a href="installation.html">see installation guide</a></p>
+</blockquote>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device &gt; my-image.tar]
+</code></pre>
+<p><a href="https://github.com/ernoaapa/eliot-os" target="_blank">EliotOS</a> is built with <a href="[EliotOS](https:/github.com/ernoaapa/eliot-os">Linuxkit</a> and you can view the Linuxkit configuration with <code>--dry-run</code> flag.</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device --dry-run]
+  &#x2713; Resolved Linuxkit config!
+  &#x2713; Resolved output: image.tar!
+kernel:
+  image: linuxkit/kernel:4.9.72
+  cmdline: &quot;console=tty0 console=ttyS0 console=ttyAMA0&quot;
+init:
+  - linuxkit/init:9250948d0de494df8a811edb3242b4584057cfe4
+  - linuxkit/runc:abc3f292653e64a2fd488e9675ace19a55ec7023
+  - linuxkit/containerd:e58a382c33bb509ba3e0e8170dfaa5a100504c5b
+  - linuxkit/ca-certificates:de21b84d9b055ad9dcecc57965b654a7a24ef8e0
+onboot:
+  - name: sysctl
+    image: linuxkit/sysctl:ce3bde5118a41092f1b7048c85d14fb35237ed45
+  - name: netdev
+    image: linuxkit/modprobe:1a192d168adadec47afa860e3fc874fbc2a823ff
+    # https://github.com/linuxkit/linuxkit/blob/master/docs/platform-rpi3.md#networking
+    command: [&quot;modprobe&quot;, &quot;smsc95xx&quot;]
+  - name: dhcpcd
+    image: linuxkit/dhcpcd:0d59a6cc03412289ef4313f2491ec666c1715cc9
+    # Halts until dhcpcd can resolve ip address
+    command: [&quot;/sbin/dhcpcd&quot;, &quot;--nobackground&quot;, &quot;-f&quot;, &quot;/dhcpcd.conf&quot;, &quot;-1&quot;]
+  - name: format
+    image: linuxkit/format:e945016ec780a788a71dcddc81497d54d3b14bc7
+  - name: mount-lib
+    image: linuxkit/mount:b346ec277b7074e5c9986128a879c10a1d18742b
+    command: [&quot;/usr/bin/mountie&quot;, &quot;/var/lib&quot;]
+    # Mount /var/log to the first found disk device
+  - name: mount-log
+    image: linuxkit/mount:b346ec277b7074e5c9986128a879c10a1d18742b
+    command: [&quot;/usr/bin/mountie&quot;, &quot;/var/log&quot;]
+
+services:
+  - name: getty
+    image: linuxkit/getty:22e27189b6b354e1d5d38fc0536a5af3f2adb79f
+    env:
+    # Makes the terminal open without password prompt
+     - INSECURE=true
+  - name: ntpd
+    image: linuxkit/openntpd:536e5947607c9e6a6771957c2ff817230cba0d3c
+  - name: dhcpcd
+    image: linuxkit/dhcpcd:0d59a6cc03412289ef4313f2491ec666c1715cc9
+
+  - name: eliotd
+    image: ernoaapa/eliotd:v0.2.2
+    command: [&quot;/eliotd&quot;, &quot;--debug&quot;, &quot;--grpc-api-listen&quot;, &quot;0.0.0.0:5000&quot;]
+    capabilities:
+      - all
+    net: host
+    pid: host
+    runtime:
+      mkdir: [&quot;/var/lib/volumes&quot;]
+    binds:
+      - /containers:/containers
+      - /var/lib/volumes:/var/lib/volumes
+      - /var/lib/containerd:/var/lib/containerd
+      - /run/containerd:/run/containerd
+      - /etc/resolv.conf:/etc/resolv.conf
+      - /etc/machine-id:/etc/machine-id
+      - /var/log:/var/log # To be able to serve default containers logs through api
+      - /tmp:/tmp # To be able to read temporary fifo log files
+files:
+  - path: /etc/issue
+    contents: &quot;welcome to EliotOS&quot;
+  - path: /etc/machine-id
+    contents: &quot;todo-generate&quot;
+    mode: &quot;0600&quot;
+trust:
+  org:
+    - linuxkit
+</code></pre>
+<p>If you want to customise the Linuxkit configuration before building</p>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device --dry-run &gt; custom-linuxkit.yml]
+# Edit the my-custom-linuxkit.yml -file...
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command eli build device custom-linuxkit.yml &gt; custom-image.tar]
+</code></pre>
+<h4 id="shell-piping"><a name="shell-piping" class="plugin-anchor" href="#shell-piping"><i class="fa fa-link" aria-hidden="true"></i></a>Shell piping</h4>
+<p>The build command supports shell piping; you can pipe-in the Linuxkit config and pipe-out the result tar image, to some other command. This is really handy specially if you wan&apos;t to make updating the device easy.</p>
+<p>For example, you want to:</p>
+<ul>
+<li>Change the hostname in Linuxkit config to include creation timestamp</li>
+<li>Build image for RaspberryPi3</li>
+<li>Unpack the package to sdcard in path <code>/Volumes/raspberrypi3</code></li>
+</ul>
+<p>The <code>custom-linuxkit.yml</code> includes:</p>
+<pre><code class="lang-yaml"><span class="hljs-comment"># ... snip ...</span>
+
+<span class="hljs-attr">files:</span>
+<span class="hljs-attr">  - path:</span> /etc/hostname
+<span class="hljs-attr">    contents:</span> MY-HOSTNAME
+<span class="hljs-attr">  - path:</span> /etc/issue
+
+<span class="hljs-comment"># ... snip ...</span>
+</code></pre>
+<pre><code class="lang-shell">**[terminal]
+**[prompt ernoaapa@mac]**[path ~]**[delimiter  $ ]**[command sed -e &quot;s/\MY-HOSTNAME/eliot-$(date +%s)/&quot; custom-linuxkit.yml \
+  | eli build device \
+  | tar xv -C /Volumes/raspberrypi3]
+</code></pre>
+<p>There&apos;s plenty of options how you can template the linuxkit file, for example <a href="https://github.com/subfuzion/envtpl" target="_blank">envtpl</a>. Use your  favourite.</p>
+<p><em>Pretty handy, ain&apos;t it? :D</em></p>
+<h4 id="how-it-works"><a name="how-it-works" class="plugin-anchor" href="#how-it-works"><i class="fa fa-link" aria-hidden="true"></i></a>How it works?</h4>
+<p>Linuxkit doesn&apos;t support building arm images on x86, but RaspberryPi is arm based computer.
+For building images, Eliot hosts <a href="https://github.com/ernoaapa/linuxkit-server" target="_blank">Linuxkit build server</a> and when you execute <code>eli build device</code>, it sends the config to <code>build.eliot.run</code> server, which builds the image on arm server and send it back as tar package.</p>
+<p>If you want to host and use your own build server, see the <a href="https://github.com/ernoaapa/linuxkit-server" target="_blank">Linuxkit build server documentation</a> and pass <code>--build-server http://my-custom-build-server.com</code> flag to build the image in your own server.</p>
+<script src="_gitbook_plugin_analytics.js"></script>
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="getting_started.html#core-concepts" class="navigation navigation-prev " aria-label="Previous page: Development in device">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="client.html#eli-get-devices" class="navigation navigation-next " aria-label="Next page: eli get devices">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"CLI client","level":"1.5","depth":1,"next":{"title":"eli get devices","level":"1.5.1","depth":2,"anchor":"#eli-get-devices","path":"client.md","ref":"client.md#eli-get-devices","articles":[]},"previous":{"title":"Development in device","level":"1.4.3","depth":2,"anchor":"#core-concepts","path":"getting_started.md","ref":"getting_started.md#core-concepts","articles":[]},"dir":"ltr"},"config":{"plugins":["insert-logo","analytics","terminal","anchors","github","include-html","easyseo"],"root":"./docs","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/ernoaapa/eliot"},"analytics":{"google":"UA-111964531-1"},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"include-html":{},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"easyseo":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"terminal":{"copyButtons":true,"fade":true,"style":"flat"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchors":{},"insert-logo":{"style":"background: none;","url":"https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-small.png"}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Eliot - Docker and Kubernetes inspired container platform for IoT devices","gitbook":">= 3.2.3"},"file":{"path":"client.md","mtime":"2018-06-25T13:00:35.181Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-27T12:04:53.961Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-insert-logo/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-terminal/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

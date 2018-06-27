@@ -1,0 +1,1041 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Introduction · Eliot - Docker and Kubernetes inspired container platform for IoT devices</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="Eliot is lightweight Kubernetes like system to manage containerized applications on IoT devices with an emphasis on simplicity, minimalicity and usability">
+		<meta name="keywords" content="IoT,container,Kubernetes,Docker,Eliot,containerd,runc,linuxkit,connected devices,devops,security">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-insert-logo/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-terminal/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="introduction.html" />
+    
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter active" data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="introduction.html">
+            
+                <a href="introduction.html">
+            
+                    
+                    Eliot
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="introduction.html">
+            
+                <a href="introduction.html#motivation">
+            
+                    
+                    Motivation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="introduction.html">
+            
+                <a href="introduction.html#use-cases">
+            
+                    
+                    Use Cases
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="introduction.html">
+            
+                <a href="introduction.html#eliot-vs-other">
+            
+                    
+                    Eliot vs. Other
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="installation.html">
+            
+                <a href="installation.html">
+            
+                    
+                    Installation
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="installation.html">
+            
+                <a href="installation.html#install-cli">
+            
+                    
+                    Install CLI
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="installation.html">
+            
+                <a href="installation.html#install-device">
+            
+                    
+                    Install device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="getting_started.html">
+            
+                <a href="getting_started.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Core Concepts
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="getting_started.html">
+            
+                <a href="getting_started.html#deploy-first-app">
+            
+                    
+                    Deploy first app
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Development in device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="client.html">
+            
+                <a href="client.html">
+            
+                    
+                    CLI client
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="client.html">
+            
+                <a href="client.html#eli-get-devices">
+            
+                    
+                    eli get devices
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="client.html">
+            
+                <a href="client.html#eli-run--i--t-image-command">
+            
+                    
+                    eli run
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="client.html">
+            
+                <a href="client.html#eli-up----command">
+            
+                    
+                    eli up
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="client.html">
+            
+                <a href="client.html#eli-create--f-fileyml">
+            
+                    
+                    eli create
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="client.html">
+            
+                <a href="client.html#eli-create-pod---image-image-ref-pod-name">
+            
+                    
+                    eli create pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="client.html">
+            
+                <a href="client.html#eli-get-pods">
+            
+                    
+                    eli get pods
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="client.html">
+            
+                <a href="client.html#eli-describe-pod-pod-name">
+            
+                    
+                    eli describe pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="client.html">
+            
+                <a href="client.html#eli-delete-pod-pod-name">
+            
+                    
+                    eli delete pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="client.html">
+            
+                <a href="client.html#eli-exec---container-id-pod-name----command">
+            
+                    
+                    eli exec
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="client.html">
+            
+                <a href="client.html#eli-attach--i---container-id-pod-name">
+            
+                    
+                    eli attach
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="client.html">
+            
+                <a href="client.html#eli-build-device">
+            
+                    
+                    eli build device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="configuration.html">
+            
+                <a href="configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="configuration.html">
+            
+                <a href="configuration.html#pod-specification">
+            
+                    
+                    Pod Specification
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="configuration.html">
+            
+                <a href="configuration.html#project-configuration">
+            
+                    
+                    Project Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="eliotos.html">
+            
+                <a href="eliotos.html">
+            
+                    
+                    EliotOS
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="contributing.html">
+            
+                <a href="contributing.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.8.1" data-path="contributing.html">
+            
+                <a href="contributing.html#development-getting-started">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.2" data-path="contributing.html">
+            
+                <a href="contributing.html#debugging">
+            
+                    
+                    Debugging
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" >
+            
+                <span>
+            
+                    
+                    Need help?
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.9.1" >
+            
+                <a target="_blank" href="https://gitter.im/eliot-run/Lobby">
+            
+                    
+                    Ask on Gitter
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.2" >
+            
+                <a target="_blank" href="https://github.com/ernoaapa/eliot/issues/new">
+            
+                    
+                    Create a GitHub issue
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Introduction</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                
+
+
+<p><img src="https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-medium.png" alt="Eliot"></p>
+<blockquote>
+<p>This is early alpha version! There are not all features yet implemented, not heavily tested with different devices and code might get large breaking changes until the first release.</p>
+</blockquote>
+<p><a href="https://github.com/ernoaapa/eliot" target="_blank">Eliot</a> is lightweight Kubernetes like system to manage containerized applications on IoT devices with an emphasis on simplicity, minimality, and usability. The goal is to give a simple way to develop, deploy and manage applications running in IoT device. Comparing to other traditional platforms, Eliot takes modern technologies from cloud to enable more DevOps way of working in IoT world.</p>
+<p>Eliot re-uses technologies and concepts from <a href="https://www.docker.com" target="_blank">Docker</a> and <a href="https://www.kubernetes.io" target="_blank">Kubernetes</a>. So if you&apos;re familiar with those, you find really easy to get started with Eliot.</p>
+<h2 id="see-it-in-action"><a name="see-it-in-action" class="plugin-anchor" href="#see-it-in-action"><i class="fa fa-link" aria-hidden="true"></i></a>See it in action!</h2>
+<style>
+  .asciicast iframe {
+    width: 100% !important;
+  }
+</style>
+<div class="asciicast-wrapper">
+  <script src="https://asciinema.org/a/vZcVZKEfAosSSrhWrJbmIqAd9.js" id="asciicast-vZcVZKEfAosSSrhWrJbmIqAd9" data-t="7" data-speed="2" async></script>
+</div>
+<p>Or check out <a href="https://medium.com/@aapaerno/announcing-eliot-container-platform-for-iot-devices-ad071e1917fd" target="_blank">this introduction article in Medium</a></p>
+<style>
+  @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i&subset=cyrillic,cyrillic-ext,latin-ext');
+  #mlb2-7315894,
+  #mlb2-7315894 *,
+  #mlb2-7315894 a:hover,
+  #mlb2-7315894 a:visited,
+  #mlb2-7315894 a:focus,
+  #mlb2-7315894 a:active {
+    overflow: visible;
+    position: static;
+    background: none;
+    border: none;
+    bottom: auto;
+    clear: none;
+    cursor: default;
+    float: none;
+    letter-spacing: normal;
+    line-height: normal;
+    text-align: left;
+    text-indent: 0;
+    text-transform: none;
+    visibility: visible;
+    white-space: normal;
+    max-height: none;
+    max-width: none;
+    left: auto;
+    min-height: 0;
+    min-width: 0;
+    right: auto;
+    top: auto;
+    width: auto;
+    z-index: auto;
+    text-shadow: none;
+    box-shadow: none;
+    outline: medium none;
+  }
+
+  #mlb2-7315894 a:hover {
+    cursor: pointer !important;
+  }
+
+  #mlb2-7315894 h4 {
+    font-weight: normal;
+  }
+
+  #mlb2-7315894 .subscribe-form {
+    padding: 20px;
+    border: 2px solid #F6F6F6 !important;
+    background: #f6f6f6 none !important;
+    border-radius: 0px !important;
+    box-sizing: border-box !important;
+  }
+
+  #mlb2-7315894 .ml-block-form {
+    margin-bottom: 0px;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section {
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section.mb10 {
+    margin-bottom: 10px;
+    float: left;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section.mb0 {
+    margin-bottom: 0px;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section h4 {
+    margin: 0px 0px 10px 0px !important;
+    padding: 0px !important;
+    color: #000000 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 28px !important;
+    line-height: 100%;
+    text-align: left !important;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section p,
+  #mlb2-7315894 .subscribe-form .form-section li {
+    line-height: 150%;
+    padding: 0px !important;
+    margin: 0px 0px 10px 0px;
+    color: #000000 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 14px !important;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section a {
+    font-size: 14px !important;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .confirmation_checkbox {
+    line-height: 150%;
+    padding: 0px !important;
+    margin: 0px 0px 15px 0px !important;
+    color: #000000 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .confirmation_checkbox input[type="checkbox"] {
+    margin-right: 5px !important;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .form-group {
+    margin-bottom: 15px;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .form-group label {
+    float: left;
+    margin-bottom: 10px;
+    width: 100%;
+    line-height: 100%;
+    color: #000000 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 14px !important;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .checkbox {
+    width: 100%;
+    margin: 0px 0px 10px 0px;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .checkbox label {
+    color: #000000 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 14px !important;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .checkbox input {
+    margin: 0px 5px 0px 0px;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section .checkbox input[type=checkbox] {
+    -webkit-appearance: checkbox;
+    opacity: 1;
+  }
+
+  #mlb2-7315894.ml-subscribe-form .form-group .form-control {
+    width: 100%;
+    font-size: 13px;
+    padding: 10px 10px;
+    height: auto;
+    font-family: Arial;
+    border-radius: 0px;
+    border: 1px solid #cccccc !important;
+    color: #000000 !important;
+    background-color: #FFFFFF !important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    clear: left;
+  }
+
+  #mlb2-7315894.ml-subscribe-form button {
+    border: none !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    border-radius: 0px !important;
+    height: 40px !important;
+    background-color: #48c4d9 !important;
+    color: #FFFFFF !important;
+    font-family: 'Arial', sans-serif !important;
+    font-size: 16px !important;
+    text-align: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: relative!important;
+  }
+
+  #mlb2-7315894.ml-subscribe-form button.gradient-on {
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
+    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
+    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
+    background: linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
+  }
+
+  #mlb2-7315894.ml-subscribe-form button.gradient-on:hover {
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+    background: linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+  }
+
+  #mlb2-7315894.ml-subscribe-form button[disabled] {
+    cursor: not-allowed!important;
+  }
+
+  #mlb2-7315894.ml-subscribe-form .form-section.ml-error label {
+    color: red!important;
+  }
+
+  #mlb2-7315894.ml-subscribe-form .form-group.ml-error label {
+    color: red!important;
+  }
+
+  #mlb2-7315894.ml-subscribe-form .form-group.ml-error .form-control {
+    border-color: red!important;
+  }
+
+  @media (max-width: 768px) {
+    #mlb2-7315894 {
+      width: 100% !important;
+    }
+    #mlb2-7315894 form.ml-block-form,
+    #mlb2-7315894.ml-subscribe-form .subscribe-form {
+      width: 100% !important;
+    }
+  }
+
+  #mlb2-7315894 .subscribe-form.horizontal {
+    padding-bottom: 0px;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section.horizontal {
+    float: left;
+    margin-bottom: 5px;
+    width: 70%;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section.horizontal .form-group {
+    float: left;
+    width: 100%;
+    padding-right: 10px;
+    box-sizing: border-box;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section.horizontal .form-group .form-control {
+    height: 40px;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section.horizontal.ml-button-position {
+    width: 30%;
+    padding: 0;
+  }
+
+  #mlb2-7315894 .subscribe-form .form-section.horizontal.ml-button-position.top-padding {
+    padding-top: 24px;
+  }
+
+  @media (max-width: 768px) {
+    #mlb2-7315894.ml-subscribe-form .subscribe-form .form-section.horizontal {
+      float: none;
+    }
+    #mlb2-7315894.ml-subscribe-form .subscribe-form .form-section.horizontal,
+    #mlb2-7315894.ml-subscribe-form .subscribe-form .form-section.horizontal.ml-button-position,
+    #mlb2-7315894.ml-subscribe-form .subscribe-form .form-section.horizontal .form-group {
+      width: 100%;
+      padding: 0;
+    }
+    #mlb2-7315894 .subscribe-form .form-section.horizontal.ml-button-position {
+      margin-bottom: 20px;
+    }
+  }
+</style>
+<div id="mlb2-7315894" class="ml-subscribe-form ml-subscribe-form-7315894">
+  <div class="ml-vertical-align-center">
+    <div class="subscribe-form ml-block-success" style="display:none">
+      <div class="form-section">
+        <h4 id="want-to-know-when-out">Want to know when out?</h4>
+        <p>Thank you! You have successfully subscribed to Eliot newsletter.</p>
+      </div>
+    </div>
+    <form class="ml-block-form" action="https://app.mailerlite.com/webforms/submit/v9i7b7" data-id="704344" data-code="v9i7b7" method="POST" target="_blank">
+      <div class="subscribe-form horizontal">
+        <div class="form-section mb10">
+          <h4 id="stay-up-to-date-with-latest">Stay up to date with latest</h4>
+          <p>Join our newsletter and we let you know when we release something cool! #noSpamWePromise</p>
+        </div>
+        <div class="form-section horizontal">
+          <div class="form-group ml-field-email ml-validate-required ml-validate-email">
+            <input type="email" name="fields[email]" class="form-control" placeholder="Email*" value="" autocomplete="email" x-autocompletetype="email" spellcheck="false" autocapitalize="off" autocorrect="off">
+          </div>
+        </div>
+        <div class="form-section horizontal ml-button-position">
+          <button type="submit" class="primary">
+            Subscribe
+          </button>
+          <button disabled="disabled" style="display: none;" type="button" class="loading">
+            <img src="https://static.mailerlite.com/images/rolling@2x.gif" width="20" height="20" style="width: 20px; height: 20px;">
+          </button>
+        </div>
+        <div class="clearfix" style="clear: both;"></div>
+        <input type="hidden" name="ml-submit" value="1">
+      </div>
+    </form>
+    <script>
+      function ml_webform_success_7315894() {
+        var $ = ml_jQuery || jQuery;
+
+        $('.ml-subscribe-form-7315894 .ml-block-success').show();
+        $('.ml-subscribe-form-7315894 .ml-block-form').hide();
+      };
+    </script>
+  </div>
+</div>
+<script type="text/javascript" src="https://static.mailerlite.com/js/w/webforms.min.js?v3772b61f1ec61c541c401d4eadfdd02f"></script>
+<p><sub>Built with &#x2764;&#xFE0E; by <a href="https://github.com/ernoaapa" target="_blank">Erno Aapa</a> and <a href="https://github.com/ernoaapa/eliot/contributors" target="_blank">contributors</a></sub></p>
+<script src="_gitbook_plugin_analytics.js"></script>
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                
+                <a href="introduction.html" class="navigation navigation-next navigation-unique" aria-label="Next page: Eliot">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Introduction","level":"1.1","depth":1,"next":{"title":"Eliot","level":"1.2","depth":1,"path":"introduction.md","ref":"introduction.md","articles":[{"title":"Motivation","level":"1.2.1","depth":2,"anchor":"#motivation","path":"introduction.md","ref":"introduction.md#motivation","articles":[]},{"title":"Use Cases","level":"1.2.2","depth":2,"anchor":"#use-cases","path":"introduction.md","ref":"introduction.md#use-cases","articles":[]},{"title":"Eliot vs. Other","level":"1.2.3","depth":2,"anchor":"#eliot-vs-other","path":"introduction.md","ref":"introduction.md#eliot-vs-other","articles":[]}]},"dir":"ltr"},"config":{"plugins":["insert-logo","analytics","terminal","anchors","github","include-html","easyseo"],"root":"./docs","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/ernoaapa/eliot"},"analytics":{"google":"UA-111964531-1"},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"include-html":{},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"easyseo":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"terminal":{"copyButtons":true,"fade":true,"style":"flat"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchors":{},"insert-logo":{"style":"background: none;","url":"https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-small.png"}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Eliot - Docker and Kubernetes inspired container platform for IoT devices","gitbook":">= 3.2.3"},"file":{"path":"README.md","mtime":"2018-06-27T12:03:32.698Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-27T12:04:53.961Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-insert-logo/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-terminal/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

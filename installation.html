@@ -1,0 +1,781 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Installation · Eliot - Docker and Kubernetes inspired container platform for IoT devices</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-insert-logo/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-terminal/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="installation.html" />
+    
+    
+    <link rel="prev" href="introduction.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="introduction.html">
+            
+                <a href="introduction.html">
+            
+                    
+                    Eliot
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="introduction.html">
+            
+                <a href="introduction.html#motivation">
+            
+                    
+                    Motivation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="introduction.html">
+            
+                <a href="introduction.html#use-cases">
+            
+                    
+                    Use Cases
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="introduction.html">
+            
+                <a href="introduction.html#eliot-vs-other">
+            
+                    
+                    Eliot vs. Other
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3" data-path="installation.html">
+            
+                <a href="installation.html">
+            
+                    
+                    Installation
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="installation.html">
+            
+                <a href="installation.html#install-cli">
+            
+                    
+                    Install CLI
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="installation.html">
+            
+                <a href="installation.html#install-device">
+            
+                    
+                    Install device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="getting_started.html">
+            
+                <a href="getting_started.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Core Concepts
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="getting_started.html">
+            
+                <a href="getting_started.html#deploy-first-app">
+            
+                    
+                    Deploy first app
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="getting_started.html">
+            
+                <a href="getting_started.html#core-concepts">
+            
+                    
+                    Development in device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="client.html">
+            
+                <a href="client.html">
+            
+                    
+                    CLI client
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="client.html">
+            
+                <a href="client.html#eli-get-devices">
+            
+                    
+                    eli get devices
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="client.html">
+            
+                <a href="client.html#eli-run--i--t-image-command">
+            
+                    
+                    eli run
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="client.html">
+            
+                <a href="client.html#eli-up----command">
+            
+                    
+                    eli up
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="client.html">
+            
+                <a href="client.html#eli-create--f-fileyml">
+            
+                    
+                    eli create
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="client.html">
+            
+                <a href="client.html#eli-create-pod---image-image-ref-pod-name">
+            
+                    
+                    eli create pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="client.html">
+            
+                <a href="client.html#eli-get-pods">
+            
+                    
+                    eli get pods
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="client.html">
+            
+                <a href="client.html#eli-describe-pod-pod-name">
+            
+                    
+                    eli describe pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="client.html">
+            
+                <a href="client.html#eli-delete-pod-pod-name">
+            
+                    
+                    eli delete pod
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="client.html">
+            
+                <a href="client.html#eli-exec---container-id-pod-name----command">
+            
+                    
+                    eli exec
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="client.html">
+            
+                <a href="client.html#eli-attach--i---container-id-pod-name">
+            
+                    
+                    eli attach
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="client.html">
+            
+                <a href="client.html#eli-build-device">
+            
+                    
+                    eli build device
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="configuration.html">
+            
+                <a href="configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="configuration.html">
+            
+                <a href="configuration.html#pod-specification">
+            
+                    
+                    Pod Specification
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="configuration.html">
+            
+                <a href="configuration.html#project-configuration">
+            
+                    
+                    Project Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="eliotos.html">
+            
+                <a href="eliotos.html">
+            
+                    
+                    EliotOS
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="contributing.html">
+            
+                <a href="contributing.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.8.1" data-path="contributing.html">
+            
+                <a href="contributing.html#development-getting-started">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.2" data-path="contributing.html">
+            
+                <a href="contributing.html#debugging">
+            
+                    
+                    Debugging
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" >
+            
+                <span>
+            
+                    
+                    Need help?
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.9.1" >
+            
+                <a target="_blank" href="https://gitter.im/eliot-run/Lobby">
+            
+                    
+                    Ask on Gitter
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.2" >
+            
+                <a target="_blank" href="https://github.com/ernoaapa/eliot/issues/new">
+            
+                    
+                    Create a GitHub issue
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Installation</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="installation"><a name="installation" class="plugin-anchor" href="#installation"><i class="fa fa-link" aria-hidden="true"></i></a>Installation</h1>
+<blockquote>
+<p>At the moment Eliot is tested only on RaspberryPI 3b, but installing it to other environments should be pretty straight forward. If you happen to test in some other device, <a href="https://github.com/ernoaapa/eliot/issues/new" target="_blank">please let us know!</a></p>
+</blockquote>
+<h2 id="install-cli"><a name="install-cli" class="plugin-anchor" href="#install-cli"><i class="fa fa-link" aria-hidden="true"></i></a>Install CLI</h2>
+<p>Eliot client, called <code>eli</code>, is just a binary what you can download from <a href="https://github.com/ernoaapa/eliot/releases" target="_blank">Eliot releases</a>.</p>
+<h3 id="macos"><a name="macos" class="plugin-anchor" href="#macos"><i class="fa fa-link" aria-hidden="true"></i></a>MacOS</h3>
+<ol>
+<li><code>brew install ernoaapa/eliot/eli</code></li>
+<li>Test <code>eli --version</code></li>
+</ol>
+<h3 id="linux"><a name="linux" class="plugin-anchor" href="#linux"><i class="fa fa-link" aria-hidden="true"></i></a>Linux</h3>
+<ol>
+<li>Download <code>eli</code> binary from <a href="https://github.com/ernoaapa/eliot/releases" target="_blank">releases</a></li>
+<li>Place it into your $PATH</li>
+<li>Test <code>eli --version</code></li>
+</ol>
+<h2 id="install-device"><a name="install-device" class="plugin-anchor" href="#install-device"><i class="fa fa-link" aria-hidden="true"></i></a>Install device</h2>
+<p>There&apos;s three options for device installation</p>
+<ol>
+<li><a href="installation.html#eliotos-on-raspberrypi3">Use EliotOS on RaspberryPI 3</a></li>
+<li><a href="installation.html#debian-raspbian-installation">Use Debian linux (e.g. Raspbian) and use deb packages</a></li>
+<li><a href="installation.html#manual-installation">Manual installation to any linux</a></li>
+</ol>
+<h3 id="eliotos-on-raspberrypi3"><a name="eliotos-on-raspberrypi3" class="plugin-anchor" href="#eliotos-on-raspberrypi3"><i class="fa fa-link" aria-hidden="true"></i></a>EliotOS on RaspberryPI3</h3>
+<p>By far the easiest and most secure way to use Eliot is by using <a href="eliotos.html">EliotOS</a>. EliotOS is minimal Linux Operating System, built with <a href="https://github.com/linuxkit/linuxkit" target="_blank">linuxkit</a>, which contains only minimal components to run Eliot which are Linux kernel, <code>runc</code>, <code>containerd</code> and <code>eliotd</code> daemon. Check the <a href="eliotos.html">EliotOS</a> section for more info.</p>
+<p><code>eli</code> provides <a href="client.html#eli-build-device">build command</a> to build <a href="eliotos.html">EliotOS</a> for RaspberryPI3 and install it to the sdcard.</p>
+<ol>
+<li>Format sdcard as you would normally</li>
+<li>Mount it to for example <code>/Volumes/rpi3</code></li>
+<li>Build image and unpack it to the directory <code>eli build device | tar xv -C /Volumes/rpi3</code></li>
+<li>Unmount the disk</li>
+<li>Connect RaspberryPI with ethernet cable to same network with your laptop and power on!</li>
+<li>In less than 10s you should see the device with command <code>eli get devices</code></li>
+<li>And that&apos;s it! &#x263A;</li>
+</ol>
+<p>Next step is to follow <a href="getting_started.html#deploy-first-app">getting started guide</a> and deploy first app!</p>
+<h3 id="debian-raspbian-installation"><a name="debian-raspbian-installation" class="plugin-anchor" href="#debian-raspbian-installation"><i class="fa fa-link" aria-hidden="true"></i></a>Debian (Raspbian) installation</h3>
+<p>Eliot provides deb packages through packagecloud for Debian linux, for example Raspbian, to install Eliot and all dependencies.</p>
+<p><a href="https://packagecloud.io/ernoaapa/eliot" target="_blank"><img height="46" width="158" alt="Eliot DEB Repository &#xB7; packagecloud" src="https://packagecloud.io/images/packagecloud-badge.png"></a></p>
+<pre><code class="lang-shell"># Install eliot deb repository
+curl -s https://packagecloud.io/install/repositories/ernoaapa/eliot/script.deb.sh | sudo bash
+
+# Install Eliot and dependencies
+sudo apt-get install -y eliot
+
+# Start the services
+sudo systemctl start containerd &amp;&amp; sudo systemctl enable containerd
+sudo systemctl start eliotd &amp;&amp; sudo systemctl enable eliotd
+</code></pre>
+<p>That&apos;s it! Now try running <code>eli get nodes</code> in your local computer and you should see your device!</p>
+<h3 id="manual-installation"><a name="manual-installation" class="plugin-anchor" href="#manual-installation"><i class="fa fa-link" aria-hidden="true"></i></a>Manual installation</h3>
+<ul>
+<li>Build and install <a href="https://github.com/opencontainers/runc" target="_blank">runc</a></li>
+<li>Build and install and run <a href="https://github.com/containerd/containerd" target="_blank">containerd</a></li>
+<li>Build and install and run <a href="https://github.com/ernoaapa/eliot" target="_blank">eliotd</a></li>
+</ul>
+<script src="_gitbook_plugin_analytics.js"></script>
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="introduction.html#eliot-vs-other" class="navigation navigation-prev " aria-label="Previous page: Eliot vs. Other">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="installation.html#install-cli" class="navigation navigation-next " aria-label="Next page: Install CLI">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Installation","level":"1.3","depth":1,"next":{"title":"Install CLI","level":"1.3.1","depth":2,"anchor":"#install-cli","path":"installation.md","ref":"installation.md#install-cli","articles":[]},"previous":{"title":"Eliot vs. Other","level":"1.2.3","depth":2,"anchor":"#eliot-vs-other","path":"introduction.md","ref":"introduction.md#eliot-vs-other","articles":[]},"dir":"ltr"},"config":{"plugins":["insert-logo","analytics","terminal","anchors","github","include-html","easyseo"],"root":"./docs","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/ernoaapa/eliot"},"analytics":{"google":"UA-111964531-1"},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"include-html":{},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"easyseo":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"terminal":{"copyButtons":true,"fade":true,"style":"flat"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchors":{},"insert-logo":{"style":"background: none;","url":"https://raw.githubusercontent.com/ernoaapa/eliot/master/docs/eliot-logo-small.png"}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Eliot - Docker and Kubernetes inspired container platform for IoT devices","gitbook":">= 3.2.3"},"file":{"path":"installation.md","mtime":"2018-06-25T13:00:35.181Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-27T12:04:53.961Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-insert-logo/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-terminal/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
