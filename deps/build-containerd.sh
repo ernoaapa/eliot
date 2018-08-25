@@ -4,7 +4,7 @@
 
 set -eu
 
-CONTAINERD_VERSION="v1.1.0"
+CONTAINERD_VERSION="v1.1.3"
 RUNC_DEP_VERSION="1.0.0-rc4+a618ab5a"
 BUILD_DIR=/tmp/build
 ELIOT_SRC_DIR=$(pwd)
