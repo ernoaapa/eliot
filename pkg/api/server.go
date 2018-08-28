@@ -221,7 +221,7 @@ func (s *Server) Exec(server containers.Containers_ExecServer) error {
 		return fmt.Errorf("You must define 'args' metadata")
 	}
 
-	log.Debugf("Execute command [%s](tty: %s) in container [%s] in namespace [%s]", strings.Join(args, " "), tty, containerID, namespace)
+	log.Debugf("Execute command [%s](tty: %t) in container [%s] in namespace [%s]", strings.Join(args, " "), tty, containerID, namespace)
 	return s.client.Exec(
 		namespace,
 		containerID,

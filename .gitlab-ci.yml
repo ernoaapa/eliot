@@ -1,4 +1,4 @@
-image: golang:1.10-stretch
+image: golang:1.11-stretch
 
 variables:
   REPO_NAME: github.com/ernoaapa/eliot

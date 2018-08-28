@@ -41,7 +41,7 @@ Eliot is built from following components
 
 ### Prerequisites
 - [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Install Golang 1.10](https://golang.org/doc/install)
+- [Install Golang 1.11](https://golang.org/doc/install)
 - [Install Docker](https://docs.docker.com/install/)
 - [Install Linuxkit](https://github.com/linuxkit/linuxkit#build-the-linuxkit-tool)
 - [Install goreleaser](https://goreleaser.com/#introduction.installing_goreleaser) (for building `eliotd`)
