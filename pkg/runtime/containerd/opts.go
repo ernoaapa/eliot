@@ -30,6 +30,37 @@ func WithEnv(overrides []string) oci.SpecOpts {
 	}
 }
 
+// setLinux sets Linux to empty if unset
+func setLinux(s *specs.Spec) {
+	if s.Linux == nil {
+		s.Linux = &specs.Linux{}
+	}
+}
+
+
+func WithDevice(deviceType string, majorId int64, minorId int64) oci.SpecOpts {
+	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
+		setLinux(s)
+		if s.Linux.Resources == nil {
+			s.Linux.Resources = &specs.LinuxResources{}
+		}
+		intptr := func(i int64) *int64 {
+			return &i
+		}
+		s.Linux.Resources.Devices = append(s.Linux.Resources.Devices, []specs.LinuxDeviceCgroup{
+			{
+				Type:   deviceType,
+				Major:  intptr(majorId),
+				Minor:  intptr(minorId),
+				Access: "rwm",
+				Allow:  true,
+			},
+		}...
+		)
+		return nil
+	}
+}
+
 // replaceOrAppendEnvValues returns the defaults with the overrides either
 // replaced by env key or appended to the list
 func replaceOrAppendEnvValues(defaults, overrides []string) []string {

@@ -60,6 +60,7 @@ func MapContainerToInternalModel(container containers.Container) model.Container
 		WorkingDir: processWorkingDir(container),
 		Pipe:       mapPipeToInternalModel(container),
 		Mounts:     mapMountsToInternalModel(container),
+		Devices:	mapDevicesToInternalModel(container),
 	}
 }
 
@@ -143,6 +144,32 @@ func mapMountsToInternalModel(container containers.Container) (result []model.Mo
 			Source:      mount.Source,
 			Destination: mount.Destination,
 			Options:     mount.Options,
+		})
+	}
+	return result
+}
+
+
+func mapDevicesToInternalModel(container containers.Container) (result []model.Device) {
+	spec, err := getSpec(container)
+	if err != nil {
+		log.Fatalf("Cannot read container spec to resolve container devices: %s", err)
+		return result
+	}
+
+	ptrint32 := func(i *int64) uint32 {
+		if (i == nil) {
+			return uint32(0);
+		}
+		return uint32(*i)
+	}
+
+	for _, device := range spec.Linux.Resources.Devices {
+		//log.Debugf("%p", device.Major)
+		result = append(result, model.Device{
+			DeviceType:  device.Type,
+			MajorId:     ptrint32(device.Major),
+			MinorId:     ptrint32(device.Minor),
 		})
 	}
 	return result

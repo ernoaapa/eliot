@@ -46,3 +46,17 @@ func TestValidationRequiresContainerFields(t *testing.T) {
 		Image: "/foo",
 	}), "should return error if container image reference is invalid")
 }
+func TestContainerDevices(t *testing.T) {
+	container := Container{
+		Name:  "foo",
+		Image: "docker.io/eaapa/hello-world:latest",
+		Devices: []Device{
+			Device{
+				DeviceType : "c",
+				MajorId: 555,
+				MinorId: 0,
+			},
+		},
+	}
+	assert.Equal(t, len(container.Devices), 1, "should return 1")
+}
