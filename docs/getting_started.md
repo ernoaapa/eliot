@@ -41,7 +41,7 @@ NAMESPACE   NAME          CONTAINERS   STATUS
 ```
 Pod listing should be empty.
 
-Now let's deploy [eaapa/hello-world](https://hub.docker.com/eaapa/hello-world) image, that just prints _Hello World_ text.
+Now let's deploy [eaapa/hello-world](https://hub.docker.com/r/eaapa/hello-world) image, that just prints _Hello World_ text.
 ```shell
 eli create pod --image eaapa/hello-world testing
 **[terminal]
