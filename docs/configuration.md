@@ -1,7 +1,7 @@
 # Configuration
 
 ## Pod Specification
-When you need to deploy same Pods to multiple devices, you don't want to run multiple `eli create` commands with `--image` etc. flags. Easier way is to create Yaml file which describes all Pods and run `create -f <file.yml>
+When you need to deploy same Pods to multiple devices, you don't want to run multiple `eli create` commands with `--image` etc. flags. Easier way is to create Yaml file which describes all Pods and run `create -f <file.yml>`
 
 Here's simple yaml specification
 ```yml

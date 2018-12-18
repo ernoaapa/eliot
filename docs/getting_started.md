@@ -17,7 +17,7 @@ If you're familiar with [Kubernetes definition of _Pod_](https://kubernetes.io/d
 A Pod wraps application container (or, in some cases, multiple containers) and gives configuration options like host network, restart policy, etc. All containers in same Pod are meant to get started, deployed, and deleted together.
 
 ## Deploy first app
-Assuming that you already complete installation of `eli` client and `eliot` agent. If not, check the[installation guide](installation.md) and come back after finishing it.  
+Assuming that you already complete installation of `eli` client and `eliot` agent. If not, check the [installation guide](installation.md) and come back after finishing it.  
 
 When you have connected RaspberryPI to network and power it on, first step is to check that Eliot can discover and connect to the device.
 ```shell
@@ -41,7 +41,7 @@ NAMESPACE   NAME          CONTAINERS   STATUS
 ```
 Pod listing should be empty.
 
-Now let's deploy [eaapa/hello-world](https://hub.docker.com/eaapa/hello-world) image, that just prints _Hello World_ text.
+Now let's deploy [eaapa/hello-world](https://hub.docker.com/r/eaapa/hello-world) image, that just prints _Hello World_ text.
 ```shell
 eli create pod --image eaapa/hello-world testing
 **[terminal]
