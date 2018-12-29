@@ -184,6 +184,15 @@ func (c *ContainerdClient) CreateContainer(pod model.Pod, container model.Contai
 		specOpts = append(specOpts, opts.WithMounts(container.Mounts))
 	}
 
+	log.Debugf("I am before devices")
+	if (len(container.Devices) > 0) {
+		for _, dev := range container.Devices {
+			log.Debugf("Adding device to container...")
+			specOpts = append(specOpts, opts.WithDevice(dev.DeviceType, int64(dev.MajorId), int64(dev.MinorId)))
+		}
+	}
+	log.Debugf("I am behind devices")
+
 	if pod.Spec.HostNetwork {
 		specOpts = append(specOpts,
 			oci.WithHostNamespace(specs.NetworkNamespace),

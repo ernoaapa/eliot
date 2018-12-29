@@ -39,6 +39,7 @@ func MapContainerToInternalModel(containers []*containers.Container) (result []m
 			Args:       container.Args,
 			Env:        container.Env,
 			WorkingDir: container.WorkingDir,
+			Devices:	mapDeviceToInternalModel(container.Devices),
 			Mounts:     mapMountsToInternalModel(container.Mounts),
 			Pipe:       mapPipeToInternalModel(container.Pipe),
 		})
@@ -67,6 +68,17 @@ func mapMountsToInternalModel(mounts []*containers.Mount) (result []model.Mount)
 			Source:      mount.Source,
 			Destination: mount.Destination,
 			Options:     mount.Options,
+		})
+	}
+	return result
+}
+
+func mapDeviceToInternalModel(devices []*containers.Device) (result []model.Device) {
+	for _, device := range devices {
+		result = append(result, model.Device{
+			DeviceType:  device.DeviceType,
+			MinorId:     device.Minorid,
+			MajorId:     device.Majorid,
 		})
 	}
 	return result

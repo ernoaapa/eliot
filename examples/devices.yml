@@ -1,0 +1,10 @@
+metadata:
+  name: "test"
+spec:
+  containers:
+    - name: "busybox"
+      image: "docker.io/library/busybox:latest"
+      devices:
+        - DeviceType: "c"
+          MajorId: 555
+          MinorId: 0
