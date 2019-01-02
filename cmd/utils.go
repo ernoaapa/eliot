@@ -194,8 +194,8 @@ func GetRuntimeClient(clicontext *cli.Context, hostname string) runtime.Client {
 	return runtime.NewContainerdClient(
 		context.Background(),
 		clicontext.GlobalDuration("timeout"),
-		clicontext.GlobalString("containerd"),
 		clicontext.String("containerd-snapshotter"),
+		clicontext.GlobalString("containerd"),
 		hostname,
 	)
 }

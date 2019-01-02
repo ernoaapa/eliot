@@ -1,4 +1,4 @@
-image: golang:1.10-stretch
+image: golang:1.11-stretch
 
 variables:
   REPO_NAME: github.com/ernoaapa/eliot
@@ -25,7 +25,8 @@ build:
     - arm64
   script:
     - ./build/install-build-tools.sh
-    - goreleaser --snapshot
+    - mkdir $(pwd)/.tmp
+    - TMPDIR="$(pwd)/.tmp" goreleaser --snapshot
   artifacts:
     paths:
     - dist/
