@@ -22,7 +22,7 @@
   * [eli delete pod](client.md#eli-delete-pod-pod-name)
   * [eli exec](client.md#eli-exec---container-id-pod-name----command)
   * [eli attach](client.md#eli-attach--i---container-id-pod-name)
-  * [eli build device](client.md#eli-build-device)
+  * [eli build device](client.md#eli-build-device---format-img--tar)
 * [Configuration](configuration.md)
   * [Pod Specification](configuration.md#pod-specification)
   * [Project Configuration](configuration.md#project-configuration)

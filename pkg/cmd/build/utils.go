@@ -50,8 +50,8 @@ func ResolveLinuxkitConfig(source string) (linuxkit []byte, err error) {
 
 // BuildImage builds given Linuxkit config and returns the image as io.ReadClose or error
 // Note: you must call image.Close()
-func BuildImage(serverURL, outputType string, config []byte) (io.ReadCloser, error) {
-	res, err := http.Post(fmt.Sprintf("%s/linuxkit/%s/build/%s", serverURL, "eli-cli", outputType), "application/yml", bytes.NewReader(config))
+func BuildImage(serverURL, outputType, outputFormat string, config []byte) (io.ReadCloser, error) {
+	res, err := http.Post(fmt.Sprintf("%s/linuxkit/%s/build/%s?output=%s", serverURL, "eli-cli", outputType, outputFormat), "application/yml", bytes.NewReader(config))
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while making request to Linuxkit build server")
 	}

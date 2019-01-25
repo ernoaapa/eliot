@@ -57,7 +57,7 @@ func TestBuildImage(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	image, err := BuildImage(ts.URL, "rpi3", exampleLinuxkitConfig)
+	image, err := BuildImage(ts.URL, "rpi3", "img", exampleLinuxkitConfig)
 	assert.NoError(t, err)
 
 	tar, err := ioutil.ReadAll(image)
@@ -73,6 +73,6 @@ func TestBuildImageReturnErrorMessage(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	_, err := BuildImage(ts.URL, "rpi3", exampleLinuxkitConfig)
+	_, err := BuildImage(ts.URL, "rpi3", "tar", exampleLinuxkitConfig)
 	assert.True(t, strings.Contains(err.Error(), "This is the error"))
 }
